@@ -39,5 +39,10 @@
     "hooks": {
       "pre-commit": "npm run pre-commit"
     }
-  }
+  },
+  "browserslist": [
+    "last 2 years",
+    "> 1%",
+    "not dead"
+  ]
 }
