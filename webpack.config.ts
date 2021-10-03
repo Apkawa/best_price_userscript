@@ -23,7 +23,7 @@ function getExtraInfo(data: BannerDataType) {
   if (typeof supportUrl !== 'string') {
     supportUrl = supportUrl?.url
   }
-  let downloadUrl = `${packageJson.repository}/raw/master/${data.chunk.name}.js`
+  let downloadUrl = `${packageJson.repository}/raw/master/dist/${data.chunk.name}.js`
   let author = packageJson.author
   if (typeof author !== "string") {
     author = author?.name
