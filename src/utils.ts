@@ -1,27 +1,28 @@
-export function getElementByXpath(xpath: string, root: Node = document): Node | null {
-  return document.evaluate(
+export function getElementByXpath(xpath: string, root: Node = document): HTMLElement | null {
+  const e = document.evaluate(
     xpath, root,
     null,
     XPathResult.FIRST_ORDERED_NODE_TYPE,
     null).singleNodeValue;
+  return e && e as HTMLElement
 }
 
-export function getElementsByXpath(xpath: string, root: Node = document): Node[] {
+export function getElementsByXpath(xpath: string, root: Node = document): HTMLElement[] {
   const iterator = document.evaluate(
     xpath, root,
     null,
     XPathResult.ORDERED_NODE_ITERATOR_TYPE,
     null);
-  let result = []
+  let result: HTMLElement[] = []
   let el = iterator.iterateNext();
   while (el) {
-    result.push(el)
+    result.push(el as HTMLElement)
     el = iterator.iterateNext();
   }
   return result
 }
 
-export function waitElement(match: (el: Node) => boolean, callback: () => void): () => void {
+export function waitElement(match: (el: HTMLElement) => boolean, callback: () => void): () => void {
   let observer = new MutationObserver((mutations) => {
     let matchFlag = false
     mutations.forEach((mutation) => {
@@ -29,7 +30,7 @@ export function waitElement(match: (el: Node) => boolean, callback: () => void):
       for (let i = 0; i < mutation.addedNodes.length; i++) {
         // do things to your newly added nodes here
         let node = mutation.addedNodes[i]
-        matchFlag = match(node)
+        matchFlag = match(node as HTMLElement)
       }
     })
     if (matchFlag) {

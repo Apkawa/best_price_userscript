@@ -2,6 +2,10 @@ import webpack from "webpack";
 import path from "path";
 import fs from "fs";
 import glob from "glob";
+import TerserPlugin from "terser-webpack-plugin"
+import {PackageJson} from "type-fest";
+
+const packageJson: PackageJson = require("./package.json")
 
 function collectUserScripts() {
   let root = path.resolve(__dirname, "src");
@@ -11,6 +15,64 @@ function collectUserScripts() {
     let name = `${path.dirname(relPath)}/${bName}`
     return [name, f]
   }))
+}
+
+
+
+// @homepage     https://github.com/Apkawa/userscripts
+// @homepageUrl  https://github.com/Apkawa/userscripts
+// @supportUrl   https://github.com/Apkawa/userscripts/issues/
+// @downloadUrl  https://github.com/Apkawa/userscripts/raw/gh-pages/pikabu.ru/video_url.user.js
+// @updateUrl    https://github.com/Apkawa/userscripts/raw/gh-pages/pikabu.ru/video_url.user.js
+
+function getExtraInfo(data: BannerDataType) {
+  let homepage = packageJson.homepage
+  let supportUrl = packageJson.bugs
+  if (typeof supportUrl !== 'string') {
+    supportUrl = supportUrl?.url
+  }
+  let downloadUrl = `${packageJson.repository}/raw/gh-pages/${data.chunk.name}.js`
+  let author = packageJson.author
+  if (typeof author !== "string") {
+    author = author?.name
+  }
+
+  return {
+    author,
+    homepage,
+    homepageUrl: homepage,
+    supportUrl,
+    downloadUrl,
+    updateUrl: downloadUrl,
+    license: packageJson.license,
+  }
+}
+
+type BannerDataType = { hash: string; chunk: webpack.Chunk; filename: string }
+function buildUserScriptMeta(data: BannerDataType) {
+  let src_path = path.resolve(__dirname, `src/${data.chunk.name}.ts`)
+  if (!fs.existsSync(src_path)) {
+    src_path = path.resolve(__dirname, `src/${data.chunk.name}.js`)
+  }
+  let text = fs.readFileSync(src_path, "utf-8")
+    .replace(/(==\/UserScript==)[\s\S]+$/, "$1")
+    .replace(/^.*==\/UserScript==.*$/gm, '')
+  let extraInfo = getExtraInfo(data)
+  let columnWidth = 13
+  for (let [k, v] of Object.entries(extraInfo)) {
+    let re = RegExp(`^//.*@${k}\\b.*$`, 'gm')
+    let f_k = `@${k}`
+    f_k += Array(columnWidth - f_k.length).fill(' ').join('')
+    let s = `// ${f_k} ${v}`
+    if (re.test(text)) {
+      text = text.replace(re, s)
+    } else {
+      text += s + '\n'
+    }
+  }
+
+  return text + '// ==/UserScript==';
+
 }
 
 const config: webpack.Configuration = {
@@ -29,7 +91,8 @@ const config: webpack.Configuration = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "[name].js"
+    filename: "[name].js",
+    clean: true,
   },
   resolve: {
     modules: [
@@ -38,17 +101,26 @@ const config: webpack.Configuration = {
     ],
     extensions: [".ts", ".js"],
   },
+  optimization: {
+    // We no not want to minimize our code.
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          compress: false,
+          mangle: false,
+          format: {
+            comments: false,
+            beautify: true,
+          },
+        },
+        extractComments: false,
+      })],
+
+  },
   plugins: [
     new webpack.BannerPlugin({
-      banner: (chunk) => {
-        let src_path = path.resolve(__dirname, `src/${chunk.chunk.name}.ts`)
-        if (!fs.existsSync(src_path)) {
-          src_path = path.resolve(__dirname, `src/${chunk.chunk.name}.js`)
-        }
-        let text = fs.readFileSync(src_path, "utf-8")
-          .replace(/(==\/UserScript==)[\s\S]+$/, "$1")
-        return text;
-      },
+      banner: buildUserScriptMeta,
       entryOnly: true,
       raw: true
     })
