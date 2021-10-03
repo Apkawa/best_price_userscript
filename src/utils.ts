@@ -1,3 +1,5 @@
+import {isFunction} from "rxjs/internal-compatibility";
+
 export function getElementByXpath(xpath: string, root: Node = document): HTMLElement | null {
   const e = document.evaluate(
     xpath, root,
@@ -67,4 +69,40 @@ export function E(tag: string, attributes: { [K: string]: string } = {}, ...chil
   })
   element.appendChild(fragment)
   return element
+}
+
+type MatchPattern = string | RegExp | ((s: string) => boolean)
+
+export function matchLocation(...glob_patterns: MatchPattern[]): boolean {
+  let s = document.location.href
+  for (let p of glob_patterns) {
+    if (isFunction(p) && p(s)) {
+      return true
+    }
+    if (RegExp(p as string).test(s)) {
+      return true
+    }
+  }
+  return false
+}
+
+type MapUrlType = {[K: string]: () => void}
+
+/**
+ * mapLocation({
+ *   '^https://foo.bar/': () => { // some code },
+ * })
+ * @param map
+ */
+export function mapLocation(map: MapUrlType): void {
+  let s = document.location.href
+  for (let [k, v] of Object.entries(map)) {
+    if (RegExp(k).test(s)) {
+      v()
+    }
+  }
+}
+
+export function parseSearch() {
+  return Object.fromEntries(new URLSearchParams(window.location.search).entries())
 }

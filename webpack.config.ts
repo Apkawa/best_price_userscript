@@ -94,6 +94,9 @@ const config: webpack.Configuration = {
       "src"
     ],
     extensions: [".ts", ".js"],
+    fallback: {
+      path: require.resolve("path-browserify"),
+    }
   },
   optimization: {
     // We no not want to minimize our code.
@@ -117,7 +120,10 @@ const config: webpack.Configuration = {
       banner: buildUserScriptMeta,
       entryOnly: true,
       raw: true
-    })
+    }),
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
   ]
 };
 
