@@ -17,21 +17,13 @@ function collectUserScripts() {
   }))
 }
 
-
-
-// @homepage     https://github.com/Apkawa/userscripts
-// @homepageUrl  https://github.com/Apkawa/userscripts
-// @supportUrl   https://github.com/Apkawa/userscripts/issues/
-// @downloadUrl  https://github.com/Apkawa/userscripts/raw/gh-pages/pikabu.ru/video_url.user.js
-// @updateUrl    https://github.com/Apkawa/userscripts/raw/gh-pages/pikabu.ru/video_url.user.js
-
 function getExtraInfo(data: BannerDataType) {
   let homepage = packageJson.homepage
   let supportUrl = packageJson.bugs
   if (typeof supportUrl !== 'string') {
     supportUrl = supportUrl?.url
   }
-  let downloadUrl = `${packageJson.repository}/raw/gh-pages/${data.chunk.name}.js`
+  let downloadUrl = `${packageJson.repository}/raw/master/${data.chunk.name}.js`
   let author = packageJson.author
   if (typeof author !== "string") {
     author = author?.name
@@ -49,6 +41,7 @@ function getExtraInfo(data: BannerDataType) {
 }
 
 type BannerDataType = { hash: string; chunk: webpack.Chunk; filename: string }
+
 function buildUserScriptMeta(data: BannerDataType) {
   let src_path = path.resolve(__dirname, `src/${data.chunk.name}.ts`)
   if (!fs.existsSync(src_path)) {
