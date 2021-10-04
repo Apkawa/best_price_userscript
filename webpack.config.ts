@@ -71,6 +71,7 @@ function buildUserScriptMeta(data: BannerDataType) {
 const config: webpack.Configuration = {
   entry: collectUserScripts(),
   target: "browserslist",
+  devtool: false,
   module: {
     rules: [{
       test: /\.ts$/,

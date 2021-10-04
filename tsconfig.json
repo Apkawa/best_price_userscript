@@ -15,6 +15,7 @@
       "dom.iterable",
       "es2018"
     ],
-    "removeComments": true
+    "removeComments": true,
+    "experimentalDecorators": true
   }
 }
