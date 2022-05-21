@@ -72,6 +72,7 @@ export function waitElement(match: (el: HTMLElement) => boolean, callback: () =>
     });
     isStarted = true;
   }
+
   function _stop() {
     observer.disconnect();
     isStarted = false;

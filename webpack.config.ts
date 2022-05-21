@@ -4,12 +4,13 @@ import fs from "fs";
 import glob from "glob";
 import TerserPlugin from "terser-webpack-plugin"
 import {PackageJson} from "type-fest";
+import fromEntries from 'fromentries';
 
 const packageJson: PackageJson = require("./package.json")
 
 function collectUserScripts() {
   let root = path.resolve(__dirname, "src");
-  return Object.fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {
+  return fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {
     let relPath = path.relative(root, f)
     let bName = path.basename(path.basename(relPath, '.js'), '.ts')
     let name = `${path.dirname(relPath)}/${bName}`
@@ -105,7 +106,10 @@ const config: webpack.Configuration = {
     minimizer: [
       new TerserPlugin({
         terserOptions: {
-          compress: false,
+          compress: {
+            defaults: false,
+            unused: true
+          },
           mangle: false,
           format: {
             comments: false,
