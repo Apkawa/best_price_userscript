@@ -85,6 +85,20 @@ export function waitElement(match: (el: HTMLElement) => boolean, callback: () =>
   };
 }
 
+export function waitCompletePage(callback: () => void): void {
+  let t: NodeJS.Timeout | null = null;
+  const stop = waitElement(
+    () => true,
+    () => {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => {
+        stop();
+        callback();
+      }, 200);
+    },
+  );
+}
+
 export function E(
   tag: string,
   attributes: {[K: string]: string} = {},
