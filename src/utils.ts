@@ -67,7 +67,7 @@ export function waitElement(match: (el: HTMLElement) => boolean, callback: () =>
     observer.observe(document.body, {
       childList: true,
       subtree: true,
-      attributes: false,
+      attributes: true,
       characterData: false,
     });
     isStarted = true;
@@ -139,6 +139,23 @@ export function mapLocation(map: MapUrlType): void {
 
 export function parseSearch(): {[key: string]: string} {
   return Object.fromEntries(new URLSearchParams(window.location.search).entries());
+}
+
+export default function isRegexp(value: unknown): value is RegExp {
+  return toString.call(value) === '[object RegExp]';
+}
+
+export function mRegExp(regExps: (RegExp | string)[]): RegExp {
+  return RegExp(
+    regExps
+      .map(function (r) {
+        if (isRegexp(r)) {
+          return r.source;
+        }
+        return r;
+      })
+      .join(''),
+  );
 }
 
 export function GM_addStyle(css: string): void {
