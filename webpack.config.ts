@@ -97,6 +97,9 @@ const config: webpack.Configuration = {
     clean: true,
   },
   resolve: {
+    alias: {
+      "app": path.resolve(__dirname, 'src')
+    },
     modules: [
       'node_modules',
       'src',
