@@ -39,7 +39,11 @@ export function markElementHandled(
   };
 }
 
-export function waitElement(match: (el: HTMLElement) => boolean, callback: () => void): () => void {
+export function waitElement(
+  match: (el: HTMLElement) => boolean,
+  callback: () => void,
+  root: HTMLElement = document.body,
+): () => void {
   const observer = new MutationObserver((mutations) => {
     let matchFlag = false;
     mutations.forEach((mutation) => {
@@ -62,7 +66,7 @@ export function waitElement(match: (el: HTMLElement) => boolean, callback: () =>
     if (isStarted) {
       return;
     }
-    observer.observe(document.body, {
+    observer.observe(root, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -83,7 +87,7 @@ export function waitElement(match: (el: HTMLElement) => boolean, callback: () =>
   };
 }
 
-export function waitCompletePage(callback: () => void): void {
+export function waitCompletePage(callback: () => void, root: HTMLElement = document.body): void {
   let t: NodeJS.Timeout | null = null;
   const stop = waitElement(
     () => true,
@@ -94,6 +98,7 @@ export function waitCompletePage(callback: () => void): void {
         callback();
       }, 200);
     },
+    root,
   );
 }
 
