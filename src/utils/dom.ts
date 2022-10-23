@@ -96,7 +96,7 @@ export function waitCompletePage(callback: () => void, root: HTMLElement = docum
       t = setTimeout(() => {
         stop();
         callback();
-      }, 200);
+      }, 150);
     },
     root,
   );
