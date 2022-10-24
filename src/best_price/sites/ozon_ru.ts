@@ -34,7 +34,7 @@ function processProductCard(cardEl: HTMLElement): void {
   }
 
   const price = getPriceFromElement(wrapEl.querySelector('div'));
-  const titleEl = wrapEl.querySelector('a span.tsBodyL');
+  const titleEl = wrapEl.querySelector('a span.tsBodyL, a span.tsBodyM:not([style])');
   const title = titleEl?.textContent;
   if (!title || !price) {
     storeParsedTitleToElement(cardEl, null);
@@ -51,7 +51,9 @@ export function initCatalog(): void {
     const cardList = document.querySelectorAll(
       '.widget-search-result-container > div > div' +
         ",[data-widget='skuLine'] > div:nth-child(2) > div" +
-        ",[data-widget='skuLineLR'] > div:nth-child(2) > div",
+        ",[data-widget='skuLine'] > div:nth-child(1) > div" + // Промо без заголовка
+        ",[data-widget='skuLineLR'] > div:nth-child(2) > div" +
+        ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
     );
     for (const cardEl of cardList) {
       processProductCard(cardEl as HTMLElement);
@@ -93,7 +95,12 @@ export function initCatalog(): void {
     initProductPage();
   }
 
-  if (matchLocation('^https://(www\\.|)ozon\\.ru/(category|highlight|search)/.*')) {
+  if (matchLocation('^https://(www\\.|)ozon\\.ru/')) {
+    initCatalog();
+  }
+  if (
+    matchLocation('^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*')
+  ) {
     initCatalog();
   }
 })();
