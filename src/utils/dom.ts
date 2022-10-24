@@ -121,3 +121,59 @@ export function E(
   element.appendChild(fragment);
   return element;
 }
+
+export interface ElementGetOrCreateOptions {
+  className?: string;
+  pos?: 'before' | 'after' | 'appendChild';
+}
+
+export function ElementGetOrCreate(
+  root: HTMLElement | null,
+  options: ElementGetOrCreateOptions = {},
+): HTMLElement | null {
+  const {className = 'GM-wrap', pos = 'appendChild'} = options;
+  if (!root) return null;
+  let wrapEl = root.parentElement?.querySelector<HTMLElement>('.' + className);
+  if (!wrapEl) {
+    wrapEl = E('div', {class: className});
+    root[pos](wrapEl);
+  }
+  return wrapEl;
+}
+
+export interface copyElementToNewRootOptions {
+  className?: string;
+  pos?: 'before' | 'after' | 'appendChild';
+}
+
+export function copyElementToNewRoot(
+  el: HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | null | undefined,
+  toRoot: HTMLElement,
+  options: copyElementToNewRootOptions = {},
+): void {
+  const {className = 'GM-cloned', pos = 'appendChild'} = options;
+  if (!el) return;
+  let elList: HTMLElement[] | NodeListOf<HTMLElement> = [];
+  if (el instanceof HTMLElement) {
+    elList = [el];
+  } else {
+    elList = el;
+  }
+  toRoot.parentElement?.querySelectorAll('.' + className)?.forEach((e) => e.remove());
+
+  for (const _el of elList) {
+    const clonedEl = _el.cloneNode(true) as HTMLElement;
+    clonedEl.classList.add(className);
+    toRoot[pos](clonedEl);
+  }
+}
+
+// export function cloneNode(el: HTMLElement, deep: boolean, copyEvent: boolean): HTMLElement {
+//   if (!copyEvent) {
+//     return el.cloneNode(deep) as HTMLElement
+//   }
+//   const clonedNode = el.cloneNode(false)
+//   const events = ''
+//
+//   return el
+// }
