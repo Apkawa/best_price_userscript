@@ -37,6 +37,7 @@ function processProductCard(cardEl: HTMLElement): void {
   const titleEl = wrapEl.querySelector('a span.tsBodyL');
   const title = titleEl?.textContent;
   if (!title || !price) {
+    storeParsedTitleToElement(cardEl, null);
     return;
   }
   console.log(title, price);

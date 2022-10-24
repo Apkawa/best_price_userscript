@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.1.1
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -372,7 +372,10 @@
         const price = getPriceFromElement(wrapEl.querySelector("div"));
         const titleEl = wrapEl.querySelector("a span.tsBodyL");
         const title = null === titleEl || void 0 === titleEl ? void 0 : titleEl.textContent;
-        if (!title || !price) return;
+        if (!title || !price) {
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
         null === (_a = null === titleEl || void 0 === titleEl ? void 0 : titleEl.parentElement) || void 0 === _a ? void 0 : _a.insertBefore(renderBestPrice(parsedTitle), titleEl);
