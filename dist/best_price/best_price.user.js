@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.2.1
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -42,7 +42,7 @@
         let isStarted = false;
         function _start() {
             if (isStarted) return;
-            observer.observe(root, {
+            observer.observe(root || document.body, {
                 childList: true,
                 subtree: true,
                 attributes: true,
@@ -59,15 +59,17 @@
             _stop();
         };
     }
-    function waitCompletePage(callback, root = document.body) {
+    function waitCompletePage(callback, options = {}) {
+        const {root: root = document.body, runOnce: runOnce = true} = options;
         let t = null;
         const stop = waitElement((() => true), (() => {
             if (t) clearTimeout(t);
             t = setTimeout((() => {
-                stop();
+                if (runOnce) stop();
                 callback();
             }), 150);
         }), root);
+        return stop;
     }
     function E(tag, attributes = {}, ...children) {
         const element = document.createElement(tag);
@@ -389,7 +391,7 @@
     function initCatalog() {
         const init = () => {
             var _a, _b;
-            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
             for (const cardEl of cardList) processProductCard(cardEl);
             const catalogEl = document.querySelector(".widget-search-result-container > div");
             const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
@@ -404,19 +406,18 @@
                         catalogEl.before(nodes);
                     }
                 }
-                waitCompletePage((() => {
-                    init();
-                }), catalogEl);
             }
         };
         waitCompletePage((() => {
             init();
-        }));
+        }), {
+            runOnce: false
+        });
     }
     (function() {
         "use strict";
-        console.log("OZON.ru");
         if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) return;
+        console.log("OZON.ru");
         if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) initProductPage();
         if (matchLocation("^https://(www\\.|)ozon\\.ru/")) initCatalog();
         if (matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")) initCatalog();
@@ -468,7 +469,9 @@
             paginationRootWrap && copyElementToNewRoot(null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
             waitCompletePage((() => {
                 init();
-            }), document.querySelector(".catalog-view__grid-container"));
+            }), {
+                root: document.querySelector(".catalog-view__grid-container")
+            });
         };
         waitCompletePage((() => {
             init();

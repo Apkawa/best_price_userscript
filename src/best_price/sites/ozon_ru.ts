@@ -53,16 +53,17 @@ export function initCatalog(): void {
         ",[data-widget='skuLine'] > div:nth-child(2) > div" +
         ",[data-widget='skuLine'] > div:nth-child(1) > div" + // Промо без заголовка
         ",[data-widget='skuLineLR'] > div:nth-child(2) > div" +
+        ",[data-widget='skuGrid'] > div:nth-child(2) > div" + // Возможно вам понравятся
         ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
     );
     for (const cardEl of cardList) {
       processProductCard(cardEl as HTMLElement);
     }
 
-    const catalogEl = document.querySelector('.widget-search-result-container > div');
-    const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
+    const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
+    const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
     if (catalogEl) {
-      buttonWrapEl && initReorderCatalog(catalogEl as HTMLElement, buttonWrapEl as HTMLElement);
+      buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
 
       // Copy paginator on top
       const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
@@ -74,23 +75,23 @@ export function initCatalog(): void {
           catalogEl.before(nodes);
         }
       }
-      waitCompletePage(() => {
-        init();
-      }, catalogEl as HTMLElement);
     }
   };
 
-  waitCompletePage(() => {
-    init();
-  });
+  waitCompletePage(
+    () => {
+      init();
+    },
+    {runOnce: false},
+  );
 }
 
 (function () {
   'use strict';
-  console.log('OZON.ru');
   if (!matchLocation('^https://(www\\.|)ozon\\.ru/.*')) {
     return;
   }
+  console.log('OZON.ru');
   if (matchLocation('^https://(www\\.|)ozon\\.ru/product/.*')) {
     initProductPage();
   }

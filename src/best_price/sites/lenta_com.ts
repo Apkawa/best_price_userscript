@@ -23,7 +23,7 @@ export function initProductPage(): void {
 
 function processProductCard(cardEl: HTMLElement) {
   if (cardEl.classList.contains('GM-best-price-wrap')) return;
-  let price = getPriceFromElement(cardEl.querySelector('.price-label--primary'));
+  let price = getPriceFromElement(cardEl.querySelector<HTMLElement>('.price-label--primary'));
   const title = cardEl.querySelector('.sku-card-small-header__title')?.textContent?.trim();
   if (!title || !price) {
     storeParsedTitleToElement(cardEl, null);
@@ -38,17 +38,20 @@ function processProductCard(cardEl: HTMLElement) {
 
 export function initCatalog(): void {
   const init = () => {
-    const cardList = document.querySelectorAll('.sku-card-small');
+    const cardList = document.querySelectorAll<HTMLElement>('.sku-card-small');
     for (const cardEl of cardList) {
-      processProductCard(cardEl as HTMLElement);
+      processProductCard(cardEl);
     }
-    const catalogWrapEl = document.querySelector('.catalog-grid__grid');
+    const catalogWrapEl = document.querySelector<HTMLElement>('.catalog-grid__grid');
 
-    const buttonWrapEl = ElementGetOrCreate(document.querySelector('.catalog-sorting'), {
-      pos: 'before',
-    });
+    const buttonWrapEl = ElementGetOrCreate(
+      document.querySelector<HTMLElement>('.catalog-sorting'),
+      {
+        pos: 'before',
+      },
+    );
     if (catalogWrapEl && buttonWrapEl) {
-      initReorderCatalog(catalogWrapEl as HTMLElement, buttonWrapEl);
+      initReorderCatalog(catalogWrapEl, buttonWrapEl);
     }
     const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
     const paginationRootWrap = ElementGetOrCreate(catalogEl, {
@@ -57,9 +60,14 @@ export function initCatalog(): void {
     });
     paginationRootWrap &&
       copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
-    waitCompletePage(() => {
-      init();
-    }, document.querySelector('.catalog-view__grid-container') as HTMLElement);
+    waitCompletePage(
+      () => {
+        init();
+      },
+      {
+        root: document.querySelector<HTMLElement>('.catalog-view__grid-container'),
+      },
+    );
   };
 
   waitCompletePage(() => {

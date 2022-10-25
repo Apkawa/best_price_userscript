@@ -41,11 +41,13 @@ export function markElementHandled(
   };
 }
 
+export type StopCallback = () => void;
+
 export function waitElement(
   match: (el: HTMLElement) => boolean,
   callback: () => void,
-  root: HTMLElement = document.body,
-): () => void {
+  root: Optional<HTMLElement> = document.body,
+): StopCallback {
   const observer = new MutationObserver((mutations) => {
     let matchFlag = false;
     mutations.forEach((mutation) => {
@@ -68,7 +70,7 @@ export function waitElement(
     if (isStarted) {
       return;
     }
-    observer.observe(root, {
+    observer.observe(root || document.body, {
       childList: true,
       subtree: true,
       attributes: true,
@@ -89,19 +91,31 @@ export function waitElement(
   };
 }
 
-export function waitCompletePage(callback: () => void, root: HTMLElement = document.body): void {
+export interface WaitCompletePageOptions {
+  root?: Optional<HTMLElement>;
+  runOnce?: boolean;
+}
+
+export function waitCompletePage(
+  callback: () => void,
+  options: WaitCompletePageOptions = {},
+): StopCallback {
+  const {root = document.body, runOnce = true} = options;
   let t: NodeJS.Timeout | null = null;
   const stop = waitElement(
     () => true,
     () => {
       if (t) clearTimeout(t);
       t = setTimeout(() => {
-        stop();
+        if (runOnce) {
+          stop();
+        }
         callback();
       }, 150);
     },
     root,
   );
+  return stop;
 }
 
 export function E(

@@ -23,7 +23,7 @@ export function initProductPage(): void {
 function processProductCard(cardEl: HTMLElement): void {
   if (cardEl.classList.contains('GM-best-price-wrap')) return;
 
-  const price = getPriceFromElement(cardEl.querySelector('.price-label--primary'));
+  const price = getPriceFromElement(cardEl.querySelector<HTMLElement>('.price-label--primary'));
   const title = cardEl.querySelector('.sku-card-small-header__title')?.textContent?.trim();
 
   if (!title || !price) {
@@ -44,9 +44,12 @@ export function initCatalog(): void {
     }
     // Reorder
     const catalogWrapEl = document.querySelector('.catalog-grid__grid');
-    const buttonWrapEl = ElementGetOrCreate(document.querySelector('.catalog-sorting'), {
-      pos: 'before',
-    });
+    const buttonWrapEl = ElementGetOrCreate(
+      document.querySelector<HTMLElement>('.catalog-sorting'),
+      {
+        pos: 'before',
+      },
+    );
     if (catalogWrapEl && buttonWrapEl) {
       initReorderCatalog(catalogWrapEl as HTMLElement, buttonWrapEl);
     }
@@ -63,9 +66,12 @@ export function initCatalog(): void {
     // Handle dynamic update
     const catalogContainerEl = document.querySelector<HTMLElement>('.catalog-view__grid-container');
     catalogContainerEl &&
-      waitCompletePage(() => {
-        init();
-      }, catalogContainerEl);
+      waitCompletePage(
+        () => {
+          init();
+        },
+        {root: catalogContainerEl},
+      );
   };
 
   waitCompletePage(() => {
