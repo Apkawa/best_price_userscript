@@ -1,3 +1,5 @@
+import {Optional} from '@app/utils/types';
+
 export function getElementByXpath(xpath: string, root: Node = document): HTMLElement | null {
   const e = document.evaluate(
     xpath,
@@ -128,7 +130,7 @@ export interface ElementGetOrCreateOptions {
 }
 
 export function ElementGetOrCreate(
-  root: HTMLElement | null,
+  root: Optional<HTMLElement>,
   options: ElementGetOrCreateOptions = {},
 ): HTMLElement | null {
   const {className = 'GM-wrap', pos = 'appendChild'} = options;
@@ -147,12 +149,16 @@ export interface copyElementToNewRootOptions {
 }
 
 export function copyElementToNewRoot(
-  el: HTMLElement | HTMLElement[] | NodeListOf<HTMLElement> | null | undefined,
+  el: Optional<HTMLElement | HTMLElement[] | NodeListOf<HTMLElement>>,
   toRoot: HTMLElement,
   options: copyElementToNewRootOptions = {},
 ): void {
   const {className = 'GM-cloned', pos = 'appendChild'} = options;
-  if (!el) return;
+  if (!el) {
+    console.warn(`el is ${typeof el}`);
+    return;
+  }
+
   let elList: HTMLElement[] | NodeListOf<HTMLElement> = [];
   if (el instanceof HTMLElement) {
     elList = [el];

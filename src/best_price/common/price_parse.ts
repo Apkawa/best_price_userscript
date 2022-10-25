@@ -1,4 +1,4 @@
-export function getPriceFromElement(el: HTMLElement | null): number | null {
+export function getPriceFromElement(el: HTMLElement | null | undefined): number | null {
   const priceText = el?.textContent?.split('₽')[0]?.trim();
   if (priceText) {
     return parseFloat(

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.1.2
+// @version      0.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -9,6 +9,8 @@
 // @match        https://ozon.ru/*
 // @match        https://www.ozon.ru/*
 // @match        https://lenta.com/*
+// @match        https://okeydostavka.ru/*
+// @match        https://www.okeydostavka.ru/*
 // @homepage     https://github.com/Apkawa/userscripts
 // @homepageUrl  https://github.com/Apkawa/userscripts
 // @supportUrl   https://github.com/Apkawa/userscripts/issues
@@ -94,7 +96,10 @@
     function copyElementToNewRoot(el, toRoot, options = {}) {
         var _a, _b;
         const {className: className = "GM-cloned", pos: pos = "appendChild"} = options;
-        if (!el) return;
+        if (!el) {
+            console.warn(`el is ${typeof el}`);
+            return;
+        }
         let elList = [];
         if (el instanceof HTMLElement) elList = [ el ]; else elList = el;
         null === (_b = null === (_a = toRoot.parentElement) || void 0 === _a ? void 0 : _a.querySelectorAll("." + className)) || void 0 === _b ? void 0 : _b.forEach((e => e.remove()));
@@ -474,5 +479,59 @@
         if (!matchLocation("^https://lenta\\.com/.*")) return;
         if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
         if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
+    })();
+    function okeydostavka_ru_initProductPage() {
+        const init = () => {
+            var _a, _b, _c, _d;
+            const productWrapEl = document.querySelector(".product_main_info");
+            if (!productWrapEl) return;
+            const title = null === (_b = null === (_a = null === productWrapEl || void 0 === productWrapEl ? void 0 : productWrapEl.querySelector("h1.main_header")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+            const price = parseFloat((null === (_c = null === productWrapEl || void 0 === productWrapEl ? void 0 : productWrapEl.querySelector('.product-price > meta[itemprop="price"]')) || void 0 === _c ? void 0 : _c.content) || "");
+            if (!price || !title) return;
+            console.log(title, price);
+            const parsedTitle = parseTitleWithPrice(title, price);
+            null === (_d = null === productWrapEl || void 0 === productWrapEl ? void 0 : productWrapEl.querySelector(".product-price")) || void 0 === _d ? void 0 : _d.after(renderBestPrice(parsedTitle));
+        };
+        waitCompletePage((() => {
+            init();
+        }));
+    }
+    function okeydostavka_ru_processProductCard(cardEl) {
+        var _a, _b;
+        if (cardEl.classList.contains("GM-best-price-wrap")) return;
+        const priceEl = null === cardEl || void 0 === cardEl ? void 0 : cardEl.querySelector(".price_and_cart .product-price");
+        const price = getPriceFromElement(null === priceEl || void 0 === priceEl ? void 0 : priceEl.querySelector(":scope > span.price"));
+        const title = null === (_b = null === (_a = cardEl.querySelector(".product-name a")) || void 0 === _a ? void 0 : _a.getAttribute("title")) || void 0 === _b ? void 0 : _b.trim();
+        if (!title || !price) {
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
+        console.log(title, price);
+        const parsedTitle = parseTitleWithPrice(title, price);
+        null === priceEl || void 0 === priceEl ? void 0 : priceEl.after(renderBestPrice(parsedTitle));
+        storeParsedTitleToElement(cardEl, parsedTitle);
+    }
+    function okeydostavka_ru_initCatalog() {
+        const init = () => {
+            const cardList = document.querySelectorAll(".product_listing_container li" + ", .also-products  li > div.product" + ", .similar-products  li > div.product" + ", .catalogEntryRecommendationWidget  li > div.product");
+            for (const cardEl of cardList) okeydostavka_ru_processProductCard(cardEl);
+            const catalogWrapEl = document.querySelector(".product_listing_container > ul");
+            const buttonWrapEl = ElementGetOrCreate(catalogWrapEl, {
+                pos: "before"
+            });
+            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+            waitCompletePage((() => {
+                init();
+            }));
+        };
+        waitCompletePage((() => {
+            init();
+        }));
+    }
+    (function() {
+        "use strict";
+        if (!matchLocation("^https://(www\\.|)okeydostavka.ru/.*")) return;
+        if (document.querySelector(".product_main_info")) okeydostavka_ru_initProductPage();
+        okeydostavka_ru_initCatalog();
     })();
 })();
