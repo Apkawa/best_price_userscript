@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.2.1
+// @version      0.2.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -45,7 +45,7 @@
             observer.observe(root || document.body, {
                 childList: true,
                 subtree: true,
-                attributes: true,
+                attributes: false,
                 characterData: false
             });
             isStarted = true;
@@ -60,16 +60,24 @@
         };
     }
     function waitCompletePage(callback, options = {}) {
-        const {root: root = document.body, runOnce: runOnce = true} = options;
+        const {root: root = document.body, runOnce: runOnce = true, sync: sync = true} = options;
         let t = null;
-        const stop = waitElement((() => true), (() => {
-            if (t) clearTimeout(t);
-            t = setTimeout((() => {
-                if (runOnce) stop();
-                callback();
-            }), 150);
-        }), root);
-        return stop;
+        let lock = false;
+        const run = () => {
+            const stop = waitElement((() => true), (() => {
+                if (t) clearTimeout(t);
+                t = setTimeout((() => {
+                    if (lock) return;
+                    lock = true;
+                    if (runOnce || sync) stop();
+                    callback();
+                    if (sync && !runOnce) setTimeout(run, 100);
+                    lock = false;
+                }), 150);
+            }), root);
+            return stop;
+        };
+        return run();
     }
     function E(tag, attributes = {}, ...children) {
         const element = document.createElement(tag);
@@ -149,12 +157,12 @@
     Object.keys;
     const entries = Object.entries;
     const values = Object.values;
-    const WORD_BOUNDARY_END = /(?=\s|[.,);]|$)/;
+    const WORD_BOUNDARY_END = /(?=\s|[.,);/]|$)/;
     const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")", WORD_BOUNDARY_END ]);
     const QUANTITY_UNITS = [ "шт", "рулон", "пакет", "уп", "упаков(?:ок|ки|ка)", "салфет(?:ок|ки|ка)", "таб", "капсул" ];
     const QUANTITY_REGEXP = RegExp(`(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join("|")})\\.?`);
     const QUANTITY_2_REGEXP = RegExp(`(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join("|")})\\.?`);
-    const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×]|по)\s?/;
+    const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×/]|по)\s?/;
     const COMBINE_QUANTITY_LIST = [ mRegExp([ /(?<quantity_2>\d+)/, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity_2>\d+)/ ]), mRegExp([ QUANTITY_2_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]) ];
     const COMBINE_QANTITY_WEIGHT_REGEXP_LIST = [ mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ /(?<quantity>\d+)/, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity>\d+)/ ]) ];
     function parseGroups(groups) {
@@ -285,7 +293,8 @@
     const BEST_PRICE_WRAP_CLASS_NAME = "GM-best-price-wrap";
     const ORDER_NAME_LOCAL_STORAGE = "GM-best-price-default-order";
     const MAX_NUMBER = 99999999999;
-    GM_addStyle("button.GM-best-order-button.active { border: 2px solid red; }");
+    const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
+    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red; }`);
     function initReorderCatalog(catalogRoot, buttonRoot) {
         var _a;
         const buttonWrap = buttonRoot;
@@ -294,6 +303,10 @@
         let i = 0;
         for (const wrapEl of catalogRoot.querySelectorAll(":scope > *")) {
             const el = wrapEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME) ? wrapEl : wrapEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME);
+            if (!el) {
+                console.warn("!", el);
+                continue;
+            }
             const ds = el.dataset;
             i += 1;
             catalogRecords.push({
@@ -305,24 +318,27 @@
         }
         const buttons = {
             initial_order: E("button", {
-                class: "GM-best-order-button"
+                class: BEST_ORDER_BUTTON_CLASS_NAME
             }, "Reset"),
             weight_price: E("button", {
-                class: "GM-best-order-button"
+                class: BEST_ORDER_BUTTON_CLASS_NAME
             }, "by Weight"),
             quantity_price: E("button", {
-                class: "GM-best-order-button"
+                class: BEST_ORDER_BUTTON_CLASS_NAME
             }, "by Quantity")
         };
-        for (const [k, b] of entries(buttons)) b.onclick = () => {
-            console.log(k);
-            localStorage.setItem(ORDER_NAME_LOCAL_STORAGE, k);
-            sort(catalogRecords, k);
+        function buttonClickHandler(orderState) {
+            console.log(orderState);
+            localStorage.setItem(ORDER_NAME_LOCAL_STORAGE, orderState);
+            sort(catalogRecords, orderState);
             refreshCatalog();
-            setActiveButton(b);
+            setActiveButton(buttons[orderState]);
+        }
+        for (const [k, b] of entries(buttons)) b.onclick = () => {
+            buttonClickHandler(k);
         };
         const defaultOrder = localStorage.getItem(ORDER_NAME_LOCAL_STORAGE);
-        if (defaultOrder) buttons[defaultOrder].click();
+        if (defaultOrder) if ("initial_order" === defaultOrder) setActiveButton(buttons[defaultOrder]); else buttonClickHandler(defaultOrder);
         function refreshCatalog() {
             const wrap = catalogRoot;
             if (!wrap) return;
@@ -335,9 +351,9 @@
             for (const b of values(buttons)) b.classList.remove("active");
             button.classList.add("active");
         }
-        null === (_a = buttonWrap.querySelector(".GM-best-price-button-wrap")) || void 0 === _a ? void 0 : _a.remove();
+        null === (_a = buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)) || void 0 === _a ? void 0 : _a.remove();
         buttonWrap.appendChild(E("div", {
-            class: "GM-best-price-button-wrap"
+            class: BEST_ORDER_BUTTON_CLASS_NAME
         }, ...values(buttons)));
     }
     function getPriceFromElement(el) {
@@ -390,22 +406,18 @@
     }
     function initCatalog() {
         const init = () => {
-            var _a, _b;
+            const catalogEl = document.querySelector(".widget-search-result-container > div");
+            if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("div.GM-best-price")) return;
             const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
             for (const cardEl of cardList) processProductCard(cardEl);
-            const catalogEl = document.querySelector(".widget-search-result-container > div");
             const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
             if (catalogEl) {
                 buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
                 const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
-                if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) {
-                    const nodes = null === paginator || void 0 === paginator ? void 0 : paginator.cloneNode(true);
-                    if (nodes) {
-                        nodes.classList.add("cloned-paginator");
-                        null === (_b = null === (_a = catalogEl.parentElement) || void 0 === _a ? void 0 : _a.querySelector(".cloned-paginator")) || void 0 === _b ? void 0 : _b.remove();
-                        catalogEl.before(nodes);
-                    }
-                }
+                const paginatorWrap = document.querySelector(".widget-search-result-container");
+                if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
+                    pos: "before"
+                });
             }
         };
         waitCompletePage((() => {

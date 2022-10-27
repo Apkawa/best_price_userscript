@@ -4,6 +4,7 @@ import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {getPrice, getPriceFromElement} from '../common/price_parse';
 import {storeParsedTitleToElement} from '../common';
+import {copyElementToNewRoot} from '../../utils/dom';
 
 export function initProductPage(): void {
   const init = () => {
@@ -48,6 +49,12 @@ function processProductCard(cardEl: HTMLElement): void {
 
 export function initCatalog(): void {
   const init = () => {
+    const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
+
+    if (catalogEl?.querySelector('div.GM-best-price')) {
+      return;
+    }
+
     const cardList = document.querySelectorAll(
       '.widget-search-result-container > div > div' +
         ",[data-widget='skuLine'] > div:nth-child(2) > div" +
@@ -60,20 +67,16 @@ export function initCatalog(): void {
       processProductCard(cardEl as HTMLElement);
     }
 
-    const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
     const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
     if (catalogEl) {
       buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-
       // Copy paginator on top
-      const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
+      const paginator = document.querySelector<HTMLElement>(
+        '[data-widget="megaPaginator"] > div:nth-child(2)',
+      );
+      const paginatorWrap = document.querySelector<HTMLElement>('.widget-search-result-container');
       if (paginator?.querySelector('a')) {
-        const nodes = paginator?.cloneNode(true);
-        if (nodes) {
-          (nodes as HTMLElement).classList.add('cloned-paginator');
-          catalogEl.parentElement?.querySelector('.cloned-paginator')?.remove();
-          catalogEl.before(nodes);
-        }
+        paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {pos: 'before'});
       }
     }
   };
@@ -82,7 +85,9 @@ export function initCatalog(): void {
     () => {
       init();
     },
-    {runOnce: false},
+    {
+      runOnce: false,
+    },
   );
 }
 

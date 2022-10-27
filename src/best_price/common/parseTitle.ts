@@ -7,7 +7,7 @@ export type ParseTitleResult = {
   weight_unit: 'кг' | 'л' | 'м' | null;
 };
 // const WORD_BOUNDARY_BEGIN = /(?:^|\s)/
-const WORD_BOUNDARY_END = /(?=\s|[.,);]|$)/;
+const WORD_BOUNDARY_END = /(?=\s|[.,);/]|$)/;
 const WEIGHT_REGEXP = mRegExp([
   /(?<value>\d+[,.]\d+|\d+)/, // Value
   /\s?/, // Space
@@ -38,7 +38,7 @@ const QUANTITY_2_REGEXP = RegExp(
   `(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join('|')})\\.?`,
 );
 
-const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×]|по)\s?/;
+const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×/]|по)\s?/;
 const COMBINE_QUANTITY_LIST = [
   mRegExp([/(?<quantity_2>\d+)/, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP]), // 20x100шт
   mRegExp([QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity_2>\d+)/]), // 20уп*100

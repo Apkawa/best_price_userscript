@@ -58,6 +58,12 @@ test('Extract quantity', () => {
 });
 
 test('Extract quantity and weight', () => {
+  expect(parseTitle('Щедрые хлебцы с чесноком 100г/8шт')).toStrictEqual({
+    weight: 0.1 * 8,
+    quantity: 8,
+    item_weight: 0.1,
+    weight_unit: 'кг',
+  });
   expect(parseTitle('Рис Увелка пропаренный, 5×80 г')).toStrictEqual({
     weight: 0.08 * 5,
     quantity: 5,

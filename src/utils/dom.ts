@@ -73,7 +73,7 @@ export function waitElement(
     observer.observe(root || document.body, {
       childList: true,
       subtree: true,
-      attributes: true,
+      attributes: false,
       characterData: false,
     });
     isStarted = true;
@@ -94,28 +94,41 @@ export function waitElement(
 export interface WaitCompletePageOptions {
   root?: Optional<HTMLElement>;
   runOnce?: boolean;
+  sync?: boolean;
 }
 
 export function waitCompletePage(
   callback: () => void,
   options: WaitCompletePageOptions = {},
 ): StopCallback {
-  const {root = document.body, runOnce = true} = options;
+  const {root = document.body, runOnce = true, sync = true} = options;
   let t: NodeJS.Timeout | null = null;
-  const stop = waitElement(
-    () => true,
-    () => {
-      if (t) clearTimeout(t);
-      t = setTimeout(() => {
-        if (runOnce) {
-          stop();
-        }
-        callback();
-      }, 150);
-    },
-    root,
-  );
-  return stop;
+
+  let lock = false;
+  const run = (): StopCallback => {
+    const stop = waitElement(
+      () => true,
+      () => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => {
+          if (lock) return;
+          lock = true;
+          if (runOnce || sync) {
+            stop();
+          }
+          callback();
+          if (sync && !runOnce) {
+            setTimeout(run, 100);
+          }
+          lock = false;
+        }, 150);
+      },
+      root,
+    );
+    return stop;
+  };
+
+  return run();
 }
 
 export function E(
