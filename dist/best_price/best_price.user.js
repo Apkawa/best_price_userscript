@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
+// @version      0.3
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -294,7 +294,8 @@
     const ORDER_NAME_LOCAL_STORAGE = "GM-best-price-default-order";
     const MAX_NUMBER = 99999999999;
     const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
-    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red; }`);
+    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
+    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
     function initReorderCatalog(catalogRoot, buttonRoot) {
         var _a;
         const buttonWrap = buttonRoot;
@@ -309,9 +310,14 @@
             }
             const ds = el.dataset;
             i += 1;
+            let initial_order = parseInt(ds.initial_order || "0");
+            if (!initial_order) {
+                initial_order = i;
+                ds.initial_order = i.toString();
+            }
             catalogRecords.push({
                 el: wrapEl,
-                initial_order: i,
+                initial_order: initial_order,
                 weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
                 quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER
             });
@@ -548,5 +554,72 @@
         if (!matchLocation("^https://(www\\.|)okeydostavka.ru/.*")) return;
         if (document.querySelector(".product_main_info")) okeydostavka_ru_initProductPage();
         okeydostavka_ru_initCatalog();
+    })();
+    function auchan_ru_initProductPage() {
+        const init = () => {
+            var _a, _b, _c;
+            if (document.querySelector("main .GM-best-price")) return;
+            const title = null === (_b = null === (_a = document.querySelector("main h1#productName")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+            const price = getPrice("main .fullPricePDP");
+            if (!price || !title) return;
+            console.log(title, price);
+            const parsedTitle = parseTitleWithPrice(title, price);
+            null === (_c = document.querySelector("main .fullPricePDP")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
+        };
+        init();
+    }
+    function auchan_ru_processProductCard(cardEl, priceSel, titleSel, renderPriceSel) {
+        var _a, _b, _c;
+        if (cardEl.classList.contains("GM-best-price-wrap")) return;
+        const price = getPriceFromElement(cardEl.querySelector(priceSel));
+        const title = null === (_b = null === (_a = cardEl.querySelector(titleSel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        if (!title || !price) {
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
+        console.log(title, price);
+        const parsedTitle = parseTitleWithPrice(title, price);
+        null === (_c = cardEl.querySelector(renderPriceSel)) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
+        storeParsedTitleToElement(cardEl, parsedTitle);
+    }
+    function auchan_ru_initCatalog() {
+        const init = () => {
+            const cardList = document.querySelectorAll("article.productCard");
+            for (const cardEl of cardList) auchan_ru_processProductCard(cardEl, ".productCardPriceData > div", ".linkToPDP", ".productCardPriceData ");
+            const catalogWrapEl = getElementByXpath('//article[contains(@class,"productCard")]/ancestor::main//article/../..');
+            if (!document.querySelector(".GM-wrap")) {
+                const buttonWrapEl = ElementGetOrCreate(document.querySelector("#categoriesThirdLvlList"), {
+                    pos: "after"
+                });
+                if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+            }
+            const catalogEl = document.querySelector(".catalog-view__main");
+            const paginationRootWrap = ElementGetOrCreate(catalogEl, {
+                pos: "before",
+                className: "GM-pagination-clone"
+            });
+            paginationRootWrap && copyElementToNewRoot(null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
+        };
+        init();
+    }
+    function initSearchResults() {
+        const cardList = document.querySelectorAll(".digi-product");
+        for (const cardEl of cardList) auchan_ru_processProductCard(cardEl, ".digi-product-price-variant_actual", ".digi-product__label", ".price-and-cart");
+        const catalogWrapEl = document.querySelector(".digi-products-grid");
+        if (!document.querySelector(".digi-search .GM-wrap")) {
+            const buttonWrapEl = ElementGetOrCreate(document.querySelector(".digi-main-results-actions"), {
+                pos: "after"
+            });
+            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+        }
+    }
+    (function() {
+        "use strict";
+        if (!matchLocation("^https://(www\\.|)auchan\\.ru/.*")) return;
+        waitCompletePage((() => {
+            if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-products")) initSearchResults(); else auchan_ru_initCatalog();
+        }), {
+            runOnce: false
+        });
     })();
 })();

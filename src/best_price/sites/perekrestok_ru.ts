@@ -81,8 +81,6 @@ export function initCatalog(): void {
 
 (function () {
   'use strict';
-  console.error('No implemented!');
-  throw 'No implemented';
   if (!matchLocation('^https://example\\.com/.*')) {
     return;
   }

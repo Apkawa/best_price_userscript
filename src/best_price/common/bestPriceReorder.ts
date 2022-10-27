@@ -4,7 +4,10 @@ import {BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE} from '
 
 const BEST_ORDER_BUTTON_CLASS_NAME = 'GM-best-price-button-wrap';
 
-GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red; }`);
+GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {
+border: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }
+`);
+GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
 
 interface CatalogRecord {
   initial_order: number;
@@ -31,9 +34,14 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
     }
     const ds = el.dataset;
     i += 1;
+    let initial_order = parseInt(ds.initial_order || '0');
+    if (!initial_order) {
+      initial_order = i;
+      ds.initial_order = i.toString();
+    }
     catalogRecords.push({
       el: wrapEl,
-      initial_order: i,
+      initial_order,
       weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
       quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER,
     });

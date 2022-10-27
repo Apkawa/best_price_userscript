@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
+// @version      0.3
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -13,6 +13,4 @@
 // @match        https://www.okeydostavka.ru/*
 // ==/UserScript==
 
-import './sites/ozon_ru';
-import './sites/lenta_com';
-import './sites/okeydostavka_ru';
+import './sites';
