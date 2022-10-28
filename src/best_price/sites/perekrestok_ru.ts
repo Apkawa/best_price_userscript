@@ -1,95 +1,63 @@
 import {matchLocation, waitCompletePage} from '../../utils';
-import {getPrice, getPriceFromElement} from '../common/price_parse';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {renderBestPrice} from '../common/price_render';
-import {storeParsedTitleToElement} from '../common';
 import {initReorderCatalog} from '../common/bestPriceReorder';
-import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
+import {ElementGetOrCreate} from '../../utils/dom';
+import {processProductCard} from '../common/common_parser';
+import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 
 export function initProductPage(): void {
-  const init = () => {
-    const title = document.querySelector('.sku-page__title')?.textContent?.trim();
-    const price = getPrice('.sku-price--primary');
-    if (!price || !title) return;
-    console.log(title, price);
-    const parsedTitle = parseTitleWithPrice(title, price);
-    document.querySelector('.sku-prices-block')?.after(renderBestPrice(parsedTitle));
-  };
-  waitCompletePage(() => {
-    init();
-  });
-}
+  const productRoot = document.querySelector<HTMLElement>('main');
+  if (!productRoot) return;
 
-function processProductCard(cardEl: HTMLElement): void {
-  if (cardEl.classList.contains('GM-best-price-wrap')) return;
-
-  const price = getPriceFromElement(cardEl.querySelector<HTMLElement>('.price-label--primary'));
-  const title = cardEl.querySelector('.sku-card-small-header__title')?.textContent?.trim();
-
-  if (!title || !price) {
-    storeParsedTitleToElement(cardEl, null);
-    return;
+  // Костыль из за кеширования, dom не перестраивается а только обноаляются значения
+  const productId = productRoot.querySelector('[itemprop="sku"]')?.getAttribute('content');
+  if (productId && productRoot.dataset.productId !== productId) {
+    productRoot.classList.remove(BEST_PRICE_WRAP_CLASS_NAME);
+    productRoot.dataset.productId = productId;
   }
-  console.log(title, price);
-  const parsedTitle = parseTitleWithPrice(title, price);
-  cardEl.querySelector('.sku-card-small-prices ')?.after(renderBestPrice(parsedTitle));
-  storeParsedTitleToElement(cardEl, parsedTitle);
+  processProductCard(productRoot, {
+    price_sel: 'div.price-new',
+    title_sel: 'h1.product__title',
+    to_render: {sel: 'div.price-new', pos: 'after'},
+  });
 }
 
 export function initCatalog(): void {
-  const init = () => {
-    const cardList = document.querySelectorAll('.sku-card-small');
-    for (const cardEl of cardList) {
-      processProductCard(cardEl as HTMLElement);
-    }
-    // Reorder
-    const catalogWrapEl = document.querySelector('.catalog-grid__grid');
-    const buttonWrapEl = ElementGetOrCreate(
-      document.querySelector<HTMLElement>('.catalog-sorting'),
-      {
-        pos: 'before',
-      },
-    );
-    if (catalogWrapEl && buttonWrapEl) {
-      initReorderCatalog(catalogWrapEl as HTMLElement, buttonWrapEl);
-    }
-
-    // Copy pagination on top
-    const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
-    const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-      pos: 'before',
-      className: 'GM-pagination-clone',
+  const cardList = document.querySelectorAll<HTMLElement>(
+    '.product-card-wrapper' + ', .swiper-slide',
+  );
+  for (const cardEl of cardList) {
+    processProductCard(cardEl, {
+      price_sel: 'div.price-new',
+      title_sel: 'span.product-card__link-text',
+      to_render: 'div.product-card__control',
     });
-    paginationRootWrap &&
-      copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
+  }
 
-    // Handle dynamic update
-    const catalogContainerEl = document.querySelector<HTMLElement>('.catalog-view__grid-container');
-    catalogContainerEl &&
-      waitCompletePage(
-        () => {
-          init();
-        },
-        {root: catalogContainerEl},
-      );
-  };
-
-  waitCompletePage(() => {
-    init();
-  });
+  // Reorder
+  for (const group of document.querySelectorAll<HTMLElement>(
+    '.catalog-content-group__list > div > div',
+  )) {
+    const buttonWrapEl = ElementGetOrCreate(group.parentElement, {
+      pos: 'before',
+    });
+    if (buttonWrapEl) {
+      initReorderCatalog(group, buttonWrapEl);
+    }
+  }
 }
 
 (function () {
   'use strict';
-  if (!matchLocation('^https://example\\.com/.*')) {
-    return;
-  }
+  const prefix = 'https://(www\\.|)perekrestok\\.ru';
+  if (!matchLocation(prefix)) return;
 
-  if (matchLocation('^https://example\\.com/product/.*')) {
-    initProductPage();
-  }
-
-  if (matchLocation('^https://example\\.com/(catalog|search|brand)/.*')) {
-    initCatalog();
-  }
+  waitCompletePage(
+    () => {
+      if (matchLocation(prefix + '/cat/\\d+/p/')) {
+        initProductPage();
+      }
+      initCatalog();
+    },
+    {runOnce: false, delay: 200},
+  );
 })();

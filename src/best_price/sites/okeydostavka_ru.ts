@@ -5,6 +5,7 @@ import {renderBestPrice} from '../common/price_render';
 import {storeParsedTitleToElement} from '../common';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {ElementGetOrCreate} from '../../utils/dom';
+import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 
 export function initProductPage(): void {
   const init = () => {
@@ -27,7 +28,7 @@ export function initProductPage(): void {
 }
 
 function processProductCard(cardEl: HTMLElement): void {
-  if (cardEl.classList.contains('GM-best-price-wrap')) return;
+  if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
   const priceEl = cardEl?.querySelector<HTMLElement>('.price_and_cart .product-price');
   const price = getPriceFromElement(priceEl?.querySelector<HTMLElement>(':scope > span.price'));
   const title = cardEl.querySelector('.product-name a')?.getAttribute('title')?.trim();

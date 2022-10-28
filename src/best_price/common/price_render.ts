@@ -1,8 +1,9 @@
 import {ParseTitlePriceResult} from './parseTitle';
+import {BEST_PRICE_CLASS_NAME} from './constants';
 
 export function renderBestPrice(titleInfo: ParseTitlePriceResult | null): HTMLElement {
   const wrapEl = document.createElement('div');
-  wrapEl.className = 'GM-best-price';
+  wrapEl.className = BEST_PRICE_CLASS_NAME;
   if (!titleInfo) {
     return wrapEl;
   }

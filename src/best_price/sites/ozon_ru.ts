@@ -55,7 +55,7 @@ export function initCatalog(): void {
       return;
     }
 
-    const cardList = document.querySelectorAll(
+    const cardList = document.querySelectorAll<HTMLElement>(
       '.widget-search-result-container > div > div' +
         ",[data-widget='skuLine'] > div:nth-child(2) > div" +
         ",[data-widget='skuLine'] > div:nth-child(1) > div" + // Промо без заголовка
@@ -64,7 +64,7 @@ export function initCatalog(): void {
         ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
     );
     for (const cardEl of cardList) {
-      processProductCard(cardEl as HTMLElement);
+      processProductCard(cardEl);
     }
 
     const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');

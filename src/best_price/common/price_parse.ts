@@ -8,7 +8,7 @@ export function getPriceFromElement(el: HTMLElement | null | undefined): number 
   return null;
 }
 
-export function getPrice(sel: string): number | null {
-  const priceEl: HTMLElement | null = document.querySelector(sel);
+export function getPrice(sel: string, root: HTMLElement | null = document.body): number | null {
+  const priceEl: HTMLElement | null = (root || document.body).querySelector(sel);
   return getPriceFromElement(priceEl);
 }

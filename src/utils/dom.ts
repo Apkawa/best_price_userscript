@@ -95,13 +95,14 @@ export interface WaitCompletePageOptions {
   root?: Optional<HTMLElement>;
   runOnce?: boolean;
   sync?: boolean;
+  delay?: number;
 }
 
 export function waitCompletePage(
   callback: () => void,
   options: WaitCompletePageOptions = {},
 ): StopCallback {
-  const {root = document.body, runOnce = true, sync = true} = options;
+  const {root = document.body, runOnce = true, sync = true, delay = 150} = options;
   let t: NodeJS.Timeout | null = null;
 
   let lock = false;
@@ -118,10 +119,10 @@ export function waitCompletePage(
           }
           callback();
           if (sync && !runOnce) {
-            setTimeout(run, 100);
+            setTimeout(run, delay);
           }
           lock = false;
-        }, 150);
+        }, delay);
       },
       root,
     );
@@ -151,9 +152,11 @@ export function E(
   return element;
 }
 
+export type InsertPosition = 'before' | 'after' | 'appendChild';
+
 export interface ElementGetOrCreateOptions {
   className?: string;
-  pos?: 'before' | 'after' | 'appendChild';
+  pos?: InsertPosition;
 }
 
 export function ElementGetOrCreate(

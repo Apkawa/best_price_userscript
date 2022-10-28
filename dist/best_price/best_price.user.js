@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -11,6 +11,8 @@
 // @match        https://lenta.com/*
 // @match        https://okeydostavka.ru/*
 // @match        https://www.okeydostavka.ru/*
+// @match        https://perekrestok.ru/*
+// @match        https://www.perekrestok.ru/*
 // @homepage     https://github.com/Apkawa/userscripts
 // @homepageUrl  https://github.com/Apkawa/userscripts
 // @supportUrl   https://github.com/Apkawa/userscripts/issues
@@ -60,7 +62,7 @@
         };
     }
     function waitCompletePage(callback, options = {}) {
-        const {root: root = document.body, runOnce: runOnce = true, sync: sync = true} = options;
+        const {root: root = document.body, runOnce: runOnce = true, sync: sync = true, delay: delay = 150} = options;
         let t = null;
         let lock = false;
         const run = () => {
@@ -71,9 +73,9 @@
                     lock = true;
                     if (runOnce || sync) stop();
                     callback();
-                    if (sync && !runOnce) setTimeout(run, 100);
+                    if (sync && !runOnce) setTimeout(run, delay);
                     lock = false;
-                }), 150);
+                }), delay);
             }), root);
             return stop;
         };
@@ -241,9 +243,13 @@
         }
         return res;
     }
+    const BEST_PRICE_CLASS_NAME = "GM-best-price";
+    const BEST_PRICE_WRAP_CLASS_NAME = "GM-best-price-wrap";
+    const ORDER_NAME_LOCAL_STORAGE = "GM-best-price-default-order";
+    const MAX_NUMBER = 99999999999;
     function renderBestPrice(titleInfo) {
         const wrapEl = document.createElement("div");
-        wrapEl.className = "GM-best-price";
+        wrapEl.className = BEST_PRICE_CLASS_NAME;
         if (!titleInfo) return wrapEl;
         if (titleInfo.weight_price_display) {
             const weightEl = document.createElement("p");
@@ -290,9 +296,6 @@
     function sort(arr, ...sortBy) {
         arr.sort(byPropertiesOf(sortBy));
     }
-    const BEST_PRICE_WRAP_CLASS_NAME = "GM-best-price-wrap";
-    const ORDER_NAME_LOCAL_STORAGE = "GM-best-price-default-order";
-    const MAX_NUMBER = 99999999999;
     const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
@@ -368,12 +371,12 @@
         if (priceText) return parseFloat(priceText.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, ""));
         return null;
     }
-    function getPrice(sel) {
-        const priceEl = document.querySelector(sel);
+    function getPrice(sel, root = document.body) {
+        const priceEl = (root || document.body).querySelector(sel);
         return getPriceFromElement(priceEl);
     }
     function storeParsedTitleToElement(cardEl, parsedTitle) {
-        cardEl.classList.add("GM-best-price-wrap");
+        cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
         if (!parsedTitle) return;
         const ds = cardEl.dataset;
         for (const [k, v] of entries(parsedTitle)) ds[k] = (v || "").toString();
@@ -457,7 +460,7 @@
     }
     function lenta_com_processProductCard(cardEl) {
         var _a, _b, _c;
-        if (cardEl.classList.contains("GM-best-price-wrap")) return;
+        if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
         let price = getPriceFromElement(cardEl.querySelector(".price-label--primary"));
         const title = null === (_b = null === (_a = cardEl.querySelector(".sku-card-small-header__title")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
         if (!title || !price) {
@@ -519,7 +522,7 @@
     }
     function okeydostavka_ru_processProductCard(cardEl) {
         var _a, _b;
-        if (cardEl.classList.contains("GM-best-price-wrap")) return;
+        if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
         const priceEl = null === cardEl || void 0 === cardEl ? void 0 : cardEl.querySelector(".price_and_cart .product-price");
         const price = getPriceFromElement(null === priceEl || void 0 === priceEl ? void 0 : priceEl.querySelector(":scope > span.price"));
         const title = null === (_b = null === (_a = cardEl.querySelector(".product-name a")) || void 0 === _a ? void 0 : _a.getAttribute("title")) || void 0 === _b ? void 0 : _b.trim();
@@ -570,7 +573,7 @@
     }
     function auchan_ru_processProductCard(cardEl, priceSel, titleSel, renderPriceSel) {
         var _a, _b, _c;
-        if (cardEl.classList.contains("GM-best-price-wrap")) return;
+        if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
         const price = getPriceFromElement(cardEl.querySelector(priceSel));
         const title = null === (_b = null === (_a = cardEl.querySelector(titleSel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
         if (!title || !price) {
@@ -620,6 +623,75 @@
             if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-products")) initSearchResults(); else auchan_ru_initCatalog();
         }), {
             runOnce: false
+        });
+    })();
+    function common_parser_processProductCard(cardEl, options) {
+        var _a, _b, _c;
+        const {price_sel: price_sel, title_sel: title_sel, to_render: to_render} = options;
+        if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
+        const price = getPrice(price_sel, cardEl);
+        const title = null === (_b = null === (_a = cardEl.querySelector(title_sel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        if (!title || !price) {
+            console.warn("Not found price or title", title, price, cardEl);
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
+        console.debug(title, price);
+        const parsedTitle = parseTitleWithPrice(title, price);
+        const renderedPrice = renderBestPrice(parsedTitle);
+        let to_render_sel = "";
+        let to_render_pos = "after";
+        if ("string" === typeof to_render) to_render_sel = to_render; else {
+            to_render_sel = to_render.sel;
+            to_render_pos = to_render.pos || to_render_pos;
+        }
+        const to_render_el = cardEl.querySelector(to_render_sel);
+        null === (_c = null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el.parentElement) || void 0 === _c ? void 0 : _c.querySelectorAll("." + BEST_PRICE_CLASS_NAME).forEach((e => e.remove()));
+        null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el[to_render_pos](renderedPrice);
+        storeParsedTitleToElement(cardEl, parsedTitle);
+    }
+    function perekrestok_ru_initProductPage() {
+        var _a;
+        const productRoot = document.querySelector("main");
+        if (!productRoot) return;
+        const productId = null === (_a = productRoot.querySelector('[itemprop="sku"]')) || void 0 === _a ? void 0 : _a.getAttribute("content");
+        if (productId && productRoot.dataset.productId !== productId) {
+            productRoot.classList.remove(BEST_PRICE_WRAP_CLASS_NAME);
+            productRoot.dataset.productId = productId;
+        }
+        common_parser_processProductCard(productRoot, {
+            price_sel: "div.price-new",
+            title_sel: "h1.product__title",
+            to_render: {
+                sel: "div.price-new",
+                pos: "after"
+            }
+        });
+    }
+    function perekrestok_ru_initCatalog() {
+        const cardList = document.querySelectorAll(".product-card-wrapper" + ", .swiper-slide");
+        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+            price_sel: "div.price-new",
+            title_sel: "span.product-card__link-text",
+            to_render: "div.product-card__control"
+        });
+        for (const group of document.querySelectorAll(".catalog-content-group__list > div > div")) {
+            const buttonWrapEl = ElementGetOrCreate(group.parentElement, {
+                pos: "before"
+            });
+            if (buttonWrapEl) initReorderCatalog(group, buttonWrapEl);
+        }
+    }
+    (function() {
+        "use strict";
+        const prefix = "https://(www\\.|)perekrestok\\.ru";
+        if (!matchLocation(prefix)) return;
+        waitCompletePage((() => {
+            if (matchLocation(prefix + "/cat/\\d+/p/")) perekrestok_ru_initProductPage();
+            perekrestok_ru_initCatalog();
+        }), {
+            runOnce: false,
+            delay: 200
         });
     })();
 })();
