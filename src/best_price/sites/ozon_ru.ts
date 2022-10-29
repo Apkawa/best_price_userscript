@@ -5,6 +5,7 @@ import {initReorderCatalog} from '../common/bestPriceReorder';
 import {getPrice, getPriceFromElement} from '../common/price_parse';
 import {storeParsedTitleToElement} from '../common';
 import {copyElementToNewRoot} from '../../utils/dom';
+import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 
 export function initProductPage(): void {
   const init = () => {
@@ -31,6 +32,7 @@ function processProductCard(cardEl: HTMLElement): void {
   const wrapEl = getElementByXpath('a/following-sibling::div[1]', cardEl);
 
   if (!wrapEl || wrapEl?.querySelector('.GM-best-price')) {
+    storeParsedTitleToElement(cardEl, null);
     return;
   }
 
@@ -51,7 +53,7 @@ export function initCatalog(): void {
   const init = () => {
     const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
 
-    if (catalogEl?.querySelector('div.GM-best-price')) {
+    if (catalogEl?.querySelector('.' + BEST_PRICE_WRAP_CLASS_NAME)) {
       return;
     }
 
@@ -69,7 +71,16 @@ export function initCatalog(): void {
 
     const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
     if (catalogEl) {
-      buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+      const el = catalogEl.querySelector<HTMLElement>(':scope > div');
+      const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === 'span 12';
+      if (isDetailCatalog) {
+        // TODO reorder detail catalog like
+        //  https://www.ozon.ru/category/besprovodnye-pylesosy-10657/
+        console.warn('is detail catalog, reorder disabled');
+      } else {
+        // reorder
+        buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+      }
       // Copy paginator on top
       const paginator = document.querySelector<HTMLElement>(
         '[data-widget="megaPaginator"] > div:nth-child(2)',

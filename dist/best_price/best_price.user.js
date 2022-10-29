@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.4
+// @version      0.4.1
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -400,7 +400,10 @@
     function processProductCard(cardEl) {
         var _a;
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
-        if (!wrapEl || (null === wrapEl || void 0 === wrapEl ? void 0 : wrapEl.querySelector(".GM-best-price"))) return;
+        if (!wrapEl || (null === wrapEl || void 0 === wrapEl ? void 0 : wrapEl.querySelector(".GM-best-price"))) {
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
         const price = getPriceFromElement(wrapEl.querySelector("div"));
         const titleEl = wrapEl.querySelector("a span.tsBodyL, a span.tsBodyM:not([style])");
         const title = null === titleEl || void 0 === titleEl ? void 0 : titleEl.textContent;
@@ -416,12 +419,14 @@
     function initCatalog() {
         const init = () => {
             const catalogEl = document.querySelector(".widget-search-result-container > div");
-            if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("div.GM-best-price")) return;
+            if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
             const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
             for (const cardEl of cardList) processProductCard(cardEl);
             const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
             if (catalogEl) {
-                buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+                const el = catalogEl.querySelector(":scope > div");
+                const isDetailCatalog = el && "span 12" === getComputedStyle(el).gridColumnStart;
+                if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
                 const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
                 const paginatorWrap = document.querySelector(".widget-search-result-container");
                 if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
