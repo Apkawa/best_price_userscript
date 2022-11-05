@@ -1,36 +1,31 @@
-# Project
-userscript-typescript-webpack is a starter to write simple userscripts in typescript
+# Коллекция юзерскриптов
 
-### Why typescript
-For typescript lover. The type definitions help you to write better scripts and faster.
+## Юзерскрипты
 
-### Tampermonkey definition file
-I choose [Tampermonkey](https://tampermonkey.net/) instead of [GreaseMonkey](https://www.greasespot.net/) as it is available in both Firefox and Chrome. Do not hesitate to modify the definition file.
+### Актуальные скрипты
 
-It won't be difficile to use with GreaseMonkey
+* [best_price](src/best_price) - поиск лучшей цены
+* [pikabu.ru/enchanted.user.ts](src/pikabu.ru/enchanted.user.ts) - улучшения пикабу, 
+  * возвращение кнопки сохранить
+  * перенос поля комментирования вверх чтобы удобнее сразу писать комментарий для комментируемых постов
+* [pikabu.ru/video_url.user.ts](src/pikabu.ru/video_url.user.ts) - добавление ссылки на скачивание [mp4] и [gif], в пикабу видео по умолчанию в формате webm, телеграм такое не переваривает
 
-## How to use it
-### Install
-I use [Yarn](https://yarnpkg.com) for this project. It is not hard to use `npm` as well.
-```shell
-yarn install
-```
 
-### Code
-Write your userscript inside `src/userscript-main.ts` file. Of course, you can break your code into many modules (Webpack is here for it).
+### Заброшенные
 
-### Run
-@see `package.json` scripts
+* `src/hd.kinopoisk.ru/kp_subtitle_petition.user.ts` - для петиций по добавлению в КП субтитров и оригинальной озвучки. Давно не обновлялось, уже не работает
+* [pikabu.ru/hide_watermark.user.ts](src/pikabu.ru/hide_watermark.user.ts) - скрытие ватермарки. вместо этого удобнее юзать правило в uBlock ` pikabu.ru##img[data-watermarked='1']`
+* [ozon.ru/best_price_calculator.user.ts](src/ozon.ru/best_price_calculator.user.ts) -  неактуальное, см [best_price](src/best_price)
 
-Build the userscript and paste the content of `dist/` to your tampermonkey script:
-```shell
-yarn run build
-```
+## Установка
 
-You can save the copy step by using another script as it will copy the output content inside your clipboard:
-```shell
-yarn run build-clip
-```
+1. Установите [Tampermonkey](https://www.tampermonkey.net/) (GreaseMonkey не тестировался, не уверен что работает)
+2. Откройте https://github.com/Apkawa/userscripts/tree/master/dist выберите файл скрипта *.user.js
+3. Нажмите кнопку `raw`
+4. Предложат установить юзерскрипт, соглашайтесь
 
-### Debug
-Browser debugging tools are enough for most cases.
+
+## Самостоятельная сборка
+
+По вопросам самостоятельной сборки и доработок см в [CONTRIBUTING](./CONTRIBUTING.md)
+
