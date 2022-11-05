@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.4.1
+// @version      0.4.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -398,14 +398,13 @@
         }));
     }
     function processProductCard(cardEl) {
-        var _a;
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
         if (!wrapEl || (null === wrapEl || void 0 === wrapEl ? void 0 : wrapEl.querySelector(".GM-best-price"))) {
             storeParsedTitleToElement(cardEl, null);
             return;
         }
         const price = getPriceFromElement(wrapEl.querySelector("div"));
-        const titleEl = wrapEl.querySelector("a span.tsBodyL, a span.tsBodyM:not([style])");
+        const titleEl = wrapEl.querySelector("a span.tsBodyL, " + "a span.tsBodyM:not([style]), " + 'a span.tsBodyM[style="color:;"]');
         const title = null === titleEl || void 0 === titleEl ? void 0 : titleEl.textContent;
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);
@@ -413,14 +412,14 @@
         }
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        null === (_a = null === titleEl || void 0 === titleEl ? void 0 : titleEl.parentElement) || void 0 === _a ? void 0 : _a.insertBefore(renderBestPrice(parsedTitle), titleEl);
+        null === titleEl || void 0 === titleEl ? void 0 : titleEl.before(renderBestPrice(parsedTitle));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
         const init = () => {
             const catalogEl = document.querySelector(".widget-search-result-container > div");
             if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
-            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
             for (const cardEl of cardList) processProductCard(cardEl);
             const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
             if (catalogEl) {

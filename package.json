@@ -56,7 +56,8 @@
     "prettier": "prettier src/ --write",
     "test": "jest src/",
     "lint": "eslint --ext js,ts,tsx --max-warnings=0 --fix src",
-    "pre-commit": "npm run prettier && npm run test && npm run lint && npm run build && git add -A ."
+    "check": "npm run test && npm run lint",
+    "pre-commit": "npm run prettier && npm run check && npm run build && git add -A ."
   },
   "engines": {
     "npm": ">=7.0.0",

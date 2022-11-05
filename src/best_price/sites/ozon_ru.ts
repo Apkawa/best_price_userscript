@@ -20,7 +20,9 @@ export function initProductPage(): void {
     }
     if (price) {
       const parsedTitle = parseTitleWithPrice(title, price);
-      document.querySelector("[data-widget='webPrice']")?.appendChild(renderBestPrice(parsedTitle));
+      document
+        .querySelector("[data-widget='webPrice']") //
+        ?.appendChild(renderBestPrice(parsedTitle));
     }
   };
   waitCompletePage(() => {
@@ -37,7 +39,11 @@ function processProductCard(cardEl: HTMLElement): void {
   }
 
   const price = getPriceFromElement(wrapEl.querySelector('div'));
-  const titleEl = wrapEl.querySelector('a span.tsBodyL, a span.tsBodyM:not([style])');
+  const titleEl = wrapEl.querySelector(
+    'a span.tsBodyL, ' +
+      'a span.tsBodyM:not([style]), ' + //
+      'a span.tsBodyM[style="color:;"]', // Возможно вам понравится (в заказе)
+  );
   const title = titleEl?.textContent;
   if (!title || !price) {
     storeParsedTitleToElement(cardEl, null);
@@ -45,7 +51,7 @@ function processProductCard(cardEl: HTMLElement): void {
   }
   console.log(title, price);
   const parsedTitle = parseTitleWithPrice(title, price);
-  titleEl?.parentElement?.insertBefore(renderBestPrice(parsedTitle), titleEl);
+  titleEl?.before(renderBestPrice(parsedTitle));
   storeParsedTitleToElement(cardEl, parsedTitle);
 }
 
@@ -62,7 +68,8 @@ export function initCatalog(): void {
         ",[data-widget='skuLine'] > div:nth-child(2) > div" +
         ",[data-widget='skuLine'] > div:nth-child(1) > div" + // Промо без заголовка
         ",[data-widget='skuLineLR'] > div:nth-child(2) > div" +
-        ",[data-widget='skuGrid'] > div:nth-child(2) > div" + // Возможно вам понравятся
+        ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + // Возможно вам понравятся
+        ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + // -/- бесконечный скролл
         ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
     );
     for (const cardEl of cardList) {

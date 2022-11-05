@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  Example for debug userscript
 // @author       Apkawa
-// @match        *://*/
+// @match        *://*/*
 // @require      file:///path/to/userscript/hd.kinopoisk.ru/main.js
 // @grant        none
 // ==/UserScript==
