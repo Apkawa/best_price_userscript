@@ -1,148 +1,244 @@
-import {parseTitle} from './parseTitle';
+import {parseTitle, parseTitleWithPrice} from './parseTitle';
 
 describe('weight', () => {
-  test('Extract weight', () => {
+  test('Extract weight/volume', () => {
     expect(parseTitle('Garnier, 1,5кг')).toStrictEqual({
-      weight: 1.5,
       quantity: 1,
-      item_weight: 1.5,
-      weight_unit: 'кг',
+      units: [{
+        total: 1.5,
+        value: 1.5,
+        unit: 'кг',
+      }],
     });
 
     expect(parseTitle('Сметана Пискаревская, 15%, 200 г')).toStrictEqual({
-      weight: 0.2,
       quantity: 1,
-      item_weight: 0.2,
-      weight_unit: 'кг',
-    });
-    expect(
-      parseTitle('Творог фруктовый Агуша Черника 3.9% 100г для дет.пит. с 6 месяцев'),
-    ).toStrictEqual({
-      weight: 0.1,
-      quantity: 1,
-      item_weight: 0.1,
-      weight_unit: 'кг',
+      units: [{
+        total: .2,
+        value: .2,
+        unit: 'кг',
+      }],
     });
 
     expect(parseTitle('Garnier Банан для очень сухих волос, 390 мл')).toStrictEqual({
-      weight: 0.39,
       quantity: 1,
-      item_weight: 0.39,
-      weight_unit: 'л',
+      units: [{
+        total: .39,
+        value: .39,
+        unit: 'л',
+      }],
     });
     expect(parseTitle('Garnier, 390 грамм')).toStrictEqual({
-      weight: 0.39,
       quantity: 1,
-      item_weight: 0.39,
-      weight_unit: 'кг',
+      units: [{
+        total: .39,
+        value: .39,
+        unit: 'кг',
+      }],
     });
   });
+
   test('extract length', () => {
-    expect(parseTitle('Силовой кабель МБ Провод ВВГмб-П нг(А)-LS 3 x 1,5 мм², 10 м')).toStrictEqual(
-      {
-        weight: 10,
-        quantity: 1,
-        item_weight: 10,
-        weight_unit: 'м',
-      },
-    );
+    expect(parseTitle('Силовой кабель МБ Провод ВВГмб-П нг(А)-LS 3 x 1,5 мм², 10 м'))
+      .toStrictEqual({
+          quantity: 1,
+          units: [{
+            total: 10,
+            value: 10,
+            unit: 'м',
+          }],
+        },
+      );
+  });
+  test('without unit', () => {
+    expect(parseTitle('Aroy-d 70% 17-19%')).toStrictEqual({quantity: 1, units: []});
   });
 });
 test('Extract quantity', () => {
-  expect(parseTitle('Aroy-d Кокосовое молоко 70% жирность 17-19%, 2 шт')).toStrictEqual({
-    weight: null,
+  expect(parseTitle('Aroy-d 70% жирность 17-19%, 2 шт')).toStrictEqual({
     quantity: 2,
-    item_weight: null,
-    weight_unit: null,
+    units: [],
   });
 });
 
-test('Extract quantity and weight', () => {
-  expect(parseTitle('Щедрые хлебцы с чесноком 100г/8шт')).toStrictEqual({
-    weight: 0.1 * 8,
-    quantity: 8,
-    item_weight: 0.1,
-    weight_unit: 'кг',
+describe('Extract quantity and weight', () => {
+  test('Common cases', () => {
+    expect(parseTitle('Щедрые хлебцы с чесноком 100г/8шт')).toStrictEqual({
+      quantity: 8,
+      units: [{
+        total: .1 * 8,
+        value: .1,
+        unit: 'кг',
+      }],
+    });
   });
-  expect(parseTitle('Рис Увелка пропаренный, 5×80 г')).toStrictEqual({
-    weight: 0.08 * 5,
-    quantity: 5,
-    item_weight: 0.08,
-    weight_unit: 'кг',
+  test('cases', () => {
+    const cases = [
+      '80г×5шт',
+      '80 г. по 5',
+      '5×80 г',
+      '5х80 г',
+      '80 г x 5 шт',
+      '5 шт. по 80 грамм',
+      '80 г x 5',
+    ];
+    for (const title of cases) {
+      expect(parseTitle('Рис, ' + title), title).toStrictEqual({
+        quantity: 5,
+        units: [{total: .08 * 5, value: .08, unit: 'кг'}],
+      });
+    }
   });
-  expect(parseTitle("Кофе молотый 500 г, Peppo's набор 2 упаковки по 250 гр")).toStrictEqual({
-    weight: 0.5,
+
+  test('Fuzzy check combinations', () => {
+    const quantity = 5;
+    const quantity_units = ['шт'];
+    const weight = 100;
+    const weight_units = {
+      'кг': ['г', 'грамм', 'гр'],
+      'л': ['мл'],
+    };
+    const delimiter = ['по', '×', 'х', '*'];
+    for (const q_u of quantity_units) {
+      for (const [unit, unit_displays] of Object.entries(weight_units)) {
+        for (const u_d of unit_displays) {
+          for (const d of delimiter) {
+
+            const weight_variations = [`${weight}${u_d}`, `${weight} ${u_d}`, `${weight} ${u_d}.`];
+            const quantity_variations = [`${quantity}${q_u}`, `${quantity} ${q_u}`,
+              `${quantity} ${q_u}.`, `${quantity}`];
+            let delim_variations = [d, ` ${d}`, `${d} `, ` ${d} `, `    ${d}    `];
+            if (['по'].includes(d))  {
+              // Word delim must be around spaces
+              delim_variations = [` ${d} `]
+            }
+
+            for (const w of weight_variations) {
+              for (const q of quantity_variations) {
+                for (const dv of delim_variations) {
+                  const titles = [`${w}${dv}${q}`, `${q}${dv}${w}`];
+                  for (const t of titles) {
+                    expect(parseTitle('Рис, ' + t), t).toStrictEqual({
+                      quantity: quantity,
+                      units: [{total: (weight * quantity) / 1000, value: weight / 1000, unit: unit}],
+                    });
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+});
+test('Priority parse weight with quantity', () => {
+  expect(parseTitle('Кофе молотый 500 г, Peppo\'s набор 2 упаковки по 250 гр')).toStrictEqual({
     quantity: 2,
-    item_weight: 0.25,
-    weight_unit: 'кг',
+    units: [{
+      total: .25 * 2,
+      value: .25,
+      unit: 'кг',
+    }],
   });
   expect(parseTitle('Кофе молотый, 1 кг, натуральный (2 упаковки по 500г)')).toStrictEqual({
-    weight: 1,
     quantity: 2,
-    item_weight: 0.5,
-    weight_unit: 'кг',
+    units: [{
+      total: .5 * 2,
+      value: .5,
+      unit: 'кг',
+    }],
   });
-
-  expect(
-    parseTitle('Пряность Куркума молотая для мяса, риса, овощей Global Spice - набор 3х20 г'),
-  ).toStrictEqual({
-    weight: 0.02 * 3,
-    quantity: 3,
-    item_weight: 0.02,
-    weight_unit: 'кг',
-  });
-
-  expect(parseTitle('Aroy-d Кокосовое молоко 70% жирность 17-19%, 500 мл x 2 шт')).toStrictEqual({
-    weight: 1.0,
-    quantity: 2,
-    item_weight: 0.5,
-    weight_unit: 'л',
-  });
-
-  expect(parseTitle('100% Кокосовое молоко АЗБУКА ПРОДУКТОВ кулинарное 6шт*1л')).toStrictEqual({
-    weight: 6.0,
-    quantity: 6,
-    item_weight: 1.0,
-    weight_unit: 'л',
-  });
-
-  expect(
-    parseTitle('Тофу классический, соевый продукт, комплект 2 шт. по 300 грамм, Green East'),
-  ).toStrictEqual({
-    weight: 0.6,
-    quantity: 2,
-    item_weight: 0.3,
-    weight_unit: 'кг',
-  });
-
-  expect(parseTitle('Влажный корм для кошек Whiskas, 75 г x 28')).toStrictEqual({
-    weight: 0.075 * 28,
-    quantity: 28,
-    item_weight: 0.075,
-    weight_unit: 'кг',
-  });
-});
-
-test('Extract quantity and weight with priority', () => {
   expect(parseTitle('Порционный сахар в стиках 1 кг (200шт. х 5 гр.) белый')).toStrictEqual({
-    weight: 0.005 * 200,
     quantity: 200,
-    item_weight: 0.005,
-    weight_unit: 'кг',
+    units: [{
+      total: .005 * 200,
+      value: .005,
+      unit: 'кг',
+    }],
   });
 });
-
 test('Extract combined quantity', () => {
   expect(parseTitle('60шт х 10уп')).toStrictEqual({
-    weight: null,
     quantity: 600,
-    item_weight: null,
-    weight_unit: null,
+    units: [],
   });
   expect(parseTitle('SYNERGETIC 110 шт, набор 2х55 шт, бесфосфатные')).toStrictEqual({
-    weight: null,
     quantity: 110,
-    item_weight: null,
-    weight_unit: null,
+    units: [],
+  });
+});
+
+
+describe('Parse with price', () => {
+  test('with quantity', () => {
+    expect(parseTitleWithPrice('Aroy-d 70% жирность 17-19%, 2 шт', 200))
+      .toStrictEqual({
+        quantity: 2,
+        quantity_price: 100,
+        quantity_price_display: '100 ₽/шт',
+        units: [],
+      });
+  });
+  test('with unit', () => {
+    expect(parseTitleWithPrice('Aroy-d 70% жирность 17-19%, 200г', 200))
+      .toStrictEqual({
+        quantity: 1,
+        quantity_price: null,
+        quantity_price_display: null,
+        units: [{
+          total: .2,
+          value: .2,
+          price: 200 / .2,
+          price_display: '1000 ₽/кг',
+          unit: 'кг',
+        }],
+      });
+  });
+  test('without unit', () => {
+    expect(parseTitleWithPrice('Aroy-d 70% 17-19%', 200))
+      .toStrictEqual(null);
+  });
+
+  test('With quantity and unit', () => {
+    expect(parseTitleWithPrice('Aroy-d 70% 17-19% 500 мл x 2 шт', 200))
+      .toStrictEqual({
+        'quantity': 2,
+        'quantity_price': 100,
+        'quantity_price_display': '100 ₽/шт',
+        'units': [
+          {
+            'price': 200,
+            'price_display': '200 ₽/л',
+            'total': 1,
+            'unit': 'л',
+            'value': 0.5,
+          },
+        ],
+      });
+  });
+});
+
+
+describe('Multi-units', () => {
+  test('Parse led lamps, we need compare lm/w and lm/rub', () => {
+    expect(parseTitle('Лампа светодиодная E27 220-240 В 10 Вт ' +
+      'груша матовая 1000 лм нейтральный белый свет')).toStrictEqual(
+      {
+        quantity: 1,
+        units: [
+          {
+            value: 1000,
+            unit: 'лм',
+            total: 1000,
+          },
+          {
+            value: 10,
+            unit: 'Вт',
+            total: 10,
+          },
+        ],
+      },
+    );
   });
 });

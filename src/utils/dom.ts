@@ -1,6 +1,8 @@
 import {Optional} from '@app/utils/types';
 
-export function getElementByXpath(xpath: string, root: Node = document): HTMLElement | null {
+
+export function getElementByXpath<T extends Node = HTMLElement>(xpath: string,
+                                                  root: Node = document): T | null {
   const e = document.evaluate(
     xpath,
     root,
@@ -8,10 +10,12 @@ export function getElementByXpath(xpath: string, root: Node = document): HTMLEle
     XPathResult.FIRST_ORDERED_NODE_TYPE,
     null,
   ).singleNodeValue;
-  return e && (e as HTMLElement);
+  return e && (e as T);
 }
 
-export function getElementsByXpath(xpath: string, root: Node = document): HTMLElement[] {
+export function getElementsByXpath<T extends Node = HTMLElement>(
+  xpath: string,
+  root: Node = document): T[] {
   const iterator = document.evaluate(
     xpath,
     root,
@@ -19,10 +23,10 @@ export function getElementsByXpath(xpath: string, root: Node = document): HTMLEl
     XPathResult.ORDERED_NODE_ITERATOR_TYPE,
     null,
   );
-  const result: HTMLElement[] = [];
+  const result: T[] = [];
   let el = iterator.iterateNext();
   while (el) {
-    result.push(el as HTMLElement);
+    result.push(el as T);
     el = iterator.iterateNext();
   }
   return result;
@@ -32,7 +36,7 @@ export function markElementHandled(
   wrapFn: (el: HTMLElement) => void,
   attrName = '_handled',
 ): (el: HTMLElement) => void {
-  return function (el) {
+  return function(el) {
     if (el.getAttribute(attrName)) {
       return;
     }

@@ -1,4 +1,5 @@
 {
+  "files": ["node_modules/jest-expect-message/types/index.d.ts"],
   "compilerOptions": {
     "target": "es2017",
     "module": "esnext",

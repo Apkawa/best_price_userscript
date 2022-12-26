@@ -7,13 +7,10 @@ export function renderBestPrice(titleInfo: ParseTitlePriceResult | null): HTMLEl
   if (!titleInfo) {
     return wrapEl;
   }
-  if (titleInfo.weight_price_display) {
-    const weightEl = document.createElement('p');
-    // price -> weight
-    //  x    -> 1000г
-    // TODO unit size
-    weightEl.innerText = titleInfo.weight_price_display;
-    wrapEl.appendChild(weightEl);
+  for (const u of titleInfo.units) {
+    const el = document.createElement('p');
+    el.innerText = u.price_display;
+    wrapEl.appendChild(el);
   }
   if (titleInfo.quantity_price_display) {
     const qtyEl = document.createElement('p');
@@ -24,7 +21,6 @@ export function renderBestPrice(titleInfo: ParseTitlePriceResult | null): HTMLEl
     wrapEl.style.border = '1px solid red';
     wrapEl.style.padding = '5px';
     wrapEl.style.margin = '5px';
-
     wrapEl.style.width = 'fit-content';
   }
   return wrapEl;
