@@ -5,7 +5,7 @@
 // @description  Example for debug userscript
 // @author       Apkawa
 // @match        *://*/*
-// @require      file:///path/to/userscript/hd.kinopoisk.ru/main.js
+// @require      file:///path/to/dist/best_price/best_price.user.js
 // @grant        none
 // ==/UserScript==
 

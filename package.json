@@ -1,10 +1,10 @@
 {
   "author": "Apkawa",
-  "homepage": "https://github.com/Apkawa/userscripts",
-  "repository": "https://github.com/Apkawa/userscripts",
+  "homepage": "https://github.com/Apkawa/best_price_userscript",
+  "repository": "https://github.com/Apkawa/best_price_userscript",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Apkawa/userscripts/issues"
+    "url": "https://github.com/Apkawa/best_price_userscript/issues"
   },
   "readme": "README.md",
   "devDependencies": {
