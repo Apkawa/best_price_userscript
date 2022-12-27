@@ -34,14 +34,25 @@ export function initCatalog(): void {
   }
 
   // Reorder
-  for (const group of document.querySelectorAll<HTMLElement>(
-    '.catalog-content-group__list > div > div',
-  )) {
-    const buttonWrapEl = ElementGetOrCreate(group.parentElement, {
+  for (const group of document.querySelectorAll<HTMLElement>('.catalog-content-group__list')) {
+    const cards = group.querySelectorAll<HTMLElement>(
+      ':scope > div:not(.GM-fix) > div > div > div',
+    );
+    const cardsWrap = ElementGetOrCreate(group, {
+      className: 'GM-fix',
+    });
+    for (const c of cards) {
+      c.style.width = '220px';
+      cardsWrap?.appendChild(c);
+    }
+
+    const buttonWrapEl = ElementGetOrCreate(group, {
       pos: 'before',
     });
-    if (buttonWrapEl) {
-      initReorderCatalog(group, buttonWrapEl);
+    if (buttonWrapEl && cardsWrap) {
+      cardsWrap.style.display = 'flex';
+      cardsWrap.style.flexWrap = 'wrap';
+      initReorderCatalog(cardsWrap, buttonWrapEl);
     }
   }
 }
@@ -58,6 +69,6 @@ export function initCatalog(): void {
       }
       initCatalog();
     },
-    {runOnce: false, delay: 200},
+    {runOnce: false, delay: 300},
   );
 })();
