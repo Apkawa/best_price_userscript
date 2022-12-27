@@ -1,7 +1,22 @@
 import {ParseTitlePriceResult} from './parseTitle';
 import {BEST_PRICE_CLASS_NAME} from './constants';
+import {entries} from '../../utils';
 
-export function renderBestPrice(titleInfo: ParseTitlePriceResult | null): HTMLElement {
+export type RenderBestPriceExtraStyle = Omit<
+  Partial<CSSStyleDeclaration>,
+  | 'length'
+  | 'parentRule'
+  | 'getPropertyPriority'
+  | 'getPropertyValue'
+  | 'item'
+  | 'removeProperty'
+  | 'setProperty'
+>;
+
+export function renderBestPrice(
+  titleInfo: ParseTitlePriceResult | null,
+  extraStyle: RenderBestPriceExtraStyle | null = {},
+): HTMLElement {
   const wrapEl = document.createElement('div');
   wrapEl.className = BEST_PRICE_CLASS_NAME;
   if (!titleInfo) {
@@ -24,8 +39,12 @@ export function renderBestPrice(titleInfo: ParseTitlePriceResult | null): HTMLEl
     wrapEl.style.border = '1px solid red';
     wrapEl.style.padding = '5px';
     wrapEl.style.margin = '5px';
-
     wrapEl.style.width = 'fit-content';
+    for (const [k, v] of entries(extraStyle || {})) {
+      if (typeof v == 'string') {
+        wrapEl.style[k] = v;
+      }
+    }
   }
   return wrapEl;
 }

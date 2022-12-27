@@ -106,7 +106,7 @@
         return wrapEl;
     }
     function copyElementToNewRoot(el, toRoot, options = {}) {
-        var _a, _b;
+        var _a;
         const {className: className = "GM-cloned", pos: pos = "appendChild"} = options;
         if (!el) {
             console.warn(`el is ${typeof el}`);
@@ -114,7 +114,7 @@
         }
         let elList = [];
         if (el instanceof HTMLElement) elList = [ el ]; else elList = el;
-        null === (_b = null === (_a = toRoot.parentElement) || void 0 === _a ? void 0 : _a.querySelectorAll("." + className)) || void 0 === _b ? void 0 : _b.forEach((e => e.remove()));
+        for (const e of (null === (_a = toRoot.parentElement) || void 0 === _a ? void 0 : _a.querySelectorAll("." + className)) || []) e.remove();
         for (const _el of elList) {
             const clonedEl = _el.cloneNode(true);
             clonedEl.classList.add(className);
@@ -247,7 +247,7 @@
     const BEST_PRICE_WRAP_CLASS_NAME = "GM-best-price-wrap";
     const ORDER_NAME_LOCAL_STORAGE = "GM-best-price-default-order";
     const MAX_NUMBER = 99999999999;
-    function renderBestPrice(titleInfo) {
+    function renderBestPrice(titleInfo, extraStyle = {}) {
         const wrapEl = document.createElement("div");
         wrapEl.className = BEST_PRICE_CLASS_NAME;
         if (!titleInfo) return wrapEl;
@@ -266,6 +266,7 @@
             wrapEl.style.padding = "5px";
             wrapEl.style.margin = "5px";
             wrapEl.style.width = "fit-content";
+            for (const [k, v] of entries(extraStyle || {})) if ("string" == typeof v) wrapEl.style[k] = v;
         }
         return wrapEl;
     }
@@ -642,16 +643,22 @@
         }
         console.debug(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        const renderedPrice = renderBestPrice(parsedTitle);
+        const renderedPrice = renderBestPrice(parsedTitle, options.extra_style);
         let to_render_sel = "";
         let to_render_pos = "after";
         if ("string" === typeof to_render) to_render_sel = to_render; else {
             to_render_sel = to_render.sel;
             to_render_pos = to_render.pos || to_render_pos;
         }
-        const to_render_el = cardEl.querySelector(to_render_sel);
-        null === (_c = null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el.parentElement) || void 0 === _c ? void 0 : _c.querySelectorAll("." + BEST_PRICE_CLASS_NAME).forEach((e => e.remove()));
-        null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el[to_render_pos](renderedPrice);
+        const to_render_els = cardEl.querySelectorAll(to_render_sel);
+        for (const to_render_el of to_render_els) for (const e of (null === (_c = null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el.parentElement) || void 0 === _c ? void 0 : _c.querySelectorAll("." + BEST_PRICE_CLASS_NAME)) || []) e.remove();
+        let i = 0;
+        for (const to_render_el of to_render_els) {
+            let r = renderedPrice;
+            if (i > 0) r = renderedPrice.cloneNode(true);
+            null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el[to_render_pos](r);
+            i += 1;
+        }
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function perekrestok_ru_initProductPage() {
@@ -697,5 +704,76 @@
             runOnce: false,
             delay: 200
         });
+    })();
+    const extraStyle = {
+        fontSize: "1rem",
+        color: "black"
+    };
+    function wildberries_ru_initProductPage() {
+        waitCompletePage((() => {
+            const productRoot = document.querySelector(".product-page");
+            if (!productRoot) return;
+            common_parser_processProductCard(productRoot, {
+                price_sel: ".price-block__final-price",
+                title_sel: ".product-page__header h1",
+                to_render: ".price-block",
+                extra_style: extraStyle
+            });
+            const cardList = document.querySelectorAll(".goods-card");
+            for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+                price_sel: ".goods-card__price-now",
+                title_sel: ".goods-card__description",
+                to_render: ".goods-card__price",
+                extra_style: extraStyle
+            });
+        }), {
+            runOnce: false,
+            delay: 300
+        });
+    }
+    function wildberries_ru_initCatalog() {
+        const init = () => {
+            const productPopupRoot = document.querySelector(".popup .product");
+            if (!productPopupRoot) return;
+            common_parser_processProductCard(productPopupRoot, {
+                price_sel: ".price-block__final-price",
+                title_sel: ".product__header",
+                to_render: ".price-block",
+                extra_style: extraStyle
+            });
+            const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
+            for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+                price_sel: ".price__lower-price",
+                title_sel: ".goods-name",
+                to_render: ".product-card__price",
+                extra_style: {
+                    fontSize: "1rem",
+                    color: "black"
+                }
+            });
+            const catalogWrapEl = document.querySelector(".product-card-list");
+            const buttonWrapEl = ElementGetOrCreate(document.querySelector(".inner-sorter"), {
+                pos: "before"
+            });
+            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+            const paginationRootWrap = ElementGetOrCreate(catalogWrapEl, {
+                pos: "before",
+                className: "GM-pagination-clone"
+            });
+            paginationRootWrap && copyElementToNewRoot(document.querySelectorAll(".pager-bottom:not(.GM-cloned)"), paginationRootWrap);
+        };
+        waitCompletePage((() => {
+            init();
+        }), {
+            runOnce: false,
+            delay: 300
+        });
+    }
+    (function() {
+        "use strict";
+        const prefix = "https://(www\\.|)wildberries\\.ru";
+        if (!matchLocation(prefix)) return;
+        wildberries_ru_initProductPage();
+        wildberries_ru_initCatalog();
     })();
 })();

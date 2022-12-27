@@ -195,7 +195,9 @@ export function copyElementToNewRoot(
   } else {
     elList = el;
   }
-  toRoot.parentElement?.querySelectorAll('.' + className)?.forEach((e) => e.remove());
+  for (const e of toRoot.parentElement?.querySelectorAll('.' + className) || []) {
+    e.remove();
+  }
 
   for (const _el of elList) {
     const clonedEl = _el.cloneNode(true) as HTMLElement;
