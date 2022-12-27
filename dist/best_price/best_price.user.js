@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.4.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -18,6 +17,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
+// @version      0.4.3
 // ==/UserScript==
 (function() {
     "use strict";
@@ -318,12 +318,14 @@
                 initial_order = i;
                 ds.initial_order = i.toString();
             }
-            catalogRecords.push({
+            const record = {
                 el: wrapEl,
                 initial_order: initial_order,
                 weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
                 quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER
-            });
+            };
+            catalogRecords.push(record);
+            console.debug("Catalog order record: ", record);
         }
         const buttons = {
             initial_order: E("button", {
@@ -679,11 +681,23 @@
             title_sel: "span.product-card__link-text",
             to_render: "div.product-card__control"
         });
-        for (const group of document.querySelectorAll(".catalog-content-group__list > div > div")) {
-            const buttonWrapEl = ElementGetOrCreate(group.parentElement, {
+        for (const group of document.querySelectorAll(".catalog-content-group__list")) {
+            const cards = group.querySelectorAll(":scope > div:not(.GM-fix) > div > div > div");
+            const cardsWrap = ElementGetOrCreate(group, {
+                className: "GM-fix"
+            });
+            for (const c of cards) {
+                c.style.width = "220px";
+                null === cardsWrap || void 0 === cardsWrap ? void 0 : cardsWrap.appendChild(c);
+            }
+            const buttonWrapEl = ElementGetOrCreate(group, {
                 pos: "before"
             });
-            if (buttonWrapEl) initReorderCatalog(group, buttonWrapEl);
+            if (buttonWrapEl && cardsWrap) {
+                cardsWrap.style.display = "flex";
+                cardsWrap.style.flexWrap = "wrap";
+                initReorderCatalog(cardsWrap, buttonWrapEl);
+            }
         }
     }
     (function() {
@@ -695,7 +709,7 @@
             perekrestok_ru_initCatalog();
         }), {
             runOnce: false,
-            delay: 200
+            delay: 300
         });
     })();
 })();

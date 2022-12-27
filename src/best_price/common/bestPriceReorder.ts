@@ -39,12 +39,14 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
       initial_order = i;
       ds.initial_order = i.toString();
     }
-    catalogRecords.push({
+    const record = {
       el: wrapEl,
       initial_order,
       weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
       quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER,
-    });
+    };
+    catalogRecords.push(record);
+    console.debug('Catalog order record: ', record);
   }
 
   const buttons = {
