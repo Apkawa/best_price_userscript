@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.4.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -18,6 +17,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
+// @version      0.4.2
 // ==/UserScript==
 (function() {
     "use strict";

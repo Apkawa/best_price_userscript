@@ -38,6 +38,7 @@ function getExtraInfo(data: BannerDataType) {
     downloadUrl,
     updateUrl: downloadUrl,
     license: packageJson.license,
+    version: packageJson.version,
   };
 }
 
