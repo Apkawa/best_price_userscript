@@ -15,7 +15,8 @@
     "@types/eslint": "^7.28.0",
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/glob": "^7.1.4",
-    "@types/jest": "^29.2.0",
+    "@types/jest": "^29.2.4",
+    "@types/jest-expect-message": "^1.1.0",
     "@types/lodash": "^4.14.175",
     "@types/node": "^16.10.2",
     "@types/prettier": "^2.4.1",
@@ -25,6 +26,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
+    "eslint-plugin-jest": "^25.7.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-userscripts": "0.0.4",
     "fromentries": "^1.3.2",
@@ -112,7 +114,8 @@
     },
     "plugins": [
       "@typescript-eslint",
-      "prettier"
+      "prettier",
+      "jest"
     ],
     "rules": {
       "prettier/prettier": "off",
@@ -122,6 +125,7 @@
           "code": 100
         }
       ],
+
       "jest/valid-expect": [
         "error",
         {

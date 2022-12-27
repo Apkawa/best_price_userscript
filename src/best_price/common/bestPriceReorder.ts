@@ -1,6 +1,7 @@
 import {E, entries, GM_addStyle, values} from '../../utils';
 import {sort} from '../../utils/sort';
 import {BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE} from './constants';
+import {loadParsedTitleFromElement} from './store';
 
 const BEST_ORDER_BUTTON_CLASS_NAME = 'GM-best-price-button-wrap';
 
@@ -32,7 +33,13 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
       console.warn('!', el);
       continue;
     }
-    const ds = el.dataset;
+    const ds = {
+      ...loadParsedTitleFromElement(el),
+      initial_order: '0',
+    };
+    if (!ds) {
+      continue;
+    }
     i += 1;
     let initial_order = parseInt(ds.initial_order || '0');
     if (!initial_order) {
@@ -42,8 +49,8 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
     const record = {
       el: wrapEl,
       initial_order,
-      weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
-      quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER,
+      weight_price: ds.units?.[0]?.price ? ds.units[0].price : MAX_NUMBER,
+      quantity_price: ds.quantity_price ? ds.quantity_price : MAX_NUMBER,
     };
     catalogRecords.push(record);
     console.debug('Catalog order record: ', record);

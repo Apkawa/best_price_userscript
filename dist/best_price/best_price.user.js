@@ -159,47 +159,59 @@
     Object.keys;
     const entries = Object.entries;
     const values = Object.values;
-    const WORD_BOUNDARY_END = /(?=\s|[.,);/]|$)/;
-    const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")", WORD_BOUNDARY_END ]);
+    var __rest = void 0 && (void 0).__rest || function(s, e) {
+        var t = {};
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+        if (null != s && "function" === typeof Object.getOwnPropertySymbols) {
+            var i = 0;
+            for (p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i])) t[p[i]] = s[p[i]];
+        }
+        return t;
+    };
+    const WORD_BOUNDARY_END = /(?=\s*|[.,);/]|$)/;
+    const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")\\.?", WORD_BOUNDARY_END ]);
     const QUANTITY_UNITS = [ "шт", "рулон", "пакет", "уп", "упаков(?:ок|ки|ка)", "салфет(?:ок|ки|ка)", "таб", "капсул" ];
     const QUANTITY_REGEXP = RegExp(`(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join("|")})\\.?`);
     const QUANTITY_2_REGEXP = RegExp(`(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join("|")})\\.?`);
-    const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×/]|по)\s?/;
+    const COMBINE_DELIMETER_REGEXP = /\s*?(?:[xх*×/]|по)\s*?/;
     const COMBINE_QUANTITY_LIST = [ mRegExp([ /(?<quantity_2>\d+)/, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity_2>\d+)/ ]), mRegExp([ QUANTITY_2_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]) ];
     const COMBINE_QANTITY_WEIGHT_REGEXP_LIST = [ mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ /(?<quantity>\d+)/, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity>\d+)/ ]) ];
-    function parseGroups(groups) {
+    function parseGroups(groups, allowSum = true) {
         const result = {
-            weight: null,
-            item_weight: null,
-            weight_unit: null,
-            quantity: 1
+            quantity: 1,
+            units: []
         };
         if (groups.value) {
             const valueStr = null === groups || void 0 === groups ? void 0 : groups.value;
             const unit = null === groups || void 0 === groups ? void 0 : groups.unit;
             if (valueStr && unit) {
                 let value = parseFloat(valueStr.replace(",", "."));
+                let unit = null;
                 if (groups.weight_unit) {
                     if (!groups.weight_SI) value /= 1e3;
-                    result.weight_unit = "кг";
+                    unit = "кг";
                 }
                 if (groups.volume_unit) {
                     if (!groups.volume_SI) value /= 1e3;
-                    result.weight_unit = "л";
+                    unit = "л";
                 }
                 if (groups.length_unit) {
                     if (!groups.length_SI) value /= 1e3;
-                    result.weight_unit = "м";
+                    unit = "м";
                 }
-                result.weight = value;
-                result.item_weight = value;
+                if (!unit) throw "Unknown unit";
+                result.units.push({
+                    unit: unit,
+                    value: value,
+                    total: value
+                });
             }
         }
         if (groups.quantity) {
             const valueStr = null === groups || void 0 === groups ? void 0 : groups.quantity;
             if (valueStr) result.quantity = parseInt(valueStr);
         }
-        if (result.item_weight && result.quantity > 1) result.weight = result.quantity * result.item_weight;
+        if (allowSum && result.quantity > 1) for (const u of result.units) u.total = result.quantity * u.value;
         return result;
     }
     function parseTitle(title) {
@@ -223,19 +235,24 @@
             const quantityMatch = QUANTITY_REGEXP.exec(title);
             if (null === quantityMatch || void 0 === quantityMatch ? void 0 : quantityMatch.groups) groups = Object.assign(Object.assign({}, groups), quantityMatch.groups);
         }
-        return parseGroups(groups);
+        let allowSum = true;
+        if (null === groups || void 0 === groups ? void 0 : groups.value) allowSum = false;
+        return parseGroups(groups, allowSum);
     }
     function parseTitleWithPrice(title, price) {
-        const res = Object.assign(Object.assign({}, parseTitle(title)), {
-            weight_price: null,
-            weight_price_display: null,
+        const _a = parseTitle(title), {units: units} = _a, titleParsed = __rest(_a, [ "units" ]);
+        const res = Object.assign(Object.assign({}, titleParsed), {
+            units: [],
             quantity_price: null,
             quantity_price_display: null
         });
-        if ((!res.quantity || 1 == res.quantity) && !res.weight) return null;
-        if (res.weight) {
-            res.weight_price = round(price / res.weight);
-            res.weight_price_display = `${res.weight_price} ₽/${res.weight_unit || "?"}`;
+        if ((!res.quantity || 1 == res.quantity) && !units.length) return null;
+        for (const u of units) {
+            const p = round(price / u.total);
+            res.units.push(Object.assign(Object.assign({}, u), {
+                price: p,
+                price_display: `${p} ₽/${u.unit || "?"}`
+            }));
         }
         if (res.quantity > 1) {
             res.quantity_price = round(price / res.quantity);
@@ -251,10 +268,10 @@
         const wrapEl = document.createElement("div");
         wrapEl.className = BEST_PRICE_CLASS_NAME;
         if (!titleInfo) return wrapEl;
-        if (titleInfo.weight_price_display) {
-            const weightEl = document.createElement("p");
-            weightEl.innerText = titleInfo.weight_price_display;
-            wrapEl.appendChild(weightEl);
+        for (const u of titleInfo.units) {
+            const el = document.createElement("p");
+            el.innerText = u.price_display;
+            wrapEl.appendChild(el);
         }
         if (titleInfo.quantity_price_display) {
             const qtyEl = document.createElement("p");
@@ -296,11 +313,26 @@
     function sort(arr, ...sortBy) {
         arr.sort(byPropertiesOf(sortBy));
     }
+    const PREFIX = "bp_";
+    function storeParsedTitleToElement(cardEl, parsedTitle) {
+        cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
+        if (!parsedTitle) return;
+        const ds = cardEl.dataset;
+        for (const [k, v] of entries(parsedTitle)) ds[PREFIX + k] = JSON.stringify(v);
+    }
+    function loadParsedTitleFromElement(cardEl) {
+        const pairs = Object.entries(cardEl.dataset).map((([k, v]) => {
+            if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
+            return [ null, null ];
+        })).filter((([k]) => k));
+        if (pairs.length > 0) return Object.fromEntries(pairs);
+        return null;
+    }
     const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
     function initReorderCatalog(catalogRoot, buttonRoot) {
-        var _a;
+        var _a, _b, _c;
         const buttonWrap = buttonRoot;
         if (!buttonWrap) return;
         const catalogRecords = [];
@@ -311,7 +343,10 @@
                 console.warn("!", el);
                 continue;
             }
-            const ds = el.dataset;
+            const ds = Object.assign(Object.assign({}, loadParsedTitleFromElement(el)), {
+                initial_order: "0"
+            });
+            if (!ds) continue;
             i += 1;
             let initial_order = parseInt(ds.initial_order || "0");
             if (!initial_order) {
@@ -321,8 +356,8 @@
             const record = {
                 el: wrapEl,
                 initial_order: initial_order,
-                weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
-                quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER
+                weight_price: (null === (_b = null === (_a = ds.units) || void 0 === _a ? void 0 : _a[0]) || void 0 === _b ? void 0 : _b.price) ? ds.units[0].price : MAX_NUMBER,
+                quantity_price: ds.quantity_price ? ds.quantity_price : MAX_NUMBER
             };
             catalogRecords.push(record);
             console.debug("Catalog order record: ", record);
@@ -362,7 +397,7 @@
             for (const b of values(buttons)) b.classList.remove("active");
             button.classList.add("active");
         }
-        null === (_a = buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)) || void 0 === _a ? void 0 : _a.remove();
+        null === (_c = buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)) || void 0 === _c ? void 0 : _c.remove();
         buttonWrap.appendChild(E("div", {
             class: BEST_ORDER_BUTTON_CLASS_NAME
         }, ...values(buttons)));
@@ -376,12 +411,6 @@
     function getPrice(sel, root = document.body) {
         const priceEl = (root || document.body).querySelector(sel);
         return getPriceFromElement(priceEl);
-    }
-    function storeParsedTitleToElement(cardEl, parsedTitle) {
-        cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
-        if (!parsedTitle) return;
-        const ds = cardEl.dataset;
-        for (const [k, v] of entries(parsedTitle)) ds[k] = (v || "").toString();
     }
     function initProductPage() {
         const init = () => {

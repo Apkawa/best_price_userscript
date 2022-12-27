@@ -1,8 +1,9 @@
 import {Optional} from '@app/utils/types';
 
-
-export function getElementByXpath<T extends Node = HTMLElement>(xpath: string,
-                                                  root: Node = document): T | null {
+export function getElementByXpath<T extends Node = HTMLElement>(
+  xpath: string,
+  root: Node = document,
+): T | null {
   const e = document.evaluate(
     xpath,
     root,
@@ -15,7 +16,8 @@ export function getElementByXpath<T extends Node = HTMLElement>(xpath: string,
 
 export function getElementsByXpath<T extends Node = HTMLElement>(
   xpath: string,
-  root: Node = document): T[] {
+  root: Node = document,
+): T[] {
   const iterator = document.evaluate(
     xpath,
     root,
@@ -36,7 +38,7 @@ export function markElementHandled(
   wrapFn: (el: HTMLElement) => void,
   attrName = '_handled',
 ): (el: HTMLElement) => void {
-  return function(el) {
+  return function (el) {
     if (el.getAttribute(attrName)) {
       return;
     }

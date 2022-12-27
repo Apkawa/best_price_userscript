@@ -1,11 +1,11 @@
 import {mRegExp, round} from '../../utils';
 
-export type Unit = 'кг' | 'л' | 'м'
+export type Unit = 'кг' | 'л' | 'м';
 
 export interface UnitValue {
-  unit: Unit,
-  value: number, // Per item value
-  total: number, // Per quantity summary,
+  unit: Unit;
+  value: number; // Per item value
+  total: number; // Per quantity summary,
 }
 
 export interface ParseTitleResult {
@@ -71,7 +71,7 @@ interface MatchGroupsResult {
   length_SI?: string;
 }
 
-function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
+function parseGroups(groups: MatchGroupsResult, allowSum = true): ParseTitleResult {
   const result: ParseTitleResult = {
     quantity: 1,
     units: [],
@@ -88,13 +88,13 @@ function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
         if (!groups.weight_SI) {
           value /= 1000;
         }
-        unit = 'кг'
+        unit = 'кг';
       }
       if (groups.volume_unit) {
         if (!groups.volume_SI) {
           value /= 1000;
         }
-        unit = 'л'
+        unit = 'л';
       }
       if (groups.length_unit) {
         if (!groups.length_SI) {
@@ -102,8 +102,8 @@ function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
         }
         unit = 'м';
       }
-      if (! unit) {
-        throw "Unknown unit"
+      if (!unit) {
+        throw 'Unknown unit';
       }
 
       result.units.push({
@@ -120,7 +120,7 @@ function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
       result.quantity = parseInt(valueStr);
     }
   }
-  if (result.quantity > 1) {
+  if (allowSum && result.quantity > 1) {
     for (const u of result.units) {
       u.total = result.quantity * u.value;
     }
@@ -160,25 +160,30 @@ export function parseTitle(title: string): ParseTitleResult {
       groups = {...groups, ...quantityMatch.groups};
     }
   }
+  let allowSum = true;
+  if (groups?.value) {
+    // Кейс когда в товаре встречаются отдельно количества и единицы измерения.
+    // По семантике в этом случае вес разделяется от количества.
+    // Пример "Кофе молотый по восточному 1 кг 4 штуки" - это 4 пачки кофе суммарным весом 1кг.
+    allowSum = false;
+  }
 
-  return parseGroups(groups as MatchGroupsResult);
+  return parseGroups(groups as MatchGroupsResult, allowSum);
 }
 
-
 export interface UnitPriceValue extends UnitValue {
-  price: number,
-  price_display: string
+  price: number;
+  price_display: string;
 }
 
 export interface ParseTitlePriceResult extends ParseTitleResult {
-  units: UnitPriceValue[]
+  units: UnitPriceValue[];
   quantity_price: number | null;
   quantity_price_display: string | null;
 }
 
 export function parseTitleWithPrice(title: string, price: number): ParseTitlePriceResult | null {
-
-  const {units, ...titleParsed} = parseTitle(title)
+  const {units, ...titleParsed} = parseTitle(title);
   const res: ParseTitlePriceResult = {
     ...titleParsed,
     units: [],
@@ -190,12 +195,12 @@ export function parseTitleWithPrice(title: string, price: number): ParseTitlePri
     return null;
   }
   for (const u of units) {
-    const p = round(price / u.total)
+    const p = round(price / u.total);
     res.units.push({
       ...u,
       price: p,
-      price_display: `${p} ₽/${u.unit || '?'}`
-    })
+      price_display: `${p} ₽/${u.unit || '?'}`,
+    });
   }
   if (res.quantity > 1) {
     res.quantity_price = round(price / res.quantity);

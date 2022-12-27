@@ -3,9 +3,9 @@ import {renderBestPrice} from '../common/price_render';
 import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {getPrice, getPriceFromElement} from '../common/price_parse';
-import {storeParsedTitleToElement} from '../common';
 import {copyElementToNewRoot} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
+import {storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
   const init = () => {
