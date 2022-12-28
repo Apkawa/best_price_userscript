@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm set-script prepare ""
-          npm ci --only=production
+          npm ci
 
       - name: Build
         run: npm build
@@ -38,6 +38,32 @@ jobs:
 
       - name: Run lint
         run: npm run lint
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: node_modules-${{ hashFiles('**/package-lock.json')}}
+
+      - name: Install dependencies
+        run: |
+          npm set-script prepare ""
+          npm ci
+
+      - name: Build
+        run: npm build
 
       - name: Extract branch name
         shell: bash
@@ -56,6 +82,7 @@ jobs:
       # Если мастер - деплоим в корень
       - uses: haya14busa/action-cond@v1
         id: target_folder
+        if: success()
         with:
           cond: ${{ steps.extract_branch.outputs.branch == 'master' }}
           if_true: ""
