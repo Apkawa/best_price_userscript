@@ -1,3 +1,10 @@
+[![CI](https://github.com/Apkawa/best_price_userscript/actions/workflows/ci.yml/badge.svg)](https://github.com/Apkawa/best_price_userscript/actions/workflows/ci.yml)
+
+[![Greasy Fork](https://img.shields.io/greasyfork/v/457268)](https://greasyfork.org/ru/scripts/457268-best-price-helper-for-marketplace)
+![Greasy Fork](https://img.shields.io/greasyfork/l/457268)
+![Greasy Fork](https://img.shields.io/greasyfork/dt/457268)
+[![OpenUserJS](https://img.shields.io/badge/OpenUserJS--green)](https://openuserjs.org/scripts/Apkawa/Best_price_helper_for_marketplace)
+
 # Best price
 
 Юзерскрипт для показа цены за единицу измерения, в СИ (килограмм, литр, метр) и за штуку
