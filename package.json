@@ -65,11 +65,11 @@
     "synctypes": "typesync && npm i",
     "prettier": "prettier src/ --write",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:unit": "jest tests/unit/",
+    "test:unit": "jest tests/unit/ src/ --coverage",
     "test:e2e": "jest tests/e2e/",
     "lint": "eslint --ext js,ts,tsx --max-warnings=0 --fix src",
     "check": "npm run test && npm run lint",
-    "pre-commit": "npm run prettier && cross-env HEADLESS=true npm run check && npm run build && git add -A ."
+    "pre-commit": "npm run prettier && npm run check && npm run build && git add -A ."
   },
   "engines": {
     "npm": ">=7.0.0",
