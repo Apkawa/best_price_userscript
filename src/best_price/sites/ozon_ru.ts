@@ -25,9 +25,12 @@ export function initProductPage(): void {
         ?.appendChild(renderBestPrice(parsedTitle));
     }
   };
-  waitCompletePage(() => {
-    init();
-  });
+  waitCompletePage(
+    () => {
+      init();
+    },
+    {runOnce: true, delay: 300},
+  );
 }
 
 function processProductCard(cardEl: HTMLElement): void {

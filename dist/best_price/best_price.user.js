@@ -426,7 +426,10 @@
         };
         waitCompletePage((() => {
             init();
-        }));
+        }), {
+            runOnce: true,
+            delay: 300
+        });
     }
     function processProductCard(cardEl) {
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);

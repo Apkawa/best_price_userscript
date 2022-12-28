@@ -1,4 +1,4 @@
-import {parseTitle, parseTitleWithPrice} from '../../common/parseTitle';
+import {parseTitle, parseTitleWithPrice} from '../../../src/best_price/common/parseTitle';
 
 describe('weight', () => {
   test('Extract weight/volume', () => {

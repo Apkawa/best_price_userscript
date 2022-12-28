@@ -1,6 +1,12 @@
-Базируется на [userscript-typescript-webpack](https://github.com/vannhi/userscript-typescript-webpack) плюс доработка сборки
+Сборка базируется на [userscript-typescript-webpack](https://github.com/vannhi/userscript-typescript-webpack) плюс доработки
 
-Все исходники на typescript
+## Стек технологий
+
+* typescript
+* webpack
+* eslint
+* jest
+* puppeteer
 
 ## Установка
 

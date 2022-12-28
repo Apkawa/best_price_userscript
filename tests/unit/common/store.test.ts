@@ -1,5 +1,8 @@
-import {loadParsedTitleFromElement, storeParsedTitleToElement} from '../../common/store';
-import {ParseTitlePriceResult} from '../../common/parseTitle';
+import {
+  loadParsedTitleFromElement,
+  storeParsedTitleToElement
+} from '../../../src/best_price/common/store';
+import {ParseTitlePriceResult} from '../../../src/best_price/common/parseTitle';
 
 describe('storeParsedTitleToElement', () => {
   test('generic', () => {
