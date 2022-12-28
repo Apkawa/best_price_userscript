@@ -30,14 +30,6 @@ jobs:
           path: '**/node_modules'
           key: node_modules-${{ hashFiles('**/package-lock.json')}}
 
-      - name: Install dependencies
-        run: |
-          npm set-script prepare ""
-          npm ci
-
-      - name: Build
-        run: npm run build
-
       - name: Extract branch name
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
         id: extract_branch
@@ -63,6 +55,16 @@ jobs:
           cond: ${{ steps.extract_tag.outputs.tag }}
           if_true: "release"
           if_false: ${{ steps.extract_branch.outputs.branch }}
+
+      - name: Install dependencies
+        run: |
+          npm set-script prepare ""
+          npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          DOWNLOAD_SUFFIX: '/raw/gh-pages/${{ steps.target_folder.outputs.value }}/'
 
       - name: Deploy to Github Pages
         if: success()

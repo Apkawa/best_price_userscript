@@ -8,6 +8,10 @@ import fromEntries from 'fromentries';
 
 const packageJson: PackageJson = require('./package.json');
 
+
+const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`
+const DOWNLOAD_ROOT = `${packageJson.repository}${DOWNLOAD_SUFFIX}`;
+
 function collectUserScripts() {
   let root = path.resolve(__dirname, 'src');
   return fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {
@@ -19,12 +23,12 @@ function collectUserScripts() {
 }
 
 function getExtraInfo(data: BannerDataType) {
-  let homepage = packageJson.homepage;
+  const homepage = packageJson.homepage;
   let supportUrl = packageJson.bugs;
   if (typeof supportUrl !== 'string') {
     supportUrl = supportUrl?.url;
   }
-  let downloadUrl = `${packageJson.repository}/raw/master/dist/${data.chunk.name}.js`;
+  const downloadUrl = `${DOWNLOAD_ROOT}${data.chunk.name}.js`;
   let author = packageJson.author;
   if (typeof author !== 'string') {
     author = author?.name;
