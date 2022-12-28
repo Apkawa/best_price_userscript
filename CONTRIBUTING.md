@@ -1,6 +1,12 @@
-Базируется на [userscript-typescript-webpack](https://github.com/vannhi/userscript-typescript-webpack) плюс доработка сборки
+Сборка базируется на [userscript-typescript-webpack](https://github.com/vannhi/userscript-typescript-webpack) плюс доработки
 
-Все исходники на typescript
+## Стек технологий
+
+* typescript
+* webpack
+* eslint
+* jest
+* puppeteer
 
 ## Установка
 
@@ -10,4 +16,16 @@
 4. Включить для Tampermonkey доступ к локальным урлам
 5. Добавить в Tampermonkey содержимое `./debug.js` отредактиров @require на актуальный путь скрипта из `./dist`
 
+
+## Версии
+
+```
+npm version [patch|minor|major]
+```
+
+https://docs.npmjs.com/about-semantic-versioning
+
+- `patch` - багфиксы
+- `minor` - добавляем новый сайт или фичу
+- `major` - когда ломаем все
 

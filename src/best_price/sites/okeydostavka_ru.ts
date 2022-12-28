@@ -2,10 +2,10 @@ import {matchLocation, waitCompletePage} from '../../utils';
 import {getPriceFromElement} from '../common/price_parse';
 import {parseTitleWithPrice} from '../common/parseTitle';
 import {renderBestPrice} from '../common/price_render';
-import {storeParsedTitleToElement} from '../common';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {ElementGetOrCreate} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
+import {storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
   const init = () => {

@@ -1,9 +1,9 @@
-import {storeParsedTitleToElement} from '.';
 import {InsertPosition} from '../../utils/dom';
 import {BEST_PRICE_CLASS_NAME, BEST_PRICE_WRAP_CLASS_NAME} from './constants';
 import {parseTitleWithPrice} from './parseTitle';
 import {getPrice} from './price_parse';
 import {renderBestPrice, RenderBestPriceExtraStyle} from './price_render';
+import {storeParsedTitleToElement} from './store';
 
 export interface ProcessProductCardOptions {
   price_sel: string;

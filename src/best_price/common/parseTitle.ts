@@ -1,13 +1,20 @@
 import {mRegExp, round} from '../../utils';
 
-export type ParseTitleResult = {
-  weight: number | null;
+export type Unit = 'кг' | 'л' | 'м';
+
+export interface UnitValue {
+  unit: Unit;
+  value: number; // Per item value
+  total: number; // Per quantity summary,
+}
+
+export interface ParseTitleResult {
   quantity: number;
-  item_weight: number | null;
-  weight_unit: 'кг' | 'л' | 'м' | null;
-};
+  units: UnitValue[];
+}
+
 // const WORD_BOUNDARY_BEGIN = /(?:^|\s)/
-const WORD_BOUNDARY_END = /(?=\s|[.,);/]|$)/;
+const WORD_BOUNDARY_END = /(?=\s*|[.,);/]|$)/;
 const WEIGHT_REGEXP = mRegExp([
   /(?<value>\d+[,.]\d+|\d+)/, // Value
   /\s?/, // Space
@@ -15,7 +22,7 @@ const WEIGHT_REGEXP = mRegExp([
   '(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)',
   '|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)',
   '|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))',
-  ')',
+  ')\\.?',
   WORD_BOUNDARY_END,
 ]);
 
@@ -38,7 +45,7 @@ const QUANTITY_2_REGEXP = RegExp(
   `(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join('|')})\\.?`,
 );
 
-const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×/]|по)\s?/;
+const COMBINE_DELIMETER_REGEXP = /\s*?(?:[xх*×/]|по)\s*?/;
 const COMBINE_QUANTITY_LIST = [
   mRegExp([/(?<quantity_2>\d+)/, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP]), // 20x100шт
   mRegExp([QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity_2>\d+)/]), // 20уп*100
@@ -64,12 +71,10 @@ interface MatchGroupsResult {
   length_SI?: string;
 }
 
-function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
+function parseGroups(groups: MatchGroupsResult, allowSum = true): ParseTitleResult {
   const result: ParseTitleResult = {
-    weight: null,
-    item_weight: null,
-    weight_unit: null,
     quantity: 1,
+    units: [],
   };
 
   if (groups.value) {
@@ -77,29 +82,35 @@ function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
     const unit = groups?.unit;
     if (valueStr && unit) {
       let value = parseFloat(valueStr.replace(',', '.'));
+      let unit: Unit | null = null;
       // Всегда считаем в мл и г
       if (groups.weight_unit) {
         if (!groups.weight_SI) {
           value /= 1000;
         }
-        result.weight_unit = 'кг';
+        unit = 'кг';
       }
       if (groups.volume_unit) {
         if (!groups.volume_SI) {
           value /= 1000;
         }
-        result.weight_unit = 'л';
+        unit = 'л';
       }
-
       if (groups.length_unit) {
         if (!groups.length_SI) {
           value /= 1000;
         }
-        result.weight_unit = 'м';
+        unit = 'м';
+      }
+      if (!unit) {
+        throw 'Unknown unit';
       }
 
-      result.weight = value;
-      result.item_weight = value;
+      result.units.push({
+        unit,
+        value,
+        total: value,
+      });
     }
   }
 
@@ -109,11 +120,11 @@ function parseGroups(groups: MatchGroupsResult): ParseTitleResult {
       result.quantity = parseInt(valueStr);
     }
   }
-
-  if (result.item_weight && result.quantity > 1) {
-    result.weight = result.quantity * result.item_weight;
+  if (allowSum && result.quantity > 1) {
+    for (const u of result.units) {
+      u.total = result.quantity * u.value;
+    }
   }
-
   return result;
 }
 
@@ -149,31 +160,47 @@ export function parseTitle(title: string): ParseTitleResult {
       groups = {...groups, ...quantityMatch.groups};
     }
   }
+  let allowSum = true;
+  if (groups?.value) {
+    // Кейс когда в товаре встречаются отдельно количества и единицы измерения.
+    // По семантике в этом случае вес разделяется от количества.
+    // Пример "Кофе молотый по восточному 1 кг 4 штуки" - это 4 пачки кофе суммарным весом 1кг.
+    allowSum = false;
+  }
 
-  return parseGroups(groups as MatchGroupsResult);
+  return parseGroups(groups as MatchGroupsResult, allowSum);
+}
+
+export interface UnitPriceValue extends UnitValue {
+  price: number;
+  price_display: string;
 }
 
 export interface ParseTitlePriceResult extends ParseTitleResult {
-  weight_price: number | null;
-  weight_price_display: string | null;
+  units: UnitPriceValue[];
   quantity_price: number | null;
   quantity_price_display: string | null;
 }
 
 export function parseTitleWithPrice(title: string, price: number): ParseTitlePriceResult | null {
+  const {units, ...titleParsed} = parseTitle(title);
   const res: ParseTitlePriceResult = {
-    ...parseTitle(title),
-    weight_price: null,
-    weight_price_display: null,
+    ...titleParsed,
+    units: [],
     quantity_price: null,
     quantity_price_display: null,
   };
-  if ((!res.quantity || res.quantity == 1) && !res.weight) {
+
+  if ((!res.quantity || res.quantity == 1) && !units.length) {
     return null;
   }
-  if (res.weight) {
-    res.weight_price = round(price / res.weight);
-    res.weight_price_display = `${res.weight_price} ₽/${res.weight_unit || '?'}`;
+  for (const u of units) {
+    const p = round(price / u.total);
+    res.units.push({
+      ...u,
+      price: p,
+      price_display: `${p} ₽/${u.unit || '?'}`,
+    });
   }
   if (res.quantity > 1) {
     res.quantity_price = round(price / res.quantity);

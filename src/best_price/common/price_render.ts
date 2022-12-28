@@ -22,13 +22,10 @@ export function renderBestPrice(
   if (!titleInfo) {
     return wrapEl;
   }
-  if (titleInfo.weight_price_display) {
-    const weightEl = document.createElement('p');
-    // price -> weight
-    //  x    -> 1000г
-    // TODO unit size
-    weightEl.innerText = titleInfo.weight_price_display;
-    wrapEl.appendChild(weightEl);
+  for (const u of titleInfo.units) {
+    const el = document.createElement('p');
+    el.innerText = u.price_display;
+    wrapEl.appendChild(el);
   }
   if (titleInfo.quantity_price_display) {
     const qtyEl = document.createElement('p');

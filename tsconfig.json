@@ -6,7 +6,9 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["./src/*"]
+      "@app/*": [
+        "./src/*"
+      ]
     },
     "strict": true,
     "esModuleInterop": true,
@@ -16,6 +18,6 @@
       "es2018"
     ],
     "removeComments": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
   }
 }

@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         Best price helper for marketplace
 // @namespace    http://tampermonkey.net/
-// @version      0.4.2
 // @description  Считаем стоимость за штуку/за кг/за л
 // @author       Apkawa
 // @license      MIT
@@ -18,6 +17,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
+// @version      0.4.3
 // ==/UserScript==
 (function() {
     "use strict";
@@ -159,47 +159,59 @@
     Object.keys;
     const entries = Object.entries;
     const values = Object.values;
-    const WORD_BOUNDARY_END = /(?=\s|[.,);/]|$)/;
-    const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")", WORD_BOUNDARY_END ]);
+    var __rest = void 0 && (void 0).__rest || function(s, e) {
+        var t = {};
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+        if (null != s && "function" === typeof Object.getOwnPropertySymbols) {
+            var i = 0;
+            for (p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i])) t[p[i]] = s[p[i]];
+        }
+        return t;
+    };
+    const WORD_BOUNDARY_END = /(?=\s*|[.,);/]|$)/;
+    const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")\\.?", WORD_BOUNDARY_END ]);
     const QUANTITY_UNITS = [ "шт", "рулон", "пакет", "уп", "упаков(?:ок|ки|ка)", "салфет(?:ок|ки|ка)", "таб", "капсул" ];
     const QUANTITY_REGEXP = RegExp(`(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join("|")})\\.?`);
     const QUANTITY_2_REGEXP = RegExp(`(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join("|")})\\.?`);
-    const COMBINE_DELIMETER_REGEXP = /\s?(?:[xх*×/]|по)\s?/;
+    const COMBINE_DELIMETER_REGEXP = /\s*?(?:[xх*×/]|по)\s*?/;
     const COMBINE_QUANTITY_LIST = [ mRegExp([ /(?<quantity_2>\d+)/, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity_2>\d+)/ ]), mRegExp([ QUANTITY_2_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]) ];
     const COMBINE_QANTITY_WEIGHT_REGEXP_LIST = [ mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, QUANTITY_REGEXP ]), mRegExp([ QUANTITY_REGEXP, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ /(?<quantity>\d+)/, COMBINE_DELIMETER_REGEXP, WEIGHT_REGEXP ]), mRegExp([ WEIGHT_REGEXP, COMBINE_DELIMETER_REGEXP, /(?<quantity>\d+)/ ]) ];
-    function parseGroups(groups) {
+    function parseGroups(groups, allowSum = true) {
         const result = {
-            weight: null,
-            item_weight: null,
-            weight_unit: null,
-            quantity: 1
+            quantity: 1,
+            units: []
         };
         if (groups.value) {
             const valueStr = null === groups || void 0 === groups ? void 0 : groups.value;
             const unit = null === groups || void 0 === groups ? void 0 : groups.unit;
             if (valueStr && unit) {
                 let value = parseFloat(valueStr.replace(",", "."));
+                let unit = null;
                 if (groups.weight_unit) {
                     if (!groups.weight_SI) value /= 1e3;
-                    result.weight_unit = "кг";
+                    unit = "кг";
                 }
                 if (groups.volume_unit) {
                     if (!groups.volume_SI) value /= 1e3;
-                    result.weight_unit = "л";
+                    unit = "л";
                 }
                 if (groups.length_unit) {
                     if (!groups.length_SI) value /= 1e3;
-                    result.weight_unit = "м";
+                    unit = "м";
                 }
-                result.weight = value;
-                result.item_weight = value;
+                if (!unit) throw "Unknown unit";
+                result.units.push({
+                    unit: unit,
+                    value: value,
+                    total: value
+                });
             }
         }
         if (groups.quantity) {
             const valueStr = null === groups || void 0 === groups ? void 0 : groups.quantity;
             if (valueStr) result.quantity = parseInt(valueStr);
         }
-        if (result.item_weight && result.quantity > 1) result.weight = result.quantity * result.item_weight;
+        if (allowSum && result.quantity > 1) for (const u of result.units) u.total = result.quantity * u.value;
         return result;
     }
     function parseTitle(title) {
@@ -223,19 +235,24 @@
             const quantityMatch = QUANTITY_REGEXP.exec(title);
             if (null === quantityMatch || void 0 === quantityMatch ? void 0 : quantityMatch.groups) groups = Object.assign(Object.assign({}, groups), quantityMatch.groups);
         }
-        return parseGroups(groups);
+        let allowSum = true;
+        if (null === groups || void 0 === groups ? void 0 : groups.value) allowSum = false;
+        return parseGroups(groups, allowSum);
     }
     function parseTitleWithPrice(title, price) {
-        const res = Object.assign(Object.assign({}, parseTitle(title)), {
-            weight_price: null,
-            weight_price_display: null,
+        const _a = parseTitle(title), {units: units} = _a, titleParsed = __rest(_a, [ "units" ]);
+        const res = Object.assign(Object.assign({}, titleParsed), {
+            units: [],
             quantity_price: null,
             quantity_price_display: null
         });
-        if ((!res.quantity || 1 == res.quantity) && !res.weight) return null;
-        if (res.weight) {
-            res.weight_price = round(price / res.weight);
-            res.weight_price_display = `${res.weight_price} ₽/${res.weight_unit || "?"}`;
+        if ((!res.quantity || 1 == res.quantity) && !units.length) return null;
+        for (const u of units) {
+            const p = round(price / u.total);
+            res.units.push(Object.assign(Object.assign({}, u), {
+                price: p,
+                price_display: `${p} ₽/${u.unit || "?"}`
+            }));
         }
         if (res.quantity > 1) {
             res.quantity_price = round(price / res.quantity);
@@ -251,10 +268,10 @@
         const wrapEl = document.createElement("div");
         wrapEl.className = BEST_PRICE_CLASS_NAME;
         if (!titleInfo) return wrapEl;
-        if (titleInfo.weight_price_display) {
-            const weightEl = document.createElement("p");
-            weightEl.innerText = titleInfo.weight_price_display;
-            wrapEl.appendChild(weightEl);
+        for (const u of titleInfo.units) {
+            const el = document.createElement("p");
+            el.innerText = u.price_display;
+            wrapEl.appendChild(el);
         }
         if (titleInfo.quantity_price_display) {
             const qtyEl = document.createElement("p");
@@ -297,11 +314,26 @@
     function sort(arr, ...sortBy) {
         arr.sort(byPropertiesOf(sortBy));
     }
+    const PREFIX = "bp_";
+    function storeParsedTitleToElement(cardEl, parsedTitle) {
+        cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
+        if (!parsedTitle) return;
+        const ds = cardEl.dataset;
+        for (const [k, v] of entries(parsedTitle)) ds[PREFIX + k] = JSON.stringify(v);
+    }
+    function loadParsedTitleFromElement(cardEl) {
+        const pairs = Object.entries(cardEl.dataset).map((([k, v]) => {
+            if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
+            return [ null, null ];
+        })).filter((([k]) => k));
+        if (pairs.length > 0) return Object.fromEntries(pairs);
+        return null;
+    }
     const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
     GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
     function initReorderCatalog(catalogRoot, buttonRoot) {
-        var _a;
+        var _a, _b, _c;
         const buttonWrap = buttonRoot;
         if (!buttonWrap) return;
         const catalogRecords = [];
@@ -312,19 +344,24 @@
                 console.warn("!", el);
                 continue;
             }
-            const ds = el.dataset;
+            const ds = Object.assign(Object.assign({}, loadParsedTitleFromElement(el)), {
+                initial_order: "0"
+            });
+            if (!ds) continue;
             i += 1;
             let initial_order = parseInt(ds.initial_order || "0");
             if (!initial_order) {
                 initial_order = i;
                 ds.initial_order = i.toString();
             }
-            catalogRecords.push({
+            const record = {
                 el: wrapEl,
                 initial_order: initial_order,
-                weight_price: ds.weight_price ? parseFloat(ds.weight_price) : MAX_NUMBER,
-                quantity_price: ds.quantity_price ? parseFloat(ds.quantity_price) : MAX_NUMBER
-            });
+                weight_price: (null === (_b = null === (_a = ds.units) || void 0 === _a ? void 0 : _a[0]) || void 0 === _b ? void 0 : _b.price) ? ds.units[0].price : MAX_NUMBER,
+                quantity_price: ds.quantity_price ? ds.quantity_price : MAX_NUMBER
+            };
+            catalogRecords.push(record);
+            console.debug("Catalog order record: ", record);
         }
         const buttons = {
             initial_order: E("button", {
@@ -361,7 +398,7 @@
             for (const b of values(buttons)) b.classList.remove("active");
             button.classList.add("active");
         }
-        null === (_a = buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)) || void 0 === _a ? void 0 : _a.remove();
+        null === (_c = buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)) || void 0 === _c ? void 0 : _c.remove();
         buttonWrap.appendChild(E("div", {
             class: BEST_ORDER_BUTTON_CLASS_NAME
         }, ...values(buttons)));
@@ -376,27 +413,16 @@
         const priceEl = (root || document.body).querySelector(sel);
         return getPriceFromElement(priceEl);
     }
-    function storeParsedTitleToElement(cardEl, parsedTitle) {
-        cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
-        if (!parsedTitle) return;
-        const ds = cardEl.dataset;
-        for (const [k, v] of entries(parsedTitle)) ds[k] = (v || "").toString();
-    }
     function initProductPage() {
-        const init = () => {
-            var _a, _b;
-            const title = null === (_a = document.querySelector("[data-widget='webProductHeading']")) || void 0 === _a ? void 0 : _a.textContent;
-            if (!title) return;
-            let price = getPrice("[data-widget='webOzonAccountPrice']");
-            if (!price) price = getPrice("[data-widget='webPrice']");
-            if (price) {
-                const parsedTitle = parseTitleWithPrice(title, price);
-                null === (_b = document.querySelector("[data-widget='webPrice']")) || void 0 === _b ? void 0 : _b.appendChild(renderBestPrice(parsedTitle));
-            }
-        };
-        waitCompletePage((() => {
-            init();
-        }));
+        var _a, _b;
+        const title = null === (_a = document.querySelector("[data-widget='webProductHeading']")) || void 0 === _a ? void 0 : _a.textContent;
+        if (!title) return;
+        let price = getPrice("[data-widget='webOzonAccountPrice']");
+        if (!price) price = getPrice("[data-widget='webPrice']");
+        if (price) {
+            const parsedTitle = parseTitleWithPrice(title, price);
+            null === (_b = document.querySelector("[data-widget='webPrice']")) || void 0 === _b ? void 0 : _b.appendChild(renderBestPrice(parsedTitle));
+        }
     }
     function processProductCard(cardEl) {
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
@@ -417,36 +443,33 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
-        const init = () => {
-            const catalogEl = document.querySelector(".widget-search-result-container > div");
-            if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
-            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
-            for (const cardEl of cardList) processProductCard(cardEl);
-            const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
-            if (catalogEl) {
-                const el = catalogEl.querySelector(":scope > div");
-                const isDetailCatalog = el && "span 12" === getComputedStyle(el).gridColumnStart;
-                if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-                const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
-                const paginatorWrap = document.querySelector(".widget-search-result-container");
-                if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
-                    pos: "before"
-                });
-            }
-        };
-        waitCompletePage((() => {
-            init();
-        }), {
-            runOnce: false
-        });
+        const catalogEl = document.querySelector(".widget-search-result-container > div");
+        if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
+        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+        for (const cardEl of cardList) processProductCard(cardEl);
+        const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
+        if (catalogEl) {
+            const el = catalogEl.querySelector(":scope > div");
+            const isDetailCatalog = el && "span 12" === getComputedStyle(el).gridColumnStart;
+            if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+            const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
+            const paginatorWrap = document.querySelector(".widget-search-result-container");
+            if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
+                pos: "before"
+            });
+        }
     }
     (function() {
         "use strict";
         if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) return;
         console.log("OZON.ru");
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) initProductPage();
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/")) initCatalog();
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")) initCatalog();
+        waitCompletePage((() => {
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) initProductPage();
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/")) initCatalog();
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")) initCatalog();
+        }), {
+            runOnce: false
+        });
     })();
     function lenta_com_initProductPage() {
         const init = () => {
@@ -686,11 +709,23 @@
             title_sel: "span.product-card__link-text",
             to_render: "div.product-card__control"
         });
-        for (const group of document.querySelectorAll(".catalog-content-group__list > div > div")) {
-            const buttonWrapEl = ElementGetOrCreate(group.parentElement, {
+        for (const group of document.querySelectorAll(".catalog-content-group__list")) {
+            const cards = group.querySelectorAll(":scope > div:not(.GM-fix) > div > div > div");
+            const cardsWrap = ElementGetOrCreate(group, {
+                className: "GM-fix"
+            });
+            for (const c of cards) {
+                c.style.width = "220px";
+                null === cardsWrap || void 0 === cardsWrap ? void 0 : cardsWrap.appendChild(c);
+            }
+            const buttonWrapEl = ElementGetOrCreate(group, {
                 pos: "before"
             });
-            if (buttonWrapEl) initReorderCatalog(group, buttonWrapEl);
+            if (buttonWrapEl && cardsWrap) {
+                cardsWrap.style.display = "flex";
+                cardsWrap.style.flexWrap = "wrap";
+                initReorderCatalog(cardsWrap, buttonWrapEl);
+            }
         }
     }
     (function() {
@@ -702,7 +737,7 @@
             perekrestok_ru_initCatalog();
         }), {
             runOnce: false,
-            delay: 200
+            delay: 300
         });
     })();
     const extraStyle = {
