@@ -10,7 +10,7 @@ export function initProductPage(): void {
       const productRoot = document.querySelector<HTMLElement>('main');
       if (!productRoot) return;
 
-      // Костыль из за кеширования, dom не перестраивается а только обноаляются значения
+      // Костыль из за кеширования, jsdom не перестраивается а только обноаляются значения
       const productId = productRoot.querySelector('[itemprop="sku"]')?.getAttribute('content');
       if (productId && productRoot.dataset.productId !== productId) {
         productRoot.classList.remove(BEST_PRICE_WRAP_CLASS_NAME);

@@ -10,14 +10,14 @@ border: 1px solid gray !important; padding: 5px !important; margin: 3px !importa
 `);
 GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
 
-interface CatalogRecord {
+interface CatalogRecord extends Record<string, unknown> {
   initial_order: number;
   weight_price: number | null;
   quantity_price: number | null;
   el: HTMLElement;
 }
 
-type OrderState = keyof Omit<CatalogRecord, 'el'>;
+type OrderState = keyof Pick<CatalogRecord, 'initial_order' | 'weight_price' | 'quantity_price'>;
 
 export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLElement): void {
   const buttonWrap = buttonRoot;
@@ -46,7 +46,7 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
       initial_order = i;
       ds.initial_order = i.toString();
     }
-    const record = {
+    const record: CatalogRecord = {
       el: wrapEl,
       initial_order,
       weight_price: ds.units?.[0]?.price ? ds.units[0].price : MAX_NUMBER,

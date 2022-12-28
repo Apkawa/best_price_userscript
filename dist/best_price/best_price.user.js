@@ -413,23 +413,15 @@
         return getPriceFromElement(priceEl);
     }
     function initProductPage() {
-        const init = () => {
-            var _a, _b;
-            const title = null === (_a = document.querySelector("[data-widget='webProductHeading']")) || void 0 === _a ? void 0 : _a.textContent;
-            if (!title) return;
-            let price = getPrice("[data-widget='webOzonAccountPrice']");
-            if (!price) price = getPrice("[data-widget='webPrice']");
-            if (price) {
-                const parsedTitle = parseTitleWithPrice(title, price);
-                null === (_b = document.querySelector("[data-widget='webPrice']")) || void 0 === _b ? void 0 : _b.appendChild(renderBestPrice(parsedTitle));
-            }
-        };
-        waitCompletePage((() => {
-            init();
-        }), {
-            runOnce: true,
-            delay: 300
-        });
+        var _a, _b;
+        const title = null === (_a = document.querySelector("[data-widget='webProductHeading']")) || void 0 === _a ? void 0 : _a.textContent;
+        if (!title) return;
+        let price = getPrice("[data-widget='webOzonAccountPrice']");
+        if (!price) price = getPrice("[data-widget='webPrice']");
+        if (price) {
+            const parsedTitle = parseTitleWithPrice(title, price);
+            null === (_b = document.querySelector("[data-widget='webPrice']")) || void 0 === _b ? void 0 : _b.appendChild(renderBestPrice(parsedTitle));
+        }
     }
     function processProductCard(cardEl) {
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
@@ -450,36 +442,33 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
-        const init = () => {
-            const catalogEl = document.querySelector(".widget-search-result-container > div");
-            if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
-            const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
-            for (const cardEl of cardList) processProductCard(cardEl);
-            const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
-            if (catalogEl) {
-                const el = catalogEl.querySelector(":scope > div");
-                const isDetailCatalog = el && "span 12" === getComputedStyle(el).gridColumnStart;
-                if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-                const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
-                const paginatorWrap = document.querySelector(".widget-search-result-container");
-                if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
-                    pos: "before"
-                });
-            }
-        };
-        waitCompletePage((() => {
-            init();
-        }), {
-            runOnce: false
-        });
+        const catalogEl = document.querySelector(".widget-search-result-container > div");
+        if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
+        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+        for (const cardEl of cardList) processProductCard(cardEl);
+        const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
+        if (catalogEl) {
+            const el = catalogEl.querySelector(":scope > div");
+            const isDetailCatalog = el && "span 12" === getComputedStyle(el).gridColumnStart;
+            if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+            const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
+            const paginatorWrap = document.querySelector(".widget-search-result-container");
+            if (null === paginator || void 0 === paginator ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
+                pos: "before"
+            });
+        }
     }
     (function() {
         "use strict";
         if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) return;
         console.log("OZON.ru");
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) initProductPage();
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/")) initCatalog();
-        if (matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")) initCatalog();
+        waitCompletePage((() => {
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) initProductPage();
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/")) initCatalog();
+            if (matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")) initCatalog();
+        }), {
+            runOnce: false
+        });
     })();
     function lenta_com_initProductPage() {
         const init = () => {
