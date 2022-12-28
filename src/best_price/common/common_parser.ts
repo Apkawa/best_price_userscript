@@ -15,11 +15,12 @@ export interface ProcessProductCardOptions {
         pos?: InsertPosition;
       };
   extra_style?: RenderBestPriceExtraStyle | null;
+  force?: boolean;
 }
 
 export function processProductCard(cardEl: HTMLElement, options: ProcessProductCardOptions): void {
-  const {price_sel, title_sel, to_render} = options;
-  if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
+  const {price_sel, title_sel, to_render, force} = options;
+  if (!force && cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
 
   const price = getPrice(price_sel, cardEl);
   const title = cardEl.querySelector(title_sel)?.textContent?.trim();
@@ -28,6 +29,7 @@ export function processProductCard(cardEl: HTMLElement, options: ProcessProductC
     storeParsedTitleToElement(cardEl, null);
     return;
   }
+
   console.debug(title, price);
   const parsedTitle = parseTitleWithPrice(title, price);
 

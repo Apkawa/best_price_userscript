@@ -655,8 +655,8 @@
     })();
     function common_parser_processProductCard(cardEl, options) {
         var _a, _b, _c;
-        const {price_sel: price_sel, title_sel: title_sel, to_render: to_render} = options;
-        if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
+        const {price_sel: price_sel, title_sel: title_sel, to_render: to_render, force: force} = options;
+        if (!force && cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
         const price = getPrice(price_sel, cardEl);
         const title = null === (_b = null === (_a = cardEl.querySelector(title_sel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
         if (!title || !price) {
@@ -745,70 +745,67 @@
         color: "black"
     };
     function wildberries_ru_initProductPage() {
-        waitCompletePage((() => {
-            const productRoot = document.querySelector(".product-page");
-            if (!productRoot) return;
-            common_parser_processProductCard(productRoot, {
-                price_sel: ".price-block__final-price",
-                title_sel: ".product-page__header h1",
-                to_render: ".price-block",
-                extra_style: extraStyle
-            });
-            const cardList = document.querySelectorAll(".goods-card");
-            for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
-                price_sel: ".goods-card__price-now",
-                title_sel: ".goods-card__description",
-                to_render: ".goods-card__price",
-                extra_style: extraStyle
-            });
-        }), {
-            runOnce: false,
-            delay: 300
+        const productRoot = document.querySelector(".product-page");
+        if (!productRoot) return;
+        common_parser_processProductCard(productRoot, {
+            price_sel: ".price-block__final-price",
+            title_sel: ".product-page__header h1",
+            to_render: ".price-block",
+            extra_style: extraStyle,
+            force: true
+        });
+        const cardList = document.querySelectorAll(".goods-card");
+        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+            price_sel: ".goods-card__price-now",
+            title_sel: ".goods-card__description",
+            to_render: ".goods-card__price",
+            extra_style: extraStyle
+        });
+    }
+    function initPopup() {
+        const productPopupRoot = document.querySelector(".popup .product");
+        if (!productPopupRoot) return;
+        common_parser_processProductCard(productPopupRoot, {
+            price_sel: ".price-block__final-price",
+            title_sel: ".product__header",
+            to_render: ".price-block",
+            extra_style: extraStyle
         });
     }
     function wildberries_ru_initCatalog() {
-        const init = () => {
-            const productPopupRoot = document.querySelector(".popup .product");
-            if (!productPopupRoot) return;
-            common_parser_processProductCard(productPopupRoot, {
-                price_sel: ".price-block__final-price",
-                title_sel: ".product__header",
-                to_render: ".price-block",
-                extra_style: extraStyle
-            });
-            const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
-            for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
-                price_sel: ".price__lower-price",
-                title_sel: ".goods-name",
-                to_render: ".product-card__price",
-                extra_style: {
-                    fontSize: "1rem",
-                    color: "black"
-                }
-            });
-            const catalogWrapEl = document.querySelector(".product-card-list");
-            const buttonWrapEl = ElementGetOrCreate(document.querySelector(".inner-sorter"), {
-                pos: "before"
-            });
-            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
-            const paginationRootWrap = ElementGetOrCreate(catalogWrapEl, {
-                pos: "before",
-                className: "GM-pagination-clone"
-            });
-            paginationRootWrap && copyElementToNewRoot(document.querySelectorAll(".pager-bottom:not(.GM-cloned)"), paginationRootWrap);
-        };
-        waitCompletePage((() => {
-            init();
-        }), {
-            runOnce: false,
-            delay: 300
+        const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
+        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+            price_sel: ".price__lower-price",
+            title_sel: ".goods-name",
+            to_render: ".product-card__price",
+            extra_style: {
+                fontSize: "1rem",
+                color: "black"
+            }
         });
+        const catalogWrapEl = document.querySelector(".product-card-list");
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector(".inner-sorter"), {
+            pos: "before"
+        });
+        if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+        const paginationRootWrap = ElementGetOrCreate(catalogWrapEl, {
+            pos: "before",
+            className: "GM-pagination-clone"
+        });
+        paginationRootWrap && copyElementToNewRoot(document.querySelectorAll(".pager-bottom:not(.GM-cloned)"), paginationRootWrap);
     }
     (function() {
         "use strict";
-        const prefix = "https://(www\\.|)wildberries\\.ru";
+        const prefix = "https://(www\\.|)wildberries\\.ru/";
         if (!matchLocation(prefix)) return;
-        wildberries_ru_initProductPage();
-        wildberries_ru_initCatalog();
+        console.debug("Wildberries.ru");
+        waitCompletePage((() => {
+            wildberries_ru_initProductPage();
+            initPopup();
+            wildberries_ru_initCatalog();
+        }), {
+            runOnce: false,
+            delay: 200
+        });
     })();
 })();
