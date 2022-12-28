@@ -43,7 +43,7 @@ jobs:
         id: extract_branch
 
       - name: Extract tag name
-        run: echo "tag=$(echo ${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
         id: extract_tag
 
       - name: Set env
