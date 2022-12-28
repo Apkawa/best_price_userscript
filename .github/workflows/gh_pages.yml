@@ -3,8 +3,7 @@ name: website
 on:
   push:
     branches:
-      - master
-      - dev
+      - '**'
 
 jobs:
   publish:
