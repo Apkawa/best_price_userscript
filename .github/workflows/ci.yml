@@ -1,9 +1,15 @@
 name: CI
 
 on:
+  pull_request:
+    branches:
+      - dev
   push:
     branches:
       - '**'
+    tags:
+      - 'v*'
+
 
 jobs:
   test:
