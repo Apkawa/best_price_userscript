@@ -52,8 +52,8 @@ jobs:
     if: contains('
       refs/heads/dev
       refs/heads/master
-      refs/tags/
-      ', github.ref)
+      ', github.ref) || startsWith(github.ref, 'refs/tags')
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -84,7 +84,6 @@ jobs:
           echo $RELEASE_VERSION 
           echo ${{ steps.extract_tag.outputs.tag }}
           echo ${{ steps.extract_branch.outputs.branch }}
-      #        if: startsWith(github.ref, 'refs/tags')
 
       # Если мастер - деплоим в корень
       - uses: haya14busa/action-cond@v1
