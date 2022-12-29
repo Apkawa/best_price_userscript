@@ -39,3 +39,71 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+  publish:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    if: contains('
+      refs/heads/dev
+      refs/heads/master
+      refs/tags/
+      ', github.ref)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: node_modules-${{ hashFiles('**/package-lock.json')}}
+
+      - name: Extract branch name
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Extract tag name
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        id: extract_tag
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Check tag
+        run: |
+          echo $RELEASE_VERSION 
+          echo ${{ env.RELEASE_VERSION }}
+      #        if: startsWith(github.ref, 'refs/tags')
+
+      # Если мастер - деплоим в корень
+      - uses: haya14busa/action-cond@v1
+        id: target_folder
+        if: success()
+        with:
+          cond: ${{ steps.extract_tag.outputs.tag }}
+          if_true: "release"
+          if_false: ${{ steps.extract_branch.outputs.branch }}
+
+      - name: Install dependencies
+        run: |
+          npm set-script prepare ""
+          npm ci
+
+      - name: Build
+        run: DOWNLOAD_SUFFIX=${env.DOWNLOAD_SUFFIX} npm run build
+        env:
+          DOWNLOAD_SUFFIX: '/raw/gh-pages/${{ steps.target_folder.outputs.value }}/'
+
+      - name: Deploy to Github Pages
+        if: success()
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: dist # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
+          TARGET_FOLDER: ${{ steps.target_folder.outputs.value }}
