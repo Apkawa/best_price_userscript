@@ -109,4 +109,4 @@ jobs:
           branch: release # The branch the action should deploy to.
           folder: dist # The folder the action should deploy.
           clean: true # Automatically remove deleted files from the deploy branch
-          target_folder: ${{ steps.target_folder.outputs.value }}
+          target-folder: ${{ steps.target_folder.outputs.value }}
