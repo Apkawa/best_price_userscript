@@ -12,6 +12,8 @@ const packageJson: PackageJson = require('./package.json');
 const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`
 const DOWNLOAD_ROOT = `${packageJson.repository}${DOWNLOAD_SUFFIX}`;
 
+console.log(`DOWNLOAD_ROOT=${DOWNLOAD_ROOT}`)
+
 function collectUserScripts() {
   let root = path.resolve(__dirname, 'src');
   return fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {

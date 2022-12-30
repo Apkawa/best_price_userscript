@@ -1,9 +1,15 @@
 name: CI
 
 on:
+  pull_request:
+    branches:
+      - dev
   push:
     branches:
       - '**'
+    tags:
+      - 'v*'
+
 
 jobs:
   test:
@@ -46,8 +52,8 @@ jobs:
     if: contains('
       refs/heads/dev
       refs/heads/master
-      refs/tags/
-      ', github.ref)
+      ', github.ref) || startsWith(github.ref, 'refs/tags')
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -78,14 +84,14 @@ jobs:
           echo $RELEASE_VERSION 
           echo ${{ steps.extract_tag.outputs.tag }}
           echo ${{ steps.extract_branch.outputs.branch }}
-      #        if: startsWith(github.ref, 'refs/tags')
 
       # Если мастер - деплоим в корень
-      - uses: haya14busa/action-cond@v1
+      - name: Set target folder
+        uses: haya14busa/action-cond@v1
         id: target_folder
         if: success()
         with:
-          cond: ${{ steps.extract_tag.outputs.tag }}
+          cond: ${{ startsWith(github.ref, 'refs/tags') }}
           if_true: "release"
           if_false: ${{ steps.extract_branch.outputs.branch }}
 
@@ -95,16 +101,18 @@ jobs:
           npm ci
 
       - name: Build
-        run: npm run build
+        run: |
+          echo $DOWNLOAD_SUFFIX
+          export DOWNLOAD_SUFFIX=$DOWNLOAD_SUFFIX
+          npm run build
         env:
-          DOWNLOAD_SUFFIX: '/raw/gh-pages/${{ steps.target_folder.outputs.value }}/'
+          DOWNLOAD_SUFFIX: '/raw/release/${{ steps.target_folder.outputs.value }}/'
 
-      - name: Deploy to Github Pages
+      - name: Deploy to release branch
         if: success()
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: dist # The folder the action should deploy.
-          CLEAN: true # Automatically remove deleted files from the deploy branch
-          TARGET_FOLDER: ${{ steps.target_folder.outputs.value }}
+          branch: release # The branch the action should deploy to.
+          folder: dist # The folder the action should deploy.
+          clean: true # Automatically remove deleted files from the deploy branch
+          target-folder: ${{ steps.target_folder.outputs.value }}
