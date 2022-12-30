@@ -1,0 +1,4 @@
+*.html linguist-detectable=false
+tests/jsdom/snapshots/ linguist-generated
+dist/ linguist-detectable=false
+docs/* linguist-documentation
