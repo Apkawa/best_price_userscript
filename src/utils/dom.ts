@@ -1,4 +1,4 @@
-import {Optional} from '@app/utils/types';
+import {Optional} from './types';
 
 export function getElementByXpath<T extends Node = HTMLElement>(
   xpath: string,

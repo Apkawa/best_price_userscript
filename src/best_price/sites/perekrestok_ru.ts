@@ -61,7 +61,7 @@ export function initCatalog(): void {
   'use strict';
   const prefix = 'https://(www\\.|)perekrestok\\.ru';
   if (!matchLocation(prefix)) return;
-
+  console.log('Perekrestok.ru');
   waitCompletePage(
     () => {
       if (matchLocation(prefix + '/cat/\\d+/p/')) {

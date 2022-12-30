@@ -2,30 +2,42 @@ import {parseTitleWithPrice} from '../common/parseTitle';
 import {renderBestPrice} from '../common/price_render';
 import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
-import {getPrice, getPriceFromElement} from '../common/price_parse';
+import {getPriceFromElement} from '../common/price_parse';
 import {copyElementToNewRoot} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
+import {processProductCard} from '../common/common_parser';
 
 export function initProductPage(): void {
+  const productRoot = document.querySelector<HTMLElement>('[data-widget="container"]');
+  if (!productRoot) return;
   const title = document.querySelector("[data-widget='webProductHeading']")?.textContent;
   if (!title) {
     return;
   }
-  // Try green price first
-  let price = getPrice("[data-widget='webOzonAccountPrice']");
-  if (!price) {
-    price = getPrice("[data-widget='webPrice']");
-  }
-  if (price) {
-    const parsedTitle = parseTitleWithPrice(title, price);
-    document
-      .querySelector("[data-widget='webPrice']") //
-      ?.appendChild(renderBestPrice(parsedTitle));
-  }
+  processProductCard(productRoot, {
+    price_sel: '[data-widget="webOzonAccountPrice"], [data-widget="webPrice"]',
+    title_sel: '[data-widget="webProductHeading"]',
+    to_render: {
+      sel: '[data-widget="webPrice"]',
+      pos: 'appendChild',
+    },
+    force: false,
+  });
+  // // Try green price first
+  // let price = getPrice("[data-widget='webOzonAccountPrice']");
+  // if (!price) {
+  //   price = getPrice("[data-widget='webPrice']");
+  // }
+  // if (price) {
+  //   const parsedTitle = parseTitleWithPrice(title, price);
+  //   document
+  //     .querySelector("[data-widget='webPrice']") //
+  //     ?.appendChild(renderBestPrice(parsedTitle));
+  // }
 }
 
-function processProductCard(cardEl: HTMLElement): void {
+function processProductCardOld(cardEl: HTMLElement): void {
   const wrapEl = getElementByXpath('a/following-sibling::div[1]', cardEl);
 
   if (!wrapEl || wrapEl?.querySelector('.GM-best-price')) {
@@ -67,7 +79,7 @@ export function initCatalog(): void {
       ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
   );
   for (const cardEl of cardList) {
-    processProductCard(cardEl);
+    processProductCardOld(cardEl);
   }
 
   const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
