@@ -24,12 +24,12 @@ export function renderBestPrice(
   }
   for (const u of titleInfo.units) {
     const el = document.createElement('p');
-    el.innerText = u.price_display;
+    el.textContent = u.price_display;
     wrapEl.appendChild(el);
   }
   if (titleInfo.quantity_price_display) {
     const qtyEl = document.createElement('p');
-    qtyEl.innerText = titleInfo.quantity_price_display;
+    qtyEl.textContent = titleInfo.quantity_price_display;
     wrapEl.appendChild(qtyEl);
   }
   if (wrapEl.childNodes.length) {
