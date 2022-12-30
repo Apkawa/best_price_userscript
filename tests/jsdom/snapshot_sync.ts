@@ -1,11 +1,21 @@
 import fs from 'fs';
 import path from 'node:path';
 
-import puppeteer, {Page} from 'puppeteer';
+import UserAgent from 'user-agents';
+import {Page, executablePath} from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
+puppeteer.use(AdblockerPlugin({blockTrackers: true}));
+puppeteer.use(StealthPlugin());
 
 import {autoScroll} from '../e2e/helpers';
 import {JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
+
 
 async function preparePage(page: Page) {
   page.setDefaultTimeout(0);
@@ -14,10 +24,8 @@ async function preparePage(page: Page) {
     width: 1920,
     height: 1080,
   });
-  await page.setUserAgent(
-    'Mozilla/5.0 (X11; Linux x86_64) ' +
-    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-  );
+  const ua = (new UserAgent()).random().toString();
+  await page.setUserAgent(ua);
 
   //await page.setBypassCSP(true);
 }
@@ -56,14 +64,31 @@ async function savePage(page: Page, options: SavePageOptions) {
     return;
   }
   await preparePage(page);
-  await page.goto(url, {
+  const response = await page.goto(url, {
     waitUntil: 'networkidle0',
   });
+  const headers = response?.headers();
+  const status = response?.status();
+  if (status !== 200) {
+    console.error('status != 200', url, headers);
+    return;
+  }
   await autoScroll(page);
   if (setup) {
     await setup(page);
   }
   await replaceAssetsUrlToAbsolute(page);
+  // drop script, inlined svg and data-*
+  await page.evaluate(() => {
+    document.querySelectorAll('svg,script').forEach(e => e.remove());
+    document.querySelectorAll('div').forEach( e => {
+      for (const k of Object.keys(e?.dataset)) {
+        delete e.dataset[k]
+      }
+    })
+    // Clean nested anchor links, forbidden for html
+    document.querySelectorAll('a a').forEach(e => e.remove())
+  });
   const bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
   const dir = path.dirname(filepath);
   if (!fs.existsSync(dir)) {
@@ -74,7 +99,11 @@ async function savePage(page: Page, options: SavePageOptions) {
 
 
 (async () => {
-  const browser = await puppeteer.launch({headless: false, devtools: false});
+  const browser = await puppeteer.launch({
+    headless: false,
+    devtools: false,
+    executablePath: executablePath(),
+  });
 
   for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
     for (const [page, conf] of entries(pages)) {
