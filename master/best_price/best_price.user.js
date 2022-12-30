@@ -12,12 +12,14 @@
 // @match        https://www.okeydostavka.ru/*
 // @match        https://perekrestok.ru/*
 // @match        https://www.perekrestok.ru/*
+// @match        https://wildberries.ru/*
+// @match        https://www.wildberries.ru/*
 // @homepage     https://github.com/Apkawa/best_price_userscript
 // @homepageUrl  https://github.com/Apkawa/best_price_userscript
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
-// @version      0.5.4
+// @version      0.5.5
 // ==/UserScript==
 (function() {
     "use strict";
