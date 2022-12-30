@@ -1,11 +1,11 @@
 import {initCatalog} from '../../../src/best_price/sites/wildberries_ru';
-import {CleanUpCallback, prepareJsdomSnapshot} from '../helpers';
+import {CleanUpCallback, prepareJsdomSnapshot, displayHtmlInBrowser} from '../helpers';
 
-describe('jsdom wildberries.ru', () => {
+describe.skip('jsdom wildberries.ru', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback;
     beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('wildberries.ru', 'catalog');
+      cleanup = await prepareJsdomSnapshot('example.com', 'catalog');
     });
     afterEach(() => {
       cleanup()
@@ -16,6 +16,8 @@ describe('jsdom wildberries.ru', () => {
     });
     it('Check buttons', async () => {
       initCatalog();
+      // For debug
+      await displayHtmlInBrowser(document)
       expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
     });
     it('Checks price', async () => {

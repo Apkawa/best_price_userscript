@@ -1,18 +1,19 @@
 import {initProductPage} from '../../../src/best_price/sites/wildberries_ru';
 import {CleanUpCallback, prepareJsdomSnapshot} from '../helpers';
 
-describe('jsdom wildberries.ru', () => {
+
+describe.skip('jsdom perekrestok.ru', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback
     beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('wildberries.ru', 'page');
+      cleanup = await prepareJsdomSnapshot('example.com', 'page');
     });
     afterEach(() => {
       cleanup()
     })
     it('Page content', () => {
       expect(
-        document.querySelector('title')?.textContent).toMatch('Wildberries');
+        document.querySelector('title')?.textContent).toMatch('');
     });
     it('Checks main price', async () => {
       initProductPage();

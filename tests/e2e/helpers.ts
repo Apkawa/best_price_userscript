@@ -49,6 +49,7 @@ export async function waitForSelectorAndGetTextContent(
   return Promise.resolve(el?.textContent || null);
 }
 
+
 export async function autoScroll(page: Page) {
   await page.evaluate(async () => {
     await new Promise((resolve) => {
