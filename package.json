@@ -10,6 +10,8 @@
   "readme": "README.md",
   "devDependencies": {
     "@babel/plugin-proposal-pipeline-operator": "^7.18.9",
+    "@commitlint/cli": "^17.3.0",
+    "@commitlint/config-conventional": "^17.3.0",
     "@testing-library/dom": "^8.19.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@types/eslint": "^8.4.10",
@@ -26,7 +28,9 @@
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
     "chalk": "^4.1.2",
+    "commitizen": "^4.2.6",
     "cross-env": "^7.0.3",
+    "cz-customizable": "^7.0.0",
     "eslint": "^8.30.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-jest": "^27.1.7",
@@ -48,6 +52,7 @@
     "puppeteer": "^19.4.1",
     "raw-loader": "^4.0.2",
     "rxjs": "^6.5.1",
+    "standard-version": "^9.5.0",
     "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
@@ -71,22 +76,27 @@
     "test:e2e": "jest tests/e2e/",
     "lint": "eslint --ext js,ts,tsx --max-warnings=0 --fix src",
     "check": "npm run test && npm run lint",
-    "pre-commit": "npm run prettier && npm run check && npm run build && git add -A ."
+    "pre-commit": "npm run prettier && npm run check && npm run build && git add -A .",
+    "commit": "cz",
+    "release": "standard-version"
   },
   "engines": {
     "npm": ">=7.0.0",
     "node": ">=12.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run pre-commit"
-    }
   },
   "browserslist": [
     "last 2 years",
     "> 1%",
     "not dead"
   ],
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable"
+    },
+    "cz-customizable": {
+      "config": "./.config/commitzen.ts"
+    }
+  },
   "babel": {
     "plugins": [
       [

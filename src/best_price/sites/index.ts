@@ -5,3 +5,7 @@ import './auchan_ru';
 import './perekrestok_ru';
 
 import './wildberries_ru';
+
+export default {
+  sites: '',
+};
