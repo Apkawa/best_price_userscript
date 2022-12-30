@@ -78,7 +78,10 @@
     "check": "npm run test && npm run lint",
     "pre-commit": "npm run prettier && npm run check && npm run build && git add -A .",
     "commit": "cz",
-    "release": "standard-version"
+    "release": "standard-version",
+    "release:pre": "npm run release -- --prerelease --skip.tag",
+    "release:patch": "npm run release -- --release-as patch",
+    "release:minor": "npm run release -- --release-as minor"
   },
   "engines": {
     "npm": ">=7.0.0",
