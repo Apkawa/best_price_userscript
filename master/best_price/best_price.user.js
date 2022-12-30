@@ -17,7 +17,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
-// @version      0.5.3
+// @version      0.5.4
 // ==/UserScript==
 (function() {
     "use strict";
@@ -413,18 +413,54 @@
         const priceEl = (root || document.body).querySelector(sel);
         return getPriceFromElement(priceEl);
     }
+    function processProductCard(cardEl, options) {
+        var _a, _b, _c;
+        const {price_sel: price_sel, title_sel: title_sel, to_render: to_render, force: force} = options;
+        if (!force && cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
+        const price = getPrice(price_sel, cardEl);
+        const title = null === (_b = null === (_a = cardEl.querySelector(title_sel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        if (!title || !price) {
+            console.warn("Not found price or title", title, price, cardEl);
+            storeParsedTitleToElement(cardEl, null);
+            return;
+        }
+        console.debug(title, price);
+        const parsedTitle = parseTitleWithPrice(title, price);
+        const renderedPrice = renderBestPrice(parsedTitle, options.extra_style);
+        let to_render_sel = "";
+        let to_render_pos = "after";
+        if ("string" === typeof to_render) to_render_sel = to_render; else {
+            to_render_sel = to_render.sel;
+            to_render_pos = to_render.pos || to_render_pos;
+        }
+        const to_render_els = cardEl.querySelectorAll(to_render_sel);
+        for (const to_render_el of to_render_els) for (const e of (null === (_c = null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el.parentElement) || void 0 === _c ? void 0 : _c.querySelectorAll("." + BEST_PRICE_CLASS_NAME)) || []) e.remove();
+        let i = 0;
+        for (const to_render_el of to_render_els) {
+            let r = renderedPrice;
+            if (i > 0) r = renderedPrice.cloneNode(true);
+            null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el[to_render_pos](r);
+            i += 1;
+        }
+        storeParsedTitleToElement(cardEl, parsedTitle);
+    }
     function initProductPage() {
-        var _a, _b;
+        var _a;
+        const productRoot = document.querySelector('[data-widget="container"]');
+        if (!productRoot) return;
         const title = null === (_a = document.querySelector("[data-widget='webProductHeading']")) || void 0 === _a ? void 0 : _a.textContent;
         if (!title) return;
-        let price = getPrice("[data-widget='webOzonAccountPrice']");
-        if (!price) price = getPrice("[data-widget='webPrice']");
-        if (price) {
-            const parsedTitle = parseTitleWithPrice(title, price);
-            null === (_b = document.querySelector("[data-widget='webPrice']")) || void 0 === _b ? void 0 : _b.appendChild(renderBestPrice(parsedTitle));
-        }
+        processProductCard(productRoot, {
+            price_sel: '[data-widget="webOzonAccountPrice"], [data-widget="webPrice"]',
+            title_sel: '[data-widget="webProductHeading"]',
+            to_render: {
+                sel: '[data-widget="webPrice"]',
+                pos: "appendChild"
+            },
+            force: false
+        });
     }
-    function processProductCard(cardEl) {
+    function processProductCardOld(cardEl) {
         const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
         if (!wrapEl || (null === wrapEl || void 0 === wrapEl ? void 0 : wrapEl.querySelector(".GM-best-price"))) {
             storeParsedTitleToElement(cardEl, null);
@@ -446,7 +482,7 @@
         const catalogEl = document.querySelector(".widget-search-result-container > div");
         if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
         const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
-        for (const cardEl of cardList) processProductCard(cardEl);
+        for (const cardEl of cardList) processProductCardOld(cardEl);
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (catalogEl) {
             const el = catalogEl.querySelector(":scope > div");
@@ -653,37 +689,6 @@
             runOnce: false
         });
     })();
-    function common_parser_processProductCard(cardEl, options) {
-        var _a, _b, _c;
-        const {price_sel: price_sel, title_sel: title_sel, to_render: to_render, force: force} = options;
-        if (!force && cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-        const price = getPrice(price_sel, cardEl);
-        const title = null === (_b = null === (_a = cardEl.querySelector(title_sel)) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
-        if (!title || !price) {
-            console.warn("Not found price or title", title, price, cardEl);
-            storeParsedTitleToElement(cardEl, null);
-            return;
-        }
-        console.debug(title, price);
-        const parsedTitle = parseTitleWithPrice(title, price);
-        const renderedPrice = renderBestPrice(parsedTitle, options.extra_style);
-        let to_render_sel = "";
-        let to_render_pos = "after";
-        if ("string" === typeof to_render) to_render_sel = to_render; else {
-            to_render_sel = to_render.sel;
-            to_render_pos = to_render.pos || to_render_pos;
-        }
-        const to_render_els = cardEl.querySelectorAll(to_render_sel);
-        for (const to_render_el of to_render_els) for (const e of (null === (_c = null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el.parentElement) || void 0 === _c ? void 0 : _c.querySelectorAll("." + BEST_PRICE_CLASS_NAME)) || []) e.remove();
-        let i = 0;
-        for (const to_render_el of to_render_els) {
-            let r = renderedPrice;
-            if (i > 0) r = renderedPrice.cloneNode(true);
-            null === to_render_el || void 0 === to_render_el ? void 0 : to_render_el[to_render_pos](r);
-            i += 1;
-        }
-        storeParsedTitleToElement(cardEl, parsedTitle);
-    }
     function perekrestok_ru_initProductPage() {
         var _a;
         const productRoot = document.querySelector("main");
@@ -693,7 +698,7 @@
             productRoot.classList.remove(BEST_PRICE_WRAP_CLASS_NAME);
             productRoot.dataset.productId = productId;
         }
-        common_parser_processProductCard(productRoot, {
+        processProductCard(productRoot, {
             price_sel: "div.price-new",
             title_sel: "h1.product__title",
             to_render: {
@@ -704,7 +709,7 @@
     }
     function perekrestok_ru_initCatalog() {
         const cardList = document.querySelectorAll(".product-card-wrapper" + ", .swiper-slide");
-        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+        for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: "div.price-new",
             title_sel: "span.product-card__link-text",
             to_render: "div.product-card__control"
@@ -732,6 +737,7 @@
         "use strict";
         const prefix = "https://(www\\.|)perekrestok\\.ru";
         if (!matchLocation(prefix)) return;
+        console.log("Perekrestok.ru");
         waitCompletePage((() => {
             if (matchLocation(prefix + "/cat/\\d+/p/")) perekrestok_ru_initProductPage();
             perekrestok_ru_initCatalog();
@@ -747,7 +753,7 @@
     function wildberries_ru_initProductPage() {
         const productRoot = document.querySelector(".product-page");
         if (!productRoot) return;
-        common_parser_processProductCard(productRoot, {
+        processProductCard(productRoot, {
             price_sel: ".price-block__final-price",
             title_sel: ".product-page__header h1",
             to_render: ".price-block",
@@ -755,7 +761,7 @@
             force: true
         });
         const cardList = document.querySelectorAll(".goods-card");
-        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+        for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: ".goods-card__price-now",
             title_sel: ".goods-card__description",
             to_render: ".goods-card__price",
@@ -765,7 +771,7 @@
     function initPopup() {
         const productPopupRoot = document.querySelector(".popup .product");
         if (!productPopupRoot) return;
-        common_parser_processProductCard(productPopupRoot, {
+        processProductCard(productPopupRoot, {
             price_sel: ".price-block__final-price",
             title_sel: ".product__header",
             to_render: ".price-block",
@@ -774,7 +780,7 @@
     }
     function wildberries_ru_initCatalog() {
         const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
-        for (const cardEl of cardList) common_parser_processProductCard(cardEl, {
+        for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: ".price__lower-price",
             title_sel: ".goods-name",
             to_render: ".product-card__price",
