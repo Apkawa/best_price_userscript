@@ -19,10 +19,10 @@
 - https://lenta.com/
 - https://okeydostavka.ru/
 - https://perekrestok.ru/
+- https://www.wildberries.ru/ 
 
 Запланированы:
 
-- https://www.wildberries.ru/ https://github.com/Apkawa/best_price_userscript/issues/4
 - https://vkusvill.ru/
 - https://auchan.ru/
 
@@ -33,7 +33,7 @@
 ## Установка
 
 1. Установите [Tampermonkey](https://www.tampermonkey.net/) (GreaseMonkey не тестировался, не уверен что работает)
-2. Откройте [best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js)
+2. Откройте [best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js)
 3. Предложат установить юзерскрипт, соглашайтесь
 
 ## Функциональность
@@ -60,11 +60,13 @@
   - Энергоэффективности лм/Вт
   - Стоимости одного люмена по аналогии с кг - лм/руб
   - Отношение энергоэффективности к стоимости - (лм/Вт)/руб (надо подумать)
-- Регрессионные тесты каждого сайта 
-- CI/CD, публикация в https://greasyfork.org/, https://openuserjs.org/
-- https://github.com/Apkawa/best_price_userscript/issues/2 Настройки
-- Локальная история цен
-- Сравнение цен в/между сайтами (+ пытаться разобрать основную категорию, например сахар)
+- [ ] Регрессионные тесты каждого сайта https://github.com/Apkawa/best_price_userscript/issues/6
+- [ ] CI/CD https://github.com/Apkawa/best_price_userscript/issues/6
+- [ ] генерация changelog
+- [ ] публикация в https://greasyfork.org/, https://openuserjs.org/ 
+- [ ] https://github.com/Apkawa/best_price_userscript/issues/2 Настройки
+- [ ] Локальная история цен
+- [ ] Сравнение цен в/между сайтами (+ пытаться разобрать основную категорию, например сахар)
 
 ## Обратная связь
 
