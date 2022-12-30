@@ -12,6 +12,8 @@
 // @match        https://www.okeydostavka.ru/*
 // @match        https://perekrestok.ru/*
 // @match        https://www.perekrestok.ru/*
+// @match        https://wildberries.ru/*
+// @match        https://www.wildberries.ru/*
 // ==/UserScript==
 
 import './sites';
