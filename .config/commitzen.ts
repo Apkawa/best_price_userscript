@@ -36,12 +36,12 @@ module.exports = {
     {name: 'core'},
     {name: 'core:parseTitle'}, // Основная логика вокруг которой все вертися
     {name: 'core:priceReorder'}, // Логика пересортировки по цене
+    {name: 'core:priceRender'}, // Логика отрисовки
     // TODO автоматическое заполнение сайтов из включенных
     {name: 'site:ozon.ru'},
     {name: 'site:wildberries.ru'},
     {name: 'site:lenta.com'},
   ],
-
   // Возможность задать спец ОБЛАСТЬ для определенного типа коммита (пример для 'fix')
   /*
   scopeOverrides: {
