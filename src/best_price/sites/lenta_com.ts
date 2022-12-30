@@ -8,18 +8,13 @@ import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
-  const init = () => {
-    const title = document.querySelector('.sku-page__title')?.textContent?.trim();
-    let price = getPrice('.sku-price--primary');
-    if (!price || !title) return;
-    price /= 100; // В ленте цена всегда с копейками
-    console.log(title, price);
-    const parsedTitle = parseTitleWithPrice(title, price);
-    document.querySelector('.sku-prices-block')?.after(renderBestPrice(parsedTitle));
-  };
-  waitCompletePage(() => {
-    init();
-  });
+  const title = document.querySelector('.sku-page__title')?.textContent?.trim();
+  let price = getPrice('.sku-price--primary');
+  if (!price || !title) return;
+  price /= 100; // В ленте цена всегда с копейками
+  console.log(title, price);
+  const parsedTitle = parseTitleWithPrice(title, price);
+  document.querySelector('.sku-prices-block')?.after(renderBestPrice(parsedTitle));
 }
 
 function processProductCard(cardEl: HTMLElement) {
@@ -38,42 +33,25 @@ function processProductCard(cardEl: HTMLElement) {
 }
 
 export function initCatalog(): void {
-  const init = () => {
-    const cardList = document.querySelectorAll<HTMLElement>('.sku-card-small');
-    for (const cardEl of cardList) {
-      processProductCard(cardEl);
-    }
-    const catalogWrapEl = document.querySelector<HTMLElement>('.catalog-grid__grid');
+  const cardList = document.querySelectorAll<HTMLElement>('.sku-card-small');
+  for (const cardEl of cardList) {
+    processProductCard(cardEl);
+  }
+  const catalogWrapEl = document.querySelector<HTMLElement>('.catalog-grid__grid');
 
-    const buttonWrapEl = ElementGetOrCreate(
-      document.querySelector<HTMLElement>('.catalog-sorting'),
-      {
-        pos: 'before',
-      },
-    );
-    if (catalogWrapEl && buttonWrapEl) {
-      initReorderCatalog(catalogWrapEl, buttonWrapEl);
-    }
-    const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
-    const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-      pos: 'before',
-      className: 'GM-pagination-clone',
-    });
-    paginationRootWrap &&
-      copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
-    waitCompletePage(
-      () => {
-        init();
-      },
-      {
-        root: document.querySelector<HTMLElement>('.catalog-view__grid-container'),
-      },
-    );
-  };
-
-  waitCompletePage(() => {
-    init();
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('.catalog-sorting'), {
+    pos: 'before',
   });
+  if (catalogWrapEl && buttonWrapEl) {
+    initReorderCatalog(catalogWrapEl, buttonWrapEl);
+  }
+  const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
+  const paginationRootWrap = ElementGetOrCreate(catalogEl, {
+    pos: 'before',
+    className: 'GM-pagination-clone',
+  });
+  paginationRootWrap &&
+    copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
 }
 
 (function () {
@@ -82,11 +60,13 @@ export function initCatalog(): void {
     return;
   }
 
-  if (matchLocation('^https://lenta\\.com/product/.*')) {
-    initProductPage();
-  }
+  waitCompletePage(() => {
+    if (matchLocation('^https://lenta\\.com/product/.*')) {
+      initProductPage();
+    }
 
-  if (matchLocation('^https://lenta\\.com/(catalog|search|brand)/.*')) {
-    initCatalog();
-  }
+    if (matchLocation('^https://lenta\\.com/(catalog|search|brand)/.*')) {
+      initCatalog();
+    }
+  });
 })();

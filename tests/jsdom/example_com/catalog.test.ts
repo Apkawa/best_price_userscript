@@ -1,7 +1,7 @@
 import {initCatalog} from '../../../src/best_price/sites/wildberries_ru';
 import {CleanUpCallback, prepareJsdomSnapshot, displayHtmlInBrowser} from '../helpers';
 
-describe.skip('jsdom wildberries.ru', () => {
+describe.skip('jsdom example.com', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback;
     beforeEach(async () => {

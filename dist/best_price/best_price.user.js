@@ -272,12 +272,12 @@
         if (!titleInfo) return wrapEl;
         for (const u of titleInfo.units) {
             const el = document.createElement("p");
-            el.innerText = u.price_display;
+            el.textContent = u.price_display;
             wrapEl.appendChild(el);
         }
         if (titleInfo.quantity_price_display) {
             const qtyEl = document.createElement("p");
-            qtyEl.innerText = titleInfo.quantity_price_display;
+            qtyEl.textContent = titleInfo.quantity_price_display;
             wrapEl.appendChild(qtyEl);
         }
         if (wrapEl.childNodes.length) {
@@ -510,19 +510,14 @@
         });
     })();
     function lenta_com_initProductPage() {
-        const init = () => {
-            var _a, _b, _c;
-            const title = null === (_b = null === (_a = document.querySelector(".sku-page__title")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
-            let price = getPrice(".sku-price--primary");
-            if (!price || !title) return;
-            price /= 100;
-            console.log(title, price);
-            const parsedTitle = parseTitleWithPrice(title, price);
-            null === (_c = document.querySelector(".sku-prices-block")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
-        };
-        waitCompletePage((() => {
-            init();
-        }));
+        var _a, _b, _c;
+        const title = null === (_b = null === (_a = document.querySelector(".sku-page__title")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        let price = getPrice(".sku-price--primary");
+        if (!price || !title) return;
+        price /= 100;
+        console.log(title, price);
+        const parsedTitle = parseTitleWithPrice(title, price);
+        null === (_c = document.querySelector(".sku-prices-block")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
     }
     function lenta_com_processProductCard(cardEl) {
         var _a, _b, _c;
@@ -540,35 +535,27 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function lenta_com_initCatalog() {
-        const init = () => {
-            const cardList = document.querySelectorAll(".sku-card-small");
-            for (const cardEl of cardList) lenta_com_processProductCard(cardEl);
-            const catalogWrapEl = document.querySelector(".catalog-grid__grid");
-            const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-sorting"), {
-                pos: "before"
-            });
-            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
-            const catalogEl = document.querySelector(".catalog-view__main");
-            const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-                pos: "before",
-                className: "GM-pagination-clone"
-            });
-            paginationRootWrap && copyElementToNewRoot(null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
-            waitCompletePage((() => {
-                init();
-            }), {
-                root: document.querySelector(".catalog-view__grid-container")
-            });
-        };
-        waitCompletePage((() => {
-            init();
-        }));
+        const cardList = document.querySelectorAll(".sku-card-small");
+        for (const cardEl of cardList) lenta_com_processProductCard(cardEl);
+        const catalogWrapEl = document.querySelector(".catalog-grid__grid");
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-sorting"), {
+            pos: "before"
+        });
+        if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+        const catalogEl = document.querySelector(".catalog-view__main");
+        const paginationRootWrap = ElementGetOrCreate(catalogEl, {
+            pos: "before",
+            className: "GM-pagination-clone"
+        });
+        paginationRootWrap && copyElementToNewRoot(null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
     }
     (function() {
         "use strict";
         if (!matchLocation("^https://lenta\\.com/.*")) return;
-        if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
-        if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
+        waitCompletePage((() => {
+            if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
+            if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
+        }));
     })();
     function okeydostavka_ru_initProductPage() {
         const init = () => {

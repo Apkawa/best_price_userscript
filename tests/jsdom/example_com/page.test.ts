@@ -23,6 +23,8 @@ describe.skip('jsdom example.com', () => {
     });
     it('Checks multiple call', async () => {
       initProductPage();
+      initProductPage();
+      initProductPage();
       expect(
         document.querySelectorAll('.product-page .GM-best-price').length == 1,
       ).toBeTruthy();
