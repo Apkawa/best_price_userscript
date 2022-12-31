@@ -1,7 +1,8 @@
-import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
 import {initCatalog} from '../../../src/best_price/sites/perekrestok_ru';
 
-describe.skip('jsdom perekrestok.ru', () => {
+import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
+
+describe('jsdom perekrestok.ru', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback;
     beforeEach(async () => {
@@ -12,11 +13,10 @@ describe.skip('jsdom perekrestok.ru', () => {
     })
     it('Page content', () => {
       expect(
-        document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+        document.querySelector('title')?.textContent).toMatch('Перекрёстке');
     });
     it('Check buttons', async () => {
       initCatalog();
-      await displayHtmlInBrowser(document)
       expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
     });
     it('Checks price', async () => {

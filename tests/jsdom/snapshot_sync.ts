@@ -15,6 +15,7 @@ puppeteer.use(StealthPlugin());
 import {autoScroll} from '../e2e/helpers';
 import {JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
+import {doc} from 'prettier';
 
 
 async function preparePage(page: Page) {
@@ -81,13 +82,31 @@ async function savePage(page: Page, options: SavePageOptions) {
   // drop script, inlined svg and data-*
   await page.evaluate(() => {
     document.querySelectorAll('svg,script').forEach(e => e.remove());
-    document.querySelectorAll('div').forEach( e => {
+    document.querySelectorAll('div').forEach(e => {
       for (const k of Object.keys(e?.dataset)) {
-        delete e.dataset[k]
+        delete e.dataset[k];
       }
-    })
+    });
     // Clean nested anchor links, forbidden for html
-    document.querySelectorAll('a a').forEach(e => e.remove())
+    document.querySelectorAll('a a').forEach(e => e.remove());
+  });
+  // workaround for styled-components
+  await page.evaluate(() => {
+
+    const styleEls: HTMLStyleElement[] = [];
+    for (const sheet of document.styleSheets) {
+      const styleEl = document.createElement('style');
+      styleEl.setAttribute('type', sheet.type);
+      styleEl.setAttribute('media', sheet.media.toString());
+      let cssText = '';
+      for (const cssRule of sheet.cssRules) {
+        cssText += cssRule.cssText;
+      }
+      styleEl.innerHTML = cssText;
+      styleEls.push(styleEl);
+    }
+    styleEls.forEach((e) => document.head.appendChild(e));
+
   });
   const bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
   const dir = path.dirname(filepath);

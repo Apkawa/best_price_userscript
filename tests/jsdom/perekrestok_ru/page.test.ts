@@ -1,30 +1,30 @@
-import {initProductPage} from '../../../src/best_price/sites/wildberries_ru';
-import {CleanUpCallback, prepareJsdomSnapshot} from '../helpers';
+import {initProductPage, initCatalog} from '../../../src/best_price/sites/perekrestok_ru';
+import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
 
 
-describe.skip('jsdom perekrestok.ru', () => {
+describe('jsdom perekrestok.ru', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback
     beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('example.com', 'page');
+      cleanup = await prepareJsdomSnapshot('perekrestok.ru', 'page');
     });
     afterEach(() => {
       cleanup()
     })
     it('Page content', () => {
       expect(
-        document.querySelector('title')?.textContent).toMatch('');
+        document.querySelector('title')?.textContent).toMatch('Перекрёстке');
     });
     it('Checks main price', async () => {
       initProductPage();
       expect(
-        document.querySelector('.product-page .GM-best-price'),
+        document.querySelector('.product-price-wrapper .GM-best-price'),
       ).toBeTruthy();
     });
     it('Checks recommends block', async () => {
-      initProductPage();
+      initCatalog();
       expect(
-        document.querySelector('.j-products-container .GM-best-price'),
+        document.querySelector('.swiper-slide .GM-best-price'),
       ).toBeTruthy();
     });
   });
