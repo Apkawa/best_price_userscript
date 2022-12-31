@@ -3,6 +3,8 @@ import {initReorderCatalog} from '../common/bestPriceReorder';
 import {ElementGetOrCreate} from '../../utils/dom';
 import {processProductCard} from '../common/common_parser';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
+import {SiteType} from './types';
+import {buildPatternPrefixFromDomain} from '../../utils/location';
 
 export function initProductPage(): void {
   const productRoot = document.querySelector<HTMLElement>('main');
@@ -57,11 +59,9 @@ export function initCatalog(): void {
   }
 }
 
-(function () {
+function setup() {
   'use strict';
-  const prefix = 'https://(www\\.|)perekrestok\\.ru';
-  if (!matchLocation(prefix)) return;
-  console.log('Perekrestok.ru');
+  const prefix = buildPatternPrefixFromDomain(SITE.domain);
   waitCompletePage(
     () => {
       if (matchLocation(prefix + '/cat/\\d+/p/')) {
@@ -71,4 +71,11 @@ export function initCatalog(): void {
     },
     {runOnce: false, delay: 300},
   );
-})();
+}
+
+const SITE: SiteType = {
+  domain: 'perekrestok.ru',
+  setup,
+};
+
+export default SITE;

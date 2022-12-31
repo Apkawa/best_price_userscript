@@ -1,7 +1,8 @@
-import {matchLocation, waitCompletePage} from '../../utils';
+import {waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
 import {processProductCard} from '../common/common_parser';
+import {SiteType} from './types';
 
 const extraStyle = {
   fontSize: '1rem',
@@ -77,11 +78,7 @@ export function initCatalog(): void {
     );
 }
 
-(function () {
-  'use strict';
-  const prefix = 'https://(www\\.|)wildberries\\.ru/';
-  if (!matchLocation(prefix)) return;
-  console.debug('Wildberries.ru');
+function setup() {
   waitCompletePage(
     () => {
       initProductPage();
@@ -90,4 +87,11 @@ export function initCatalog(): void {
     },
     {runOnce: false, delay: 200},
   );
-})();
+}
+
+const SITE: SiteType = {
+  domain: 'wildberries.ru',
+  setup,
+};
+
+export default SITE;

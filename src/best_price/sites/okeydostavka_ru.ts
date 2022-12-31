@@ -1,4 +1,4 @@
-import {matchLocation, waitCompletePage} from '../../utils';
+import {waitCompletePage} from '../../utils';
 import {getPriceFromElement} from '../common/price_parse';
 import {parseTitleWithPrice} from '../common/parseTitle';
 import {renderBestPrice} from '../common/price_render';
@@ -6,25 +6,21 @@ import {initReorderCatalog} from '../common/bestPriceReorder';
 import {ElementGetOrCreate} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
+import {SiteType} from './types';
 
 export function initProductPage(): void {
-  const init = () => {
-    const productWrapEl = document.querySelector('.product_main_info');
-    if (!productWrapEl) return;
+  const productWrapEl = document.querySelector('.product_main_info');
+  if (!productWrapEl) return;
 
-    const title = productWrapEl?.querySelector('h1.main_header')?.textContent?.trim();
-    const price = parseFloat(
-      productWrapEl?.querySelector<HTMLMetaElement>('.product-price > meta[itemprop="price"]')
-        ?.content || '',
-    );
-    if (!price || !title) return;
-    console.log(title, price);
-    const parsedTitle = parseTitleWithPrice(title, price);
-    productWrapEl?.querySelector('.product-price')?.after(renderBestPrice(parsedTitle));
-  };
-  waitCompletePage(() => {
-    init();
-  });
+  const title = productWrapEl?.querySelector('h1.main_header')?.textContent?.trim();
+  const price = parseFloat(
+    productWrapEl?.querySelector<HTMLMetaElement>('.product-price > meta[itemprop="price"]')
+      ?.content || '',
+  );
+  if (!price || !title) return;
+  console.log(title, price);
+  const parsedTitle = parseTitleWithPrice(title, price);
+  productWrapEl?.querySelector('.product-price')?.after(renderBestPrice(parsedTitle));
 }
 
 function processProductCard(cardEl: HTMLElement): void {
@@ -44,44 +40,37 @@ function processProductCard(cardEl: HTMLElement): void {
 }
 
 export function initCatalog(): void {
-  const init = () => {
-    const cardList = document.querySelectorAll(
-      '.product_listing_container li' +
-        ', .also-products  li > div.product' +
-        ', .similar-products  li > div.product' +
-        ', .catalogEntryRecommendationWidget  li > div.product',
-    );
-    for (const cardEl of cardList) {
-      processProductCard(cardEl as HTMLElement);
-    }
-    // Reorder
-    const catalogWrapEl = document.querySelector<HTMLElement>('.product_listing_container > ul');
-    const buttonWrapEl = ElementGetOrCreate(catalogWrapEl, {
-      pos: 'before',
-    });
-    if (catalogWrapEl && buttonWrapEl) {
-      initReorderCatalog(catalogWrapEl, buttonWrapEl);
-    }
+  const cardList = document.querySelectorAll(
+    '.product_listing_container li' +
+      ', .also-products  li > div.product' +
+      ', .similar-products  li > div.product' +
+      ', .catalogEntryRecommendationWidget  li > div.product',
+  );
+  for (const cardEl of cardList) {
+    processProductCard(cardEl as HTMLElement);
+  }
+  // Reorder
+  const catalogWrapEl = document.querySelector<HTMLElement>('.product_listing_container > ul');
+  const buttonWrapEl = ElementGetOrCreate(catalogWrapEl, {
+    pos: 'before',
+  });
+  if (catalogWrapEl && buttonWrapEl) {
+    initReorderCatalog(catalogWrapEl, buttonWrapEl);
+  }
+}
 
-    waitCompletePage(() => {
-      init();
-    });
-  };
-
+function setup() {
   waitCompletePage(() => {
-    init();
+    if (document.querySelector('.product_main_info')) {
+      initProductPage();
+    }
+    initCatalog();
   });
 }
 
-(function () {
-  'use strict';
-  if (!matchLocation('^https://(www\\.|)okeydostavka.ru/.*')) {
-    return;
-  }
+const SITE: SiteType = {
+  domain: 'okeydostavka.ru',
+  setup,
+};
 
-  if (document.querySelector('.product_main_info')) {
-    initProductPage();
-  }
-
-  initCatalog();
-})();
+export default SITE;

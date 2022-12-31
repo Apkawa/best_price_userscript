@@ -7,6 +7,8 @@ import {copyElementToNewRoot} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
 import {processProductCard} from '../common/common_parser';
+import {SiteType} from './types';
+import {buildPatternPrefixFromDomain} from '../../utils/location';
 
 export function initProductPage(): void {
   const productRoot = document.querySelector<HTMLElement>('[data-widget="container"]');
@@ -105,24 +107,18 @@ export function initCatalog(): void {
   }
 }
 
-(function () {
-  'use strict';
-  if (!matchLocation('^https://(www\\.|)ozon\\.ru/.*')) {
-    return;
-  }
-  console.log('OZON.ru');
+function setup() {
+  const prefix = buildPatternPrefixFromDomain(SITE.domain);
   waitCompletePage(
     () => {
-      if (matchLocation('^https://(www\\.|)ozon\\.ru/product/.*')) {
+      if (matchLocation(prefix + '/product/.*')) {
         initProductPage();
       }
 
-      if (matchLocation('^https://(www\\.|)ozon\\.ru/')) {
+      if (matchLocation(prefix + '/')) {
         initCatalog();
       }
-      if (
-        matchLocation('^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*')
-      ) {
+      if (matchLocation(prefix + '/(category|highlight|search|my|product|brand)/.*')) {
         initCatalog();
       }
     },
@@ -130,4 +126,11 @@ export function initCatalog(): void {
       runOnce: false,
     },
   );
-})();
+}
+
+const SITE: SiteType = {
+  domain: 'ozon.ru',
+  setup,
+};
+
+export default SITE;

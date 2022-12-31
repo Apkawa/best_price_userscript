@@ -1,4 +1,8 @@
 export function GM_addStyle(css: string): void {
+  if (typeof document === 'undefined') {
+    console.warn('GM_addStyle run in node');
+    return;
+  }
   const style =
     (document.getElementById('GM_addStyleBy8626') as HTMLStyleElement) ||
     (function (): HTMLStyleElement {

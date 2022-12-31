@@ -1,6 +1,7 @@
 'use strict';
 // https://github.com/leoforfree/cz-customizable#steps
-// import sites from "src/best_price/sites"
+import sites from '../src/best_price/sites/index';
+const sites_scope = sites.map(s => ({name: 'site:' + s.domain}))
 
 module.exports = {
   // Добавим описание на русском языке ко всем типам
@@ -37,10 +38,7 @@ module.exports = {
     {name: 'core:parseTitle'}, // Основная логика вокруг которой все вертися
     {name: 'core:priceReorder'}, // Логика пересортировки по цене
     {name: 'core:priceRender'}, // Логика отрисовки
-    // TODO автоматическое заполнение сайтов из включенных
-    {name: 'site:ozon.ru'},
-    {name: 'site:wildberries.ru'},
-    {name: 'site:lenta.com'},
+    ...sites_scope
   ],
   // Возможность задать спец ОБЛАСТЬ для определенного типа коммита (пример для 'fix')
   /*

@@ -8,18 +8,20 @@ import fromEntries from 'fromentries';
 
 const packageJson: PackageJson = require('./package.json');
 
+import sites from './src/best_price/sites';
 
-const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`
+
+const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`;
 const DOWNLOAD_ROOT = `${packageJson.repository}${DOWNLOAD_SUFFIX}`;
 
-console.log(`DOWNLOAD_ROOT=${DOWNLOAD_ROOT}`)
+console.log(`DOWNLOAD_ROOT=${DOWNLOAD_ROOT}`);
 
 function collectUserScripts() {
-  let root = path.resolve(__dirname, 'src');
+  const root = path.resolve(__dirname, 'src');
   return fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {
-    let relPath = path.relative(root, f);
-    let bName = path.basename(path.basename(relPath, '.js'), '.ts');
-    let name = `${path.dirname(relPath)}/${bName}`;
+    const relPath = path.relative(root, f);
+    const bName = path.basename(path.basename(relPath, '.js'), '.ts');
+    const name = `${path.dirname(relPath)}/${bName}`;
     return [name, f];
   }));
 }
@@ -35,6 +37,11 @@ function getExtraInfo(data: BannerDataType) {
   if (typeof author !== 'string') {
     author = author?.name;
   }
+  const match: string[] = [];
+  for (const site of sites) {
+    match.push(`https://${site.domain}/*`);
+    match.push(`https://www.${site.domain}/*`);
+  }
 
   return {
     author,
@@ -45,6 +52,7 @@ function getExtraInfo(data: BannerDataType) {
     updateUrl: downloadUrl,
     license: packageJson.license,
     version: packageJson.version,
+    match,
   };
 }
 
@@ -58,13 +66,27 @@ function buildUserScriptMeta(data: BannerDataType) {
   let text = fs.readFileSync(src_path, 'utf-8')
     .replace(/(==\/UserScript==)[\s\S]+$/, '$1')
     .replace(/^.*==\/UserScript==.*$/gm, '');
-  let extraInfo = getExtraInfo(data);
-  let columnWidth = 13;
-  for (let [k, v] of Object.entries(extraInfo)) {
-    let re = RegExp(`^//.*@${k}\\b.*$`, 'gm');
+  const extraInfo = getExtraInfo(data);
+  const columnWidth = 13;
+  for (const [k, v] of Object.entries(extraInfo)) {
+    let item_val: string[];
+    if (typeof v === 'string') {
+      item_val = [v];
+    } else {
+      item_val = v;
+    }
+    const re = RegExp(`^//.*@${k}\\b.*$`, 'gm');
     let f_k = `@${k}`;
     f_k += Array(columnWidth - f_k.length).fill(' ').join('');
-    let s = `// ${f_k} ${v}`;
+    let s = '';
+    let i = 0;
+    for (const _v of item_val) {
+      if (i > 0) {
+        s += '\n';
+      }
+      s += `// ${f_k} ${_v}`;
+      i++;
+    }
     if (re.test(text)) {
       text = text.replace(re, s);
     } else {
@@ -88,12 +110,13 @@ const config: webpack.Configuration = {
         loader: 'ts-loader',
         options: {
           transpileOnly: true,
+          configFile: require.resolve('./tsconfig-ts-loader.json'),
         },
       },
     },
       {
         test: /\.svg$/,
-        loader: 'raw-loader'
+        loader: 'raw-loader',
         // type: 'asset/inline'
       },
     ],
@@ -105,7 +128,7 @@ const config: webpack.Configuration = {
   },
   resolve: {
     alias: {
-      "app": path.resolve(__dirname, 'src')
+      'app': path.resolve(__dirname, 'src'),
     },
     modules: [
       'node_modules',

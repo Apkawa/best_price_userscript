@@ -5,15 +5,17 @@
 // @author       Apkawa
 // @license      MIT
 // @icon         https://www.google.com/s2/favicons?domain=ozon.ru
-// @match        https://ozon.ru/*
-// @match        https://www.ozon.ru/*
-// @match        https://lenta.com/*
-// @match        https://okeydostavka.ru/*
-// @match        https://www.okeydostavka.ru/*
-// @match        https://perekrestok.ru/*
-// @match        https://www.perekrestok.ru/*
-// @match        https://wildberries.ru/*
-// @match        https://www.wildberries.ru/*
 // ==/UserScript==
 
-import './sites';
+import SITES from './sites';
+import {buildPatternPrefixFromDomain, matchLocation} from '../utils/location';
+
+(function () {
+  for (const s of SITES) {
+    const prefix = buildPatternPrefixFromDomain(s.domain);
+    if (matchLocation(prefix + '/.*')) {
+      console.log(s.domain);
+      s.setup();
+    }
+  }
+})();

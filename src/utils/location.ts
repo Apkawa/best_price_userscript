@@ -1,14 +1,21 @@
 import {isFunction} from 'rxjs/internal-compatibility';
 
-type MatchPattern = string | RegExp | ((s: string) => boolean);
+type MatchPattern = string | RegExp | ((s: Location) => boolean);
+
+export function buildPatternPrefixFromDomain(domain: string): string {
+  return `^https://(www.|)${domain}`;
+}
 
 export function matchLocation(...patterns: MatchPattern[]): boolean {
-  const s = document.location.href;
-  for (const p of patterns) {
+  const s = document.location;
+  for (let p of patterns) {
     if (isFunction(p) && p(s)) {
       return true;
     }
-    if (RegExp(p as string).test(s)) {
+    if (typeof p === 'string') {
+      p = p.replace(/[.]/g, '\\.');
+    }
+    if (RegExp(p as string).test(s.href)) {
       return true;
     }
   }

@@ -1,23 +1,16 @@
 {
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    // same as the --compilerOptions flag and the TS_NODE_COMPILER_OPTIONS environment variable
+    "compilerOptions": {
+      "module": "commonjs",
+      "target": "es2017",
+      "esModuleInterop": true
+    }
+  },
   "compilerOptions": {
+    "module": "commonjs",
     "target": "es2017",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "rootDir": ".",
-    "baseUrl": ".",
-    "paths": {
-      "@app/*": [
-        "./src/*"
-      ]
-    },
-    "strict": true,
-    "esModuleInterop": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2018"
-    ],
-    "removeComments": true,
-    "experimentalDecorators": true,
+    "esModuleInterop": true
   }
 }

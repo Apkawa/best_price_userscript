@@ -1,92 +1,57 @@
-import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
-import {getPrice, getPriceFromElement} from '../common/price_parse';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {renderBestPrice} from '../common/price_render';
+import {getElementByXpath, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
-import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
-import {storeParsedTitleToElement} from '../common/store';
+import {SiteType} from './types';
+import {processProductCard} from '../common/common_parser';
 
 export function initProductPage(): void {
-  const init = () => {
-    if (document.querySelector('main .GM-best-price')) return;
-    const title = document.querySelector('main h1#productName')?.textContent?.trim();
-    const price = getPrice('main .fullPricePDP');
-    if (!price || !title) return;
-    console.log(title, price);
-    const parsedTitle = parseTitleWithPrice(title, price);
-    document.querySelector('main .fullPricePDP')?.after(renderBestPrice(parsedTitle));
-  };
-  init();
-}
-
-function processProductCard(
-  cardEl: HTMLElement,
-  priceSel: string,
-  titleSel: string,
-  renderPriceSel: string,
-): void {
-  if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-  const price = getPriceFromElement(cardEl.querySelector<HTMLElement>(priceSel));
-  const title = cardEl.querySelector(titleSel)?.textContent?.trim();
-  if (!title || !price) {
-    storeParsedTitleToElement(cardEl, null);
-    return;
-  }
-  console.log(title, price);
-  const parsedTitle = parseTitleWithPrice(title, price);
-  cardEl.querySelector(renderPriceSel)?.after(renderBestPrice(parsedTitle));
-  storeParsedTitleToElement(cardEl, parsedTitle);
+  const productRoot = document.querySelector('main');
+  if (!productRoot) return;
+  processProductCard(productRoot, {
+    price_sel: '.fullPricePDP',
+    title_sel: 'h1#productName',
+    to_render: {sel: '.fullPricePDP', pos: 'after'},
+  });
 }
 
 export function initCatalog(): void {
-  const init = () => {
-    const cardList = document.querySelectorAll<HTMLElement>('article.productCard');
-    for (const cardEl of cardList) {
-      processProductCard(
-        cardEl,
-        '.productCardPriceData > div',
-        '.linkToPDP',
-        '.productCardPriceData ',
-      );
-    }
-    // Reorder
-    const catalogWrapEl = getElementByXpath(
-      '//article[contains(@class,"productCard")]/ancestor::main//article/../..',
-    );
-    if (!document.querySelector('.GM-wrap')) {
-      const buttonWrapEl = ElementGetOrCreate(
-        document.querySelector<HTMLElement>('#categoriesThirdLvlList'),
-        {
-          pos: 'after',
-        },
-      );
-      if (catalogWrapEl && buttonWrapEl) {
-        initReorderCatalog(catalogWrapEl, buttonWrapEl);
-      }
-    }
-
-    // Copy pagination on top
-    const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
-    const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-      pos: 'before',
-      className: 'GM-pagination-clone',
+  const cardList = document.querySelectorAll<HTMLElement>('article.productCard');
+  for (const cardEl of cardList) {
+    processProductCard(cardEl, {
+      price_sel: '.productCardPriceData > div',
+      title_sel: '.linkToPDP',
+      to_render: '.productCardPriceData',
+      force: true,
     });
-    paginationRootWrap &&
-      copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
-  };
-  init();
+  }
+  // Reorder
+  const catalogWrapEl = getElementByXpath('//article[contains(@class,"productCard")]/../..');
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('main > div'), {
+    pos: 'before',
+  });
+  buttonWrapEl.style.paddingLeft = '42px';
+  if (catalogWrapEl && buttonWrapEl) {
+    initReorderCatalog(catalogWrapEl, buttonWrapEl);
+  }
+
+  // Copy pagination on top
+  const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
+  const paginationRootWrap = ElementGetOrCreate(catalogEl, {
+    pos: 'before',
+    className: 'GM-pagination-clone',
+  });
+  paginationRootWrap &&
+    copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
 }
 
 export function initSearchResults(): void {
   const cardList = document.querySelectorAll<HTMLElement>('.digi-product');
   for (const cardEl of cardList) {
-    processProductCard(
-      cardEl,
-      '.digi-product-price-variant_actual',
-      '.digi-product__label',
-      '.price-and-cart',
-    );
+    processProductCard(cardEl, {
+      price_sel: '.digi-product-price-variant_actual',
+      title_sel: '.digi-product__label',
+      to_render: '.price-and-cart',
+    });
   }
   // Reorder
   const catalogWrapEl = document.querySelector<HTMLElement>('.digi-products-grid');
@@ -103,26 +68,28 @@ export function initSearchResults(): void {
   }
 }
 
-(function () {
-  'use strict';
-  if (!matchLocation('^https://(www\\.|)auchan\\.ru/.*')) {
-    return;
-  }
-
+function setup() {
   waitCompletePage(
     () => {
       if (document.querySelector('#productName')) {
         initProductPage();
       } else {
-        if (document.querySelector('.digi-products')) {
+        if (document.querySelector('.digi-products .digi-product')) {
           initSearchResults();
-        } else {
-          initCatalog();
         }
+        initCatalog();
       }
     },
     {
       runOnce: false,
+      delay: 450,
     },
   );
-})();
+}
+
+const SITE: SiteType = {
+  domain: 'auchan.ru',
+  setup,
+};
+
+export default SITE;

@@ -6,6 +6,8 @@ import {initReorderCatalog} from '../common/bestPriceReorder';
 import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
+import {SiteType} from './types';
+import {buildPatternPrefixFromDomain} from '../../utils/location';
 
 export function initProductPage(): void {
   const title = document.querySelector('.sku-page__title')?.textContent?.trim();
@@ -54,19 +56,22 @@ export function initCatalog(): void {
     copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
 }
 
-(function () {
-  'use strict';
-  if (!matchLocation('^https://lenta\\.com/.*')) {
-    return;
-  }
-
+function setup() {
+  const prefix = buildPatternPrefixFromDomain(SITE.domain);
   waitCompletePage(() => {
-    if (matchLocation('^https://lenta\\.com/product/.*')) {
+    if (matchLocation(prefix + '/product/.*')) {
       initProductPage();
     }
 
-    if (matchLocation('^https://lenta\\.com/(catalog|search|brand)/.*')) {
+    if (matchLocation(prefix + '/(catalog|search|brand)/.*')) {
       initCatalog();
     }
   });
-})();
+}
+
+const SITE: SiteType = {
+  domain: 'lenta.com',
+  setup,
+};
+
+export default SITE;
