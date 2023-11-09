@@ -19,7 +19,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
-// @version      0.5.5
+// @version      0.5.6
 // ==/UserScript==
 (function() {
     "use strict";
@@ -469,7 +469,7 @@
             return;
         }
         const price = getPriceFromElement(wrapEl.querySelector("div"));
-        const titleEl = wrapEl.querySelector("a span.tsBodyL, " + "a span.tsBodyM:not([style]), " + 'a span.tsBodyM[style="color:;"]');
+        const titleEl = wrapEl.querySelector("a span.tsBodyL, " + "a span.tsBodyM:not([style]), " + 'a span.tsBodyM[style="color:;"], ' + "a span.tsBody500Medium ");
         const title = null === titleEl || void 0 === titleEl ? void 0 : titleEl.textContent;
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);
