@@ -49,7 +49,9 @@ function processProductCardOld(cardEl: HTMLElement): void {
   const titleEl = wrapEl.querySelector(
     'a span.tsBodyL, ' +
       'a span.tsBodyM:not([style]), ' + //
-      'a span.tsBodyM[style="color:;"]', // Возможно вам понравится (в заказе)
+      'a span.tsBodyM[style="color:;"], ' + // Возможно вам понравится (в заказе)
+      'a span.tsBody500Medium ' +
+      '',
   );
   const title = titleEl?.textContent;
   if (!title || !price) {
@@ -111,6 +113,7 @@ export function initCatalog(): void {
     return;
   }
   console.log('OZON.ru');
+
   waitCompletePage(
     () => {
       if (matchLocation('^https://(www\\.|)ozon\\.ru/product/.*')) {

@@ -29,3 +29,18 @@ https://docs.npmjs.com/about-semantic-versioning
 - `minor` - добавляем новый сайт или фичу
 - `major` - когда ломаем все
 
+
+## Тесты
+
+`npm run test` - запуск юнит тестов
+
+### Порядок обновления снапшотов для тестов
+
+1) 
+    * в папке `tests/jsdom/snapshots` удалить определенный снапшот или все снапшоты
+    * или в `tests/jsdom/jsdom_snapshot.ts`  `JSDOM_SNAPSHOT_CONF` добавить флаг `replace` `true`  
+2) запустить обновление снапшота `npm run test:jsdom:snapshot-sync`
+
+
+
+

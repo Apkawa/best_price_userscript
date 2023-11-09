@@ -469,7 +469,7 @@
             return;
         }
         const price = getPriceFromElement(wrapEl.querySelector("div"));
-        const titleEl = wrapEl.querySelector("a span.tsBodyL, " + "a span.tsBodyM:not([style]), " + 'a span.tsBodyM[style="color:;"]');
+        const titleEl = wrapEl.querySelector("a span.tsBodyL, " + "a span.tsBodyM:not([style]), " + 'a span.tsBodyM[style="color:;"], ' + "a span.tsBody500Medium ");
         const title = null === titleEl || void 0 === titleEl ? void 0 : titleEl.textContent;
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);

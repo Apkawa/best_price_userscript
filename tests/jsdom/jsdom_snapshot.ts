@@ -6,6 +6,7 @@ export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, './snapshots/');
 
 export interface ConfType {
   url: string,
+  replace?: boolean,
   setup: (page: Page) => Promise<void>
 }
 

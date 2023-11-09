@@ -53,6 +53,7 @@ async function savePage(page: Page, options: SavePageOptions) {
   const {url, setup, filepath, replace = false} = options;
   if (!url) return;
   if (!replace && fs.existsSync(filepath)) {
+    console.log("snapshot already exist. Skipped...");
     return;
   }
   await preparePage(page);
