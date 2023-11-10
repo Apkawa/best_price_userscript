@@ -1,12 +1,11 @@
-import {initCatalog} from '../../../src/best_price/sites/wildberries_ru';
+import {initCatalog} from '../../../src/best_price/sites/lenta_com';
 import {CleanUpCallback, prepareJsdomSnapshot, displayHtmlInBrowser} from '../helpers';
 
-// !!! remove .skip
-describe.skip('jsdom wildberries.ru', () => {
+describe.skip('jsdom Lenta.com', () => {
   describe('Check catalog', () => {
     let cleanup: CleanUpCallback;
     beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('example.com', 'catalog');
+      cleanup = await prepareJsdomSnapshot('lenta.com', 'catalog');
     });
     afterEach(async () => {
       // For debug
@@ -15,12 +14,10 @@ describe.skip('jsdom wildberries.ru', () => {
     })
     it('Page content', () => {
       expect(
-        document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+        document.querySelector('title')?.textContent).toMatch('Лента');
     });
     it('Check buttons', async () => {
       initCatalog();
-      // For debug
-      await displayHtmlInBrowser(document)
       expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
     });
     it('Checks price', async () => {

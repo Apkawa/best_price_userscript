@@ -527,8 +527,8 @@
     function lenta_com_processProductCard(cardEl) {
         var _a, _b, _c;
         if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-        let price = getPriceFromElement(cardEl.querySelector(".price-label--primary"));
-        const title = null === (_b = null === (_a = cardEl.querySelector(".sku-card-small-header__title")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        let price = getPriceFromElement(cardEl.querySelector(".lui-priceText--view_secondary"));
+        const title = null === (_b = null === (_a = cardEl.querySelector(".lui-sku-product-card-text--view-primary")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);
             return;
@@ -536,12 +536,12 @@
         price /= 100;
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        null === (_c = cardEl.querySelector(".sku-card-small-prices ")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
+        null === (_c = cardEl.querySelector(".lui-sku-product-card-price")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function lenta_com_initCatalog() {
         const init = () => {
-            const cardList = document.querySelectorAll(".sku-card-small");
+            const cardList = document.querySelectorAll(".lui-sku-product-card");
             for (const cardEl of cardList) lenta_com_processProductCard(cardEl);
             const catalogWrapEl = document.querySelector(".catalog-grid__grid");
             const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-sorting"), {
@@ -567,6 +567,7 @@
     (function() {
         "use strict";
         if (!matchLocation("^https://lenta\\.com/.*")) return;
+        console.log("Lenta.com");
         if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
         if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
     })();

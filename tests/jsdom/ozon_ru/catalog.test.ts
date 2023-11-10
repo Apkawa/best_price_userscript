@@ -1,12 +1,18 @@
 import {initCatalog} from '../../../src/best_price/sites/ozon_ru';
-import {prepareJsdomSnapshot} from '../helpers';
+import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
 
 
 describe('jsdom ozon.ru', () => {
   describe('Check catalog', () => {
+    let cleanup: CleanUpCallback
     beforeEach(async () => {
-      await prepareJsdomSnapshot('ozon.ru', 'catalog');
+      cleanup = await prepareJsdomSnapshot('ozon.ru', 'catalog');
     });
+    afterEach(async () => {
+      // For debug
+      // await displayHtmlInBrowser(document)
+      cleanup()
+    })
     it('Page content', () => {
       expect(document.querySelector('title')?.textContent).toMatch('OZON');
     });

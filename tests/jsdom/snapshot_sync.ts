@@ -11,6 +11,7 @@ puppeteer.use(puppeteerStealth())
 import {autoScroll, AutoScrollOptions} from '../e2e/helpers';
 import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
+import {waitForNetworkIdle} from './helpers';
 
 async function preparePage(page: Page) {
   page.setDefaultTimeout(0);
@@ -55,8 +56,9 @@ async function savePage(page: Page, options: SavePageOptions) {
   const {url, setup, filepath, scrollOptions={}} = options;
   await preparePage(page);
   await page.goto(url, {
-    waitUntil: 'networkidle0',
+    waitUntil: 'domcontentloaded',
   });
+  await waitForNetworkIdle(page, options.waitOptions);
   // TODO  проверка CF
   await autoScroll(page, scrollOptions);
   if (setup) {

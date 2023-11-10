@@ -54,6 +54,7 @@ export function waitElement(
   callback: () => void,
   root: Optional<HTMLElement> = document.body,
 ): StopCallback {
+  // FIXME Fix for jsdom
   const observer = new MutationObserver((mutations) => {
     let matchFlag = false;
     mutations.forEach((mutation) => {

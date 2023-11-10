@@ -24,8 +24,12 @@ export function initProductPage(): void {
 
 function processProductCard(cardEl: HTMLElement) {
   if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-  let price = getPriceFromElement(cardEl.querySelector<HTMLElement>('.price-label--primary'));
-  const title = cardEl.querySelector('.sku-card-small-header__title')?.textContent?.trim();
+  let price = getPriceFromElement(
+    cardEl.querySelector<HTMLElement>('.lui-priceText--view_secondary'),
+  );
+  const title = cardEl
+    .querySelector('.lui-sku-product-card-text--view-primary')
+    ?.textContent?.trim();
   if (!title || !price) {
     storeParsedTitleToElement(cardEl, null);
     return;
@@ -33,13 +37,13 @@ function processProductCard(cardEl: HTMLElement) {
   price /= 100;
   console.log(title, price);
   const parsedTitle = parseTitleWithPrice(title, price);
-  cardEl.querySelector('.sku-card-small-prices ')?.after(renderBestPrice(parsedTitle));
+  cardEl.querySelector('.lui-sku-product-card-price')?.after(renderBestPrice(parsedTitle));
   storeParsedTitleToElement(cardEl, parsedTitle);
 }
 
 export function initCatalog(): void {
   const init = () => {
-    const cardList = document.querySelectorAll<HTMLElement>('.sku-card-small');
+    const cardList = document.querySelectorAll<HTMLElement>('.lui-sku-product-card');
     for (const cardEl of cardList) {
       processProductCard(cardEl);
     }
@@ -81,6 +85,8 @@ export function initCatalog(): void {
   if (!matchLocation('^https://lenta\\.com/.*')) {
     return;
   }
+
+  console.log('Lenta.com');
 
   if (matchLocation('^https://lenta\\.com/product/.*')) {
     initProductPage();

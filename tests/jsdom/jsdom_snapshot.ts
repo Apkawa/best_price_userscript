@@ -2,6 +2,7 @@ import path from 'node:path';
 import {Page} from 'puppeteer';
 import fs from 'fs';
 import {AutoScrollOptions} from '../e2e/helpers';
+import {WaitForNetworkIdleOptions} from './helpers';
 
 export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, './snapshots/');
 
@@ -9,7 +10,8 @@ export interface ConfType {
   url: string,
   replace?: boolean,
   setup?: (page: Page) => Promise<void>
-  scrollOptions?: AutoScrollOptions
+  scrollOptions?: AutoScrollOptions,
+  waitOptions?: WaitForNetworkIdleOptions,
 }
 
 export const JSDOM_SNAPSHOT_CONF = {
@@ -22,8 +24,6 @@ export const JSDOM_SNAPSHOT_CONF = {
       scrollOptions: {
         timeout: 10*1000 // там бесконечный скролл с оценками, 10 секунд скроллим и хватит.
       },
-      replace: true,
-
     },
   },
   'perekrestok.ru': {
@@ -38,6 +38,9 @@ export const JSDOM_SNAPSHOT_CONF = {
   'lenta.com': {
     catalog: {
       url: 'https://lenta.com/catalog/bakaleya/sahar-sol/sahar/',
+      waitOptions: {
+        maxInflightRequests: 5,
+      }
     },
     page: {
       url: 'https://lenta.com/product/sahar-rossiya-1kg-006128/',
