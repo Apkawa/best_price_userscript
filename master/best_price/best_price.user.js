@@ -19,7 +19,7 @@
 // @supportUrl   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadUrl  https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
 // @updateUrl    https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
-// @version      0.5.6
+// @version      0.5.7
 // ==/UserScript==
 (function() {
     "use strict";
@@ -272,12 +272,12 @@
         if (!titleInfo) return wrapEl;
         for (const u of titleInfo.units) {
             const el = document.createElement("p");
-            el.innerText = u.price_display;
+            el.innerHTML = u.price_display;
             wrapEl.appendChild(el);
         }
         if (titleInfo.quantity_price_display) {
             const qtyEl = document.createElement("p");
-            qtyEl.innerText = titleInfo.quantity_price_display;
+            qtyEl.innerHTML = titleInfo.quantity_price_display;
             wrapEl.appendChild(qtyEl);
         }
         if (wrapEl.childNodes.length) {
@@ -483,7 +483,7 @@
     function initCatalog() {
         const catalogEl = document.querySelector(".widget-search-result-container > div");
         if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
-        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (catalogEl) {
@@ -527,8 +527,8 @@
     function lenta_com_processProductCard(cardEl) {
         var _a, _b, _c;
         if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-        let price = getPriceFromElement(cardEl.querySelector(".price-label--primary"));
-        const title = null === (_b = null === (_a = cardEl.querySelector(".sku-card-small-header__title")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
+        let price = getPriceFromElement(cardEl.querySelector(".lui-priceText--view_secondary"));
+        const title = null === (_b = null === (_a = cardEl.querySelector(".lui-sku-product-card-text--view-primary")) || void 0 === _a ? void 0 : _a.textContent) || void 0 === _b ? void 0 : _b.trim();
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);
             return;
@@ -536,12 +536,12 @@
         price /= 100;
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        null === (_c = cardEl.querySelector(".sku-card-small-prices ")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
+        null === (_c = cardEl.querySelector(".lui-sku-product-card-price")) || void 0 === _c ? void 0 : _c.after(renderBestPrice(parsedTitle));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function lenta_com_initCatalog() {
         const init = () => {
-            const cardList = document.querySelectorAll(".sku-card-small");
+            const cardList = document.querySelectorAll(".lui-sku-product-card");
             for (const cardEl of cardList) lenta_com_processProductCard(cardEl);
             const catalogWrapEl = document.querySelector(".catalog-grid__grid");
             const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-sorting"), {
@@ -567,6 +567,7 @@
     (function() {
         "use strict";
         if (!matchLocation("^https://lenta\\.com/.*")) return;
+        console.log("Lenta.com");
         if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
         if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
     })();
