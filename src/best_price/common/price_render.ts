@@ -22,14 +22,15 @@ export function renderBestPrice(
   if (!titleInfo) {
     return wrapEl;
   }
+  // нужно отказаться от innerText https://github.com/jsdom/jsdom/issues/1245
   for (const u of titleInfo.units) {
     const el = document.createElement('p');
-    el.innerText = u.price_display;
+    el.innerHTML = u.price_display;
     wrapEl.appendChild(el);
   }
   if (titleInfo.quantity_price_display) {
     const qtyEl = document.createElement('p');
-    qtyEl.innerText = titleInfo.quantity_price_display;
+    qtyEl.innerHTML = titleInfo.quantity_price_display;
     wrapEl.appendChild(qtyEl);
   }
   if (wrapEl.childNodes.length) {

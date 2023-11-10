@@ -1,13 +1,15 @@
 import path from 'node:path';
 import {Page} from 'puppeteer';
 import fs from 'fs';
+import {AutoScrollOptions} from '../e2e/helpers';
 
 export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, './snapshots/');
 
 export interface ConfType {
   url: string,
   replace?: boolean,
-  setup: (page: Page) => Promise<void>
+  setup?: (page: Page) => Promise<void>
+  scrollOptions?: AutoScrollOptions
 }
 
 export const JSDOM_SNAPSHOT_CONF = {
@@ -16,9 +18,13 @@ export const JSDOM_SNAPSHOT_CONF = {
       url: 'https://www.ozon.ru/category/korm-dlya-koshek-12348/',
     },
     page: {
-      url: 'https://www.ozon.ru/product/' +
-        'tabletki-dlya-posudomoechnyh-mashin-kix-becfosfatnye-30sht-701406601/'
-    }
+      url: 'https://www.ozon.ru/product/1118134991/',
+      scrollOptions: {
+        timeout: 10*1000 // там бесконечный скролл с оценками, 10 секунд скроллим и хватит.
+      },
+      replace: true,
+
+    },
   },
   'perekrestok.ru': {
     catalog: {
@@ -75,7 +81,8 @@ export const JSDOM_SNAPSHOT_CONF = {
 
 export type SiteNameType = keyof typeof JSDOM_SNAPSHOT_CONF
 export type PageNameType<K extends SiteNameType> = keyof typeof JSDOM_SNAPSHOT_CONF[K]
-export type SiteConfType<K extends SiteNameType, P extends PageNameType<K>> = typeof JSDOM_SNAPSHOT_CONF[K][P]
+export type SiteConfType<K extends SiteNameType,
+  P extends PageNameType<K>> = typeof JSDOM_SNAPSHOT_CONF[K][P]
 
 
 export interface SnapshotResult {

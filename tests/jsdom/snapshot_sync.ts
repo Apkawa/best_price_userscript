@@ -1,10 +1,15 @@
 import fs from 'fs';
 import path from 'node:path';
 
-import puppeteer, {Page} from 'puppeteer';
+import {Page} from 'puppeteer';
+// обходим клоудфлар
+import puppeteer from 'puppeteer-extra';
+import puppeteerStealth from 'puppeteer-extra-plugin-stealth';
 
-import {autoScroll} from '../e2e/helpers';
-import {JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
+puppeteer.use(puppeteerStealth())
+
+import {autoScroll, AutoScrollOptions} from '../e2e/helpers';
+import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
 
 async function preparePage(page: Page) {
@@ -22,11 +27,8 @@ async function preparePage(page: Page) {
   //await page.setBypassCSP(true);
 }
 
-interface SavePageOptions {
+interface SavePageOptions extends ConfType {
   filepath: string,
-  url: string,
-  setup?: (page: Page) => Promise<void>,
-  replace?: boolean
 }
 
 
@@ -50,17 +52,13 @@ async function replaceAssetsUrlToAbsolute(page: Page) {
 }
 
 async function savePage(page: Page, options: SavePageOptions) {
-  const {url, setup, filepath, replace = false} = options;
-  if (!url) return;
-  if (!replace && fs.existsSync(filepath)) {
-    console.log("snapshot already exist. Skipped...");
-    return;
-  }
+  const {url, setup, filepath, scrollOptions={}} = options;
   await preparePage(page);
   await page.goto(url, {
     waitUntil: 'networkidle0',
   });
-  await autoScroll(page);
+  // TODO  проверка CF
+  await autoScroll(page, scrollOptions);
   if (setup) {
     await setup(page);
   }
@@ -80,13 +78,20 @@ async function savePage(page: Page, options: SavePageOptions) {
   for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
     for (const [page, conf] of entries(pages)) {
       const page_filepath = path.join(JSDOM_SNAPSHOT_FILE_ROOT, site, `${page}.html`);
-      console.log(site, page, page_filepath, conf);
-      const p = await browser.newPage();
-      await savePage(p, {
+      const options: SavePageOptions = {
         filepath: page_filepath,
         ...conf,
-      });
+      };
+      console.log(site, page, options);
+      if (!options.url) continue;
+      if (!options.replace && fs.existsSync(options.filepath)) {
+        console.log("snapshot already exist. Skipped...");
+        continue;
+      }
+      const p = await browser.newPage();
+      await savePage(p, options);
       await p.close();
+
     }
   }
 

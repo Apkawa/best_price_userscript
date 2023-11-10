@@ -272,12 +272,12 @@
         if (!titleInfo) return wrapEl;
         for (const u of titleInfo.units) {
             const el = document.createElement("p");
-            el.innerText = u.price_display;
+            el.innerHTML = u.price_display;
             wrapEl.appendChild(el);
         }
         if (titleInfo.quantity_price_display) {
             const qtyEl = document.createElement("p");
-            qtyEl.innerText = titleInfo.quantity_price_display;
+            qtyEl.innerHTML = titleInfo.quantity_price_display;
             wrapEl.appendChild(qtyEl);
         }
         if (wrapEl.childNodes.length) {
@@ -483,7 +483,7 @@
     function initCatalog() {
         const catalogEl = document.querySelector(".widget-search-result-container > div");
         if (null === catalogEl || void 0 === catalogEl ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
-        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (catalogEl) {

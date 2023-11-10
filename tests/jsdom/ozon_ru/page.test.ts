@@ -8,7 +8,9 @@ describe('jsdom ozon.ru', () => {
     beforeEach(async () => {
       cleanup = await prepareJsdomSnapshot('ozon.ru', 'page');
     });
-    afterEach(() => {
+    afterEach(async () => {
+      // For debug
+      // await displayHtmlInBrowser(document)
       cleanup()
     })
     it('Page content', () => {
@@ -26,7 +28,7 @@ describe('jsdom ozon.ru', () => {
       initProductPage();
       initProductPage();
       expect(
-        document.querySelectorAll('[data-widget="webPrice"]  .GM-best-price').length == 1,
+        document.querySelectorAll('[data-widget="webPrice"] .GM-best-price').length == 1,
       ).toBeTruthy();
     });
     it('Checks recommends block', async () => {

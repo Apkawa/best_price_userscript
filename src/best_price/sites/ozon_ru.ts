@@ -74,9 +74,12 @@ export function initCatalog(): void {
   const cardList = document.querySelectorAll<HTMLElement>(
     '.widget-search-result-container > div > div' +
       ",[data-widget='skuLine'] > div:nth-child(2) > div" +
+      ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + // Товары на главной
+      ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + // Товары на главной
       ",[data-widget='skuLine'] > div:nth-child(1) > div" + // Промо без заголовка
       ",[data-widget='skuLineLR'] > div:nth-child(2) > div" +
       ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + // Возможно вам понравятся
+      ",[data-widget='skuGrid'] > div:nth-child(2) > div" + // Похожие товары, рекомендуем также
       ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + // -/- бесконечный скролл
       ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div",
   );

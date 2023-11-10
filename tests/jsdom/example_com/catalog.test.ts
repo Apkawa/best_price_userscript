@@ -7,7 +7,9 @@ describe.skip('jsdom wildberries.ru', () => {
     beforeEach(async () => {
       cleanup = await prepareJsdomSnapshot('example.com', 'catalog');
     });
-    afterEach(() => {
+    afterEach(async () => {
+      // For debug
+      await displayHtmlInBrowser(document)
       cleanup()
     })
     it('Page content', () => {

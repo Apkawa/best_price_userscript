@@ -49,22 +49,39 @@ export async function waitForSelectorAndGetTextContent(
   return Promise.resolve(el?.textContent || null);
 }
 
+export interface AutoScrollOptions {
+  wait?: number,
+  timeout?: number,
+  maxHeight?: number,
+}
 
-export async function autoScroll(page: Page) {
-  await page.evaluate(async () => {
+export async function autoScroll(page: Page, options: AutoScrollOptions={}) {
+  await page.evaluate(async (options: AutoScrollOptions) => {
+    const {wait = 100, timeout = 0, maxHeight = 0} = options;
     await new Promise((resolve) => {
       let totalHeight = 0;
+      let totalTime = 0;
       const distance = 100;
       const timer = setInterval(() => {
         const scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
         totalHeight += distance;
-
+        let stop = false;
         if (totalHeight >= scrollHeight - window.innerHeight) {
+          stop = true;
+        }
+        if (timeout && totalTime >= timeout ) {
+          stop = true;
+        }
+        if (maxHeight && totalHeight >= maxHeight) {
+          stop = true
+        }
+        if (stop) {
           clearInterval(timer);
           resolve(true);
         }
-      }, 100);
+        totalTime += wait;
+      }, wait);
     });
-  });
+  }, options);
 }
