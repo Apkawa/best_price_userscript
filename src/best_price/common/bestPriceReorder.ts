@@ -19,6 +19,7 @@ interface CatalogRecord extends Record<string, unknown> {
 
 type OrderState = keyof Pick<CatalogRecord, 'initial_order' | 'weight_price' | 'quantity_price'>;
 
+// TODO button style
 export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLElement): void {
   const buttonWrap = buttonRoot;
   if (!buttonWrap) return;

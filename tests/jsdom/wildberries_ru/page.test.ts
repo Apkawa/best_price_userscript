@@ -1,5 +1,5 @@
 import {initProductPage} from '../../../src/best_price/sites/wildberries_ru';
-import {CleanUpCallback, prepareJsdomSnapshot} from '../helpers';
+import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
 
 describe('jsdom wildberries.ru', () => {
   describe('Check catalog', () => {
@@ -7,7 +7,9 @@ describe('jsdom wildberries.ru', () => {
     beforeEach(async () => {
       cleanup = await prepareJsdomSnapshot('wildberries.ru', 'page');
     });
-    afterEach(() => {
+    afterEach(async () => {
+      // For debug
+      // await displayHtmlInBrowser(document)
       cleanup()
     })
     it('Page content', () => {
@@ -23,7 +25,7 @@ describe('jsdom wildberries.ru', () => {
     it('Checks recommends block', async () => {
       initProductPage();
       expect(
-        document.querySelector('.j-products-container .GM-best-price'),
+        document.querySelector('.cards-list__container .GM-best-price'),
       ).toBeTruthy();
     });
   });

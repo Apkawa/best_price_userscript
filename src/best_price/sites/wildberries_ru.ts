@@ -20,12 +20,12 @@ export function initProductPage(): void {
   });
 
   // Блок рекомендаций
-  const cardList = document.querySelectorAll<HTMLElement>('.goods-card');
+  const cardList = document.querySelectorAll<HTMLElement>('.product-card');
   for (const cardEl of cardList) {
     processProductCard(cardEl, {
-      price_sel: '.goods-card__price-now',
-      title_sel: '.goods-card__description',
-      to_render: '.goods-card__price',
+      price_sel: '.price__lower-price',
+      title_sel: '.product-card__name',
+      to_render: '.product-card__price',
       extra_style: extraStyle,
     });
   }
@@ -49,19 +49,19 @@ export function initCatalog(): void {
   for (const cardEl of cardList) {
     processProductCard(cardEl, {
       price_sel: '.price__lower-price',
-      title_sel: '.goods-name',
+      title_sel: '.product-card__name',
       to_render: '.product-card__price',
-      extra_style: {
-        fontSize: '1rem',
-        color: 'black',
-      },
+      extra_style: extraStyle,
     });
   }
   // Reorder buttons
   const catalogWrapEl = document.querySelector<HTMLElement>('.product-card-list');
-  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('.inner-sorter'), {
-    pos: 'before',
-  });
+  const buttonWrapEl = ElementGetOrCreate(
+    document.querySelector<HTMLElement>('.catalog-page__main'),
+    {
+      pos: 'before',
+    },
+  );
   if (catalogWrapEl && buttonWrapEl) {
     initReorderCatalog(catalogWrapEl, buttonWrapEl);
   }

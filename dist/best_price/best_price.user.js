@@ -763,11 +763,11 @@
             extra_style: extraStyle,
             force: true
         });
-        const cardList = document.querySelectorAll(".goods-card");
+        const cardList = document.querySelectorAll(".product-card");
         for (const cardEl of cardList) processProductCard(cardEl, {
-            price_sel: ".goods-card__price-now",
-            title_sel: ".goods-card__description",
-            to_render: ".goods-card__price",
+            price_sel: ".price__lower-price",
+            title_sel: ".product-card__name",
+            to_render: ".product-card__price",
             extra_style: extraStyle
         });
     }
@@ -785,15 +785,12 @@
         const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
         for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: ".price__lower-price",
-            title_sel: ".goods-name",
+            title_sel: ".product-card__name",
             to_render: ".product-card__price",
-            extra_style: {
-                fontSize: "1rem",
-                color: "black"
-            }
+            extra_style: extraStyle
         });
         const catalogWrapEl = document.querySelector(".product-card-list");
-        const buttonWrapEl = ElementGetOrCreate(document.querySelector(".inner-sorter"), {
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-page__main"), {
             pos: "before"
         });
         if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);

@@ -35,6 +35,7 @@ export const prepareJsdomSnapshot = <T extends typeof JSDOM_SNAPSHOT_CONF,
 };
 
 export async function displayHtmlInBrowser(html: string | Document): Promise<Page> {
+  // TODO reuse browser
   const browser = await puppeteer.launch({
     headless: false,
     devtools: false,
@@ -83,9 +84,10 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
   let resolve: (value: void) => void;
   let reject: (reason?: any) => void;
   let lastRequestTimeoutId: NodeJS.Timeout;
+  let timeoutId: NodeJS.Timeout | null;
 
   function cleanup() {
-    clearTimeout(timeoutId);
+    timeoutId && clearTimeout(timeoutId);
     clearTimeout(firstRequestTimeoutId);
     clearTimeout(lastRequestTimeoutId);
     /* eslint-disable no-use-before-define */
@@ -132,7 +134,10 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
   page.on('requestfinished', onRequestFinished);
   page.on('requestfailed', onRequestFinished);
 
-  const timeoutId = setTimeout(onTimeout, timeout); // Overall page timeout
+  if (timeout) {
+    timeoutId = setTimeout(onTimeout, timeout); // Overall page timeout
+  }
+
   const firstRequestTimeoutId = setTimeout(onFirstRequestTimeout, waitForFirstRequest);
 
   return new Promise<void>((res, rej) => {

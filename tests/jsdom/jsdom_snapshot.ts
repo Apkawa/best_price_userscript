@@ -51,13 +51,13 @@ export const JSDOM_SNAPSHOT_CONF = {
       url: 'https://www.wildberries.ru/catalog/pitanie/chay-kofe/kofe#c34640737',
     },
     page: {
-      url: 'https://www.wildberries.ru/catalog/34640737/detail.aspx',
+      url: 'https://www.wildberries.ru/catalog/164419278/detail.aspx',
     },
     popup: {
       url: 'https://www.wildberries.ru/catalog/34640737/detail.aspx',
       setup: async (page: Page) => {
         await page.evaluate(() => window.scrollTo(0, 0));
-        const el = await page.waitForSelector('.goods-card__preview-btn');
+        const el = await page.waitForSelector('.product-card__fast-view');
         await el?.evaluate(e => (e as HTMLButtonElement).click());
         await page.waitForSelector('.popup.j-product-popup.shown');
       },
@@ -66,10 +66,20 @@ export const JSDOM_SNAPSHOT_CONF = {
   'okeydostavka.ru': {
     catalog: {
       url: 'https://www.okeydostavka.ru/spb/bakaleia-i-konservy/muka-smesi-dlia-vypechki-20',
+      waitOptions: {
+        timeout: 0,
+        maxInflightRequests: 2,
+        waitForLastRequest: 500,
+      }
     },
     page: {
       url: 'https://www.okeydostavka.ru/spb/' +
         'makaronnye-izdeliia-shebekinskie-babochki-vysshii-sort-',
+      waitOptions: {
+        timeout: 60*1000,
+        maxInflightRequests: 0,
+        waitForLastRequest: 500,
+      }
     },
   },
   'example.com': {
