@@ -39,10 +39,10 @@ function getExtraInfo(data: BannerDataType) {
   return {
     author,
     homepage,
-    homepageUrl: homepage,
-    supportUrl,
-    downloadUrl,
-    updateUrl: downloadUrl,
+    homepageURL: homepage,
+    supportURL: supportUrl,
+    downloadURL: downloadUrl,
+    updateURL: downloadUrl,
     license: packageJson.license,
     version: packageJson.version,
   };
