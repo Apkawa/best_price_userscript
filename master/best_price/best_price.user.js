@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
-// @version      0.5.9
+// @version      0.5.10
 // ==/UserScript==
 (function() {
     "use strict";
@@ -463,7 +463,7 @@
         });
     }
     function processProductCardOld(cardEl) {
-        const wrapEl = getElementByXpath("a/following-sibling::div[1]", cardEl);
+        const wrapEl = getElementByXpath("(a|div/a)/following-sibling::div[1]", cardEl);
         if (!wrapEl || (null === wrapEl || void 0 === wrapEl ? void 0 : wrapEl.querySelector(".GM-best-price"))) {
             storeParsedTitleToElement(cardEl, null);
             return;
