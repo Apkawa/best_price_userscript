@@ -38,7 +38,7 @@ export function initProductPage(): void {
 }
 
 function processProductCardOld(cardEl: HTMLElement): void {
-  const wrapEl = getElementByXpath('a/following-sibling::div[1]', cardEl);
+  const wrapEl = getElementByXpath('(a|div/a)/following-sibling::div[1]', cardEl);
 
   if (!wrapEl || wrapEl?.querySelector('.GM-best-price')) {
     storeParsedTitleToElement(cardEl, null);

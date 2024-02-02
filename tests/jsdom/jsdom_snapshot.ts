@@ -18,6 +18,15 @@ export const JSDOM_SNAPSHOT_CONF = {
   'ozon.ru': {
     catalog: {
       url: 'https://www.ozon.ru/category/korm-dlya-koshek-12348/',
+      setup: async (page: Page) => {
+        await page.waitForSelector('[data-widget="searchResultsSort"]');
+      },
+      waitOptions: {
+        maxInflightRequests: 5,
+      },
+      scrollOptions: {
+        timeout: 10*1000 // там бесконечный скролл с оценками, 10 секунд скроллим и хватит.
+      },
     },
     page: {
       url: 'https://www.ozon.ru/product/1118134991/',

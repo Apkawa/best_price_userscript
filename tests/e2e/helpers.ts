@@ -53,11 +53,15 @@ export interface AutoScrollOptions {
   wait?: number,
   timeout?: number,
   maxHeight?: number,
+  setup?: (page: Page) => Promise<void>,
 }
 
 export async function autoScroll(page: Page, options: AutoScrollOptions={}) {
   await page.evaluate(async (options: AutoScrollOptions) => {
-    const {wait = 100, timeout = 0, maxHeight = 0} = options;
+    const {wait = 100, timeout = 0, maxHeight = 0, setup} = options;
+    if (setup) {
+      await setup(page);
+    }
     await new Promise((resolve) => {
       let totalHeight = 0;
       let totalTime = 0;
