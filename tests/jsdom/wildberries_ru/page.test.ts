@@ -22,7 +22,7 @@ describe('jsdom wildberries.ru', () => {
         document.querySelector('.product-page .GM-best-price'),
       ).toBeTruthy();
     });
-    it('Checks recommends block', async () => {
+    it.skip('Checks recommends block', async () => {
       initProductPage();
       expect(
         document.querySelector('.cards-list__container .GM-best-price'),

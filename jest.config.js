@@ -2,6 +2,7 @@
 // const ts_preset = require('ts-jest/jest-preset');
 module.exports = {
   testEnvironment: 'node',
+  // Todo migrate to playwright preset
   preset: 'jest-puppeteer',
   testMatch: [ '**/?(*.)+(spec|test).[t]s' ],
   testPathIgnorePatterns: [

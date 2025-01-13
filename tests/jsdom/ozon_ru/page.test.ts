@@ -36,6 +36,7 @@ describe('jsdom ozon.ru', () => {
       expect(
         document.querySelector('[data-widget="skuShelfGoods"] .GM-best-price'),
       ).toBeTruthy();
+
     });
   });
 });

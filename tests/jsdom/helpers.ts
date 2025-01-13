@@ -2,8 +2,8 @@ import jsdomGlobal from 'jsdom-global';
 import fs from 'fs';
 import {ConstructorOptions} from 'jsdom';
 import {ConfType, getPageFilePath, JSDOM_SNAPSHOT_CONF} from './jsdom_snapshot';
-import puppeteer, {Page} from 'puppeteer';
-import {promises} from 'dns';
+import {Page} from 'patchright';
+import {chromium} from 'patchright';
 
 
 export type CleanUpCallback = () => void
@@ -36,22 +36,14 @@ export const prepareJsdomSnapshot = <T extends typeof JSDOM_SNAPSHOT_CONF,
 
 export async function displayHtmlInBrowser(html: string | Document): Promise<Page> {
   // TODO reuse browser
-  const browser = await puppeteer.launch({
+  const browser = await chromium.launch({
     headless: false,
     devtools: false,
-    defaultViewport: null,
   });
   const page = await browser.newPage();
-  //monitor requests
-  await page.setRequestInterception(true);
-  //check resourceType is script
-  page.on('request', async (request): Promise<void> => {
-    if (request.resourceType() === 'script') {
-      await request.abort();
-    } else {
-      await request.continue();
-    }
-
+  // disable scripts on page
+  await page.route('**/*', route => {
+    route.request().resourceType() === 'script' ? route.abort() : route.continue();
   });
   let _html;
   if (typeof html === 'string') {
@@ -60,7 +52,7 @@ export async function displayHtmlInBrowser(html: string | Document): Promise<Pag
   } else {
     _html = html.documentElement.outerHTML;
   }
-  await page.setContent(_html, {waitUntil: 'networkidle0'});
+  await page.setContent(_html, {waitUntil: 'networkidle'});
   return Promise.resolve(page);
 }
 

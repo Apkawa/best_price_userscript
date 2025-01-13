@@ -1,6 +1,7 @@
 /**
  * @jest-environment jest-environment-puppeteer
  */
+// TODO custom env for patchright browser
 // Check test work
 // https://pptr.dev/category/guides
 describe('Google', () => {
