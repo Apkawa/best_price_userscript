@@ -48,9 +48,9 @@ function getExtraInfo(data: BannerDataType) {
   };
 }
 
-type BannerDataType = {hash: string; chunk: webpack.Chunk; filename: string}
+type BannerDataType = {hash?: string; chunk: webpack.Chunk; filename: string}
 
-function buildUserScriptMeta(data: BannerDataType) {
+function buildUserScriptMeta(data: BannerDataType): string {
   let src_path = path.resolve(__dirname, `src/${data.chunk.name}.ts`);
   if (!fs.existsSync(src_path)) {
     src_path = path.resolve(__dirname, `src/${data.chunk.name}.js`);
@@ -141,6 +141,7 @@ const config: webpack.Configuration = {
       banner: buildUserScriptMeta,
       entryOnly: true,
       raw: true,
+      stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',

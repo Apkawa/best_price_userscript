@@ -1,3 +1,26 @@
+// ==UserScript==
+// @name         Best price helper for marketplace
+// @namespace    http://tampermonkey.net/
+// @description  Считаем стоимость за штуку/за кг/за л
+// @author       Apkawa
+// @license      MIT
+// @icon         https://www.google.com/s2/favicons?domain=ozon.ru
+// @match        https://ozon.ru/*
+// @match        https://www.ozon.ru/*
+// @match        https://lenta.com/*
+// @match        https://okeydostavka.ru/*
+// @match        https://www.okeydostavka.ru/*
+// @match        https://perekrestok.ru/*
+// @match        https://www.perekrestok.ru/*
+// @match        https://wildberries.ru/*
+// @match        https://www.wildberries.ru/*
+// @homepage     https://github.com/Apkawa/best_price_userscript
+// @homepageURL  https://github.com/Apkawa/best_price_userscript
+// @supportURL   https://github.com/Apkawa/best_price_userscript/issues
+// @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
+// @updateURL    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
+// @version      0.5.10
+// ==/UserScript==
 (() => {
     "use strict";
     function getElementByXpath(xpath, root = document) {
