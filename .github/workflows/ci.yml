@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm pkg set scripts.prepare=""
+          npm pkg set scripts.prepare="true"
           npm ci
 
       - name: Build
