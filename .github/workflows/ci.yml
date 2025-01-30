@@ -97,7 +97,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm set-script prepare ""
+          npm pkg set scripts.prepare="true"
           npm ci
 
       - name: Build
