@@ -1,20 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
+import { Page } from "playwright";
 
-import {Page, WaitForOptions} from 'puppeteer';
+export interface WaitForOptions {
+  referer?: string;
+  timeout?: number;
+  waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
+}
 
+
+const USERSCRIPT_PATH = require.resolve('@/../dist/best_price/best_price.user.js')
 
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
   const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
   page.setDefaultTimeout(defaultTimeout);
   page.setDefaultNavigationTimeout(defaultTimeout);
-  await page.setUserAgent(
-    'Mozilla/5.0 (X11; Linux x86_64) ' +
-    'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-  );
-
-  await page.setBypassCSP(true);
+  // await page.setUserAgent(
+  //   'Mozilla/5.0 (X11; Linux x86_64) ' +
+  //   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+  // );
+  //
+  // await page.setBypassCSP(true);
   await page.goto(url, {...options});
-  await page.addScriptTag({path: require.resolve(process.env.USERSCRIPT_PATH as string)});
+  await page.addScriptTag({path: USERSCRIPT_PATH});
 }
 
 interface ElementInfo extends Pick<Element, 'textContent' | 'outerHTML'> {
@@ -56,7 +62,7 @@ export interface AutoScrollOptions {
   setup?: (page: Page) => Promise<void>,
 }
 
-export async function autoScroll(page: Page, options: AutoScrollOptions={}) {
+export async function autoScroll(page: Page, options: AutoScrollOptions = {}) {
   await page.evaluate(async (options: AutoScrollOptions) => {
     const {wait = 100, timeout = 0, maxHeight = 0, setup} = options;
     if (setup) {
@@ -74,11 +80,11 @@ export async function autoScroll(page: Page, options: AutoScrollOptions={}) {
         if (totalHeight >= scrollHeight - window.innerHeight) {
           stop = true;
         }
-        if (timeout && totalTime >= timeout ) {
+        if (timeout && totalTime >= timeout) {
           stop = true;
         }
         if (maxHeight && totalHeight >= maxHeight) {
-          stop = true
+          stop = true;
         }
         if (stop) {
           clearInterval(timer);

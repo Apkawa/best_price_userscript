@@ -1,18 +1,13 @@
-import {initProductPage, initCatalog} from '../../../src/best_price/sites/ozon_ru';
-import {CleanUpCallback, displayHtmlInBrowser, prepareJsdomSnapshot} from '../helpers';
+import {describe, it} from 'node:test';
+import {expect} from 'playwright/test';
+import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
+import '@tests/test_utils/globalHooks';
 
+import {initCatalog, initProductPage} from '@/best_price/sites/ozon_ru';
 
 describe('jsdom ozon.ru', () => {
   describe('Check page', () => {
-    let cleanup: CleanUpCallback
-    beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('ozon.ru', 'page');
-    });
-    afterEach(async () => {
-      // For debug
-      // await displayHtmlInBrowser(document)
-      cleanup()
-    })
+    prepareJsdomSnapshotHook('ozon.ru', 'page');
     it('Page content', () => {
       expect(
         document.querySelector('title')?.textContent).toMatch('');
@@ -36,6 +31,7 @@ describe('jsdom ozon.ru', () => {
       expect(
         document.querySelector('[data-widget="skuShelfGoods"] .GM-best-price'),
       ).toBeTruthy();
+
     });
   });
 });

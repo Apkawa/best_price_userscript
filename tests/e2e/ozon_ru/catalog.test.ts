@@ -1,6 +1,4 @@
-/**
- * @jest-environment jest-environment-puppeteer
- */
+import {test, expect} from 'playwright/test';
 
 
 import {
@@ -9,23 +7,23 @@ import {
   waitForSelectorAndGetTextContent,
 } from '../helpers';
 
-describe('ozon.ru', () => {
-  describe('Check catalog', () => {
-    beforeAll(async () => {
+test.describe('ozon.ru', () => {
+  test.describe('Check catalog', () => {
+    test.beforeEach(async ({page}) => {
       await prepareAndGoTo(page, 'https://www.ozon.ru/category/masla-9354/');
     });
-    it('Page content', async () => {
+    test('Page content', async ({page}) => {
       const html = await page.content();
       expect(await page.title()).toMatch('OZON');
       expect(html).toMatch('OZON');
     });
 
-    it('Check buttons', async () => {
+    test('Check buttons', async ({page}) => {
       const el = await waitForSelectorAndGetTextContent(page, '.GM-best-price-button-wrap');
       expect(el).toMatch('Resetby Weightby Quantity');
     });
 
-    it('Checks price', async () => {
+    test('Checks price', async ({page}) => {
       const el = await waitForSelectorAndGetElementInfo(page,
         '.widget-search-result-container .GM-best-price');
       expect(el?.textContent).toBeTruthy();

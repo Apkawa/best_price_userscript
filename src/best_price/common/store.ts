@@ -10,8 +10,17 @@ export function storeParsedTitleToElement(
 ): void {
   cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
   if (!parsedTitle) return;
-  const ds = cardEl.dataset;
-  for (const [k, v] of entries(parsedTitle)) {
+  storeDataToElement(cardEl, parsedTitle);
+}
+
+type DataInfoType = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+};
+
+export function storeDataToElement(el: HTMLElement, data: DataInfoType) {
+  const ds = el.dataset;
+  for (const [k, v] of entries(data)) {
     ds[PREFIX + k] = JSON.stringify(v);
   }
 }

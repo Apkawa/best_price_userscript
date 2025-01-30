@@ -110,7 +110,9 @@ export function waitCompletePage(
   options: WaitCompletePageOptions = {},
 ): StopCallback {
   const {root = document.body, runOnce = true, sync = true, delay = 150} = options;
-  let t: NodeJS.Timeout | null = null;
+  // На случай того что страница уже давно загружена
+  // let t: NodeJS.Timeout = setTimeout(callback, delay);
+  let t: NodeJS.Timeout;
 
   let lock = false;
   const run = (): StopCallback => {

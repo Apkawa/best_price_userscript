@@ -24,17 +24,6 @@ export function initProductPage(): void {
     },
     force: false,
   });
-  // // Try green price first
-  // let price = getPrice("[data-widget='webOzonAccountPrice']");
-  // if (!price) {
-  //   price = getPrice("[data-widget='webPrice']");
-  // }
-  // if (price) {
-  //   const parsedTitle = parseTitleWithPrice(title, price);
-  //   document
-  //     .querySelector("[data-widget='webPrice']") //
-  //     ?.appendChild(renderBestPrice(parsedTitle));
-  // }
 }
 
 function processProductCardOld(cardEl: HTMLElement): void {
