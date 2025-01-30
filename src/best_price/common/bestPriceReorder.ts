@@ -1,14 +1,20 @@
 import {E, entries, GM_addStyle, values} from '../../utils';
 import {sort} from '../../utils/sort';
 import {BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE} from './constants';
-import {loadParsedTitleFromElement} from './store';
+import {loadParsedTitleFromElement, storeDataToElement} from './store';
 
 const BEST_ORDER_BUTTON_CLASS_NAME = 'GM-best-price-button-wrap';
 
-GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {
+function addStyles() {
+  GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {
 border: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }
 `);
-GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
+  GM_addStyle(
+    `button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`,
+  );
+}
+
+addStyles();
 
 interface CatalogRecord extends Record<string, unknown> {
   initial_order: number;
@@ -35,8 +41,8 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
       continue;
     }
     const ds = {
-      ...loadParsedTitleFromElement(el),
       initial_order: '0',
+      ...loadParsedTitleFromElement(el),
     };
     if (!ds) {
       continue;
@@ -46,6 +52,7 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
     if (!initial_order) {
       initial_order = i;
       ds.initial_order = i.toString();
+      storeDataToElement(el, {initial_order: i});
     }
     const record: CatalogRecord = {
       el: wrapEl,

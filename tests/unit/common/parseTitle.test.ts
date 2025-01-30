@@ -1,7 +1,10 @@
-import {parseTitle, parseTitleWithPrice} from '../../../src/best_price/common/parseTitle';
+import {describe, it} from 'node:test';
+import {expect} from '@tests/test_utils/expect';
+
+import {parseTitle, parseTitleWithPrice, Unit} from '@/best_price/common/parseTitle';
 
 describe('weight', () => {
-  test('Extract weight/volume', () => {
+  it('Extract weight/volume', () => {
     expect(parseTitle('Garnier, 1,5кг')).toStrictEqual({
       quantity: 1,
       units: [
@@ -47,7 +50,7 @@ describe('weight', () => {
   });
 
   // TODO
-  test.skip('extract length', () => {
+  it.skip('extract length', () => {
     expect(parseTitle('Силовой кабель МБ Провод ВВГмб-П нг(А)-LS 3 x 1,5 мм², 10 м')).toStrictEqual(
       {
         quantity: 1,
@@ -61,19 +64,19 @@ describe('weight', () => {
       },
     );
   });
-  test('without unit', () => {
+  it('without unit', () => {
     expect(parseTitle('Aroy-d 70% 17-19%')).toStrictEqual({quantity: 1, units: []});
   });
 });
 
 describe('Extract quantity', () => {
-  test('Extract quantity', () => {
+  it('Extract quantity', () => {
     expect(parseTitle('Aroy-d 70% жирность 17-19%, 2 шт')).toStrictEqual({
       quantity: 2,
       units: [],
     });
   });
-  test('Extract combined quantity', () => {
+  it('Extract combined quantity', () => {
     expect(parseTitle('60шт х 10уп')).toStrictEqual({
       quantity: 600,
       units: [],
@@ -86,7 +89,7 @@ describe('Extract quantity', () => {
 });
 
 describe('Extract quantity and weight', () => {
-  test('Common cases', () => {
+  it('Common cases', () => {
     expect(parseTitle('Щедрые хлебцы с чесноком 100г/8шт')).toStrictEqual({
       quantity: 8,
       units: [
@@ -98,7 +101,7 @@ describe('Extract quantity and weight', () => {
       ],
     });
   });
-  test('cases', () => {
+  it('cases', () => {
     const cases = [
       '80г×5шт',
       '80 г. по 5',
@@ -116,7 +119,7 @@ describe('Extract quantity and weight', () => {
     }
   });
 
-  test('Fuzzy check combinations', () => {
+  it('Fuzzy check combinations', () => {
     const quantity = 5;
     const quantity_units = ['шт'];
     const weight = 100;
@@ -150,7 +153,11 @@ describe('Extract quantity and weight', () => {
                     expect(parseTitle('Рис, ' + t), t).toStrictEqual({
                       quantity: quantity,
                       units: [
-                        {total: (weight * quantity) / 1000, value: weight / 1000, unit: unit},
+                        {
+                          total: (weight * quantity) / 1000,
+                          value: weight / 1000,
+                          unit: unit as Unit,
+                        },
                       ],
                     });
                   }
@@ -162,8 +169,8 @@ describe('Extract quantity and weight', () => {
       }
     }
   });
-  test('Priority parse weight with quantity', () => {
-    expect(parseTitle("Кофе молотый 500 г, Peppo's набор 2 упаковки по 250 гр")).toStrictEqual({
+  it('Priority parse weight with quantity', () => {
+    expect(parseTitle('Кофе молотый 500 г, Peppo\'s набор 2 упаковки по 250 гр')).toStrictEqual({
       quantity: 2,
       units: [
         {
@@ -195,7 +202,7 @@ describe('Extract quantity and weight', () => {
     });
   });
 
-  test('No sum total with quantity and weight, but no combine', () => {
+  it('No sum total with quantity and weight, but no combine', () => {
     expect(parseTitle(' Кофе молотый по восточному 1 кг 4 штуки')).toStrictEqual({
       quantity: 4,
       units: [
@@ -210,7 +217,7 @@ describe('Extract quantity and weight', () => {
 });
 
 describe('Parse with price', () => {
-  test('with quantity', () => {
+  it('with quantity', () => {
     expect(parseTitleWithPrice('Aroy-d 70% жирность 17-19%, 2 шт', 200)).toStrictEqual({
       quantity: 2,
       quantity_price: 100,
@@ -218,7 +225,7 @@ describe('Parse with price', () => {
       units: [],
     });
   });
-  test('with unit', () => {
+  it('with unit', () => {
     expect(parseTitleWithPrice('Aroy-d 70% жирность 17-19%, 200г', 200)).toStrictEqual({
       quantity: 1,
       quantity_price: null,
@@ -234,11 +241,11 @@ describe('Parse with price', () => {
       ],
     });
   });
-  test('without unit', () => {
+  it('without unit', () => {
     expect(parseTitleWithPrice('Aroy-d 70% 17-19%', 200)).toStrictEqual(null);
   });
 
-  test('With quantity and unit', () => {
+  it('With quantity and unit', () => {
     expect(parseTitleWithPrice('Aroy-d 70% 17-19% 500 мл x 2 шт', 200)).toStrictEqual({
       quantity: 2,
       quantity_price: 100,
@@ -256,26 +263,26 @@ describe('Parse with price', () => {
   });
 });
 
-describe.skip('Multi-units', () => {
-  test('Parse led lamps, we need compare lm/w and lm/rub', () => {
-    expect(
-      parseTitle(
-        'Лампа светодиодная E27 220-240 В 10 Вт ' + 'груша матовая 1000 лм нейтральный белый свет',
-      ),
-    ).toStrictEqual({
-      quantity: 1,
-      units: [
-        {
-          value: 1000,
-          unit: 'лм',
-          total: 1000,
-        },
-        {
-          value: 10,
-          unit: 'Вт',
-          total: 10,
-        },
-      ],
-    });
-  });
-});
+// describe.skip('Multi-units', () => {
+//   it('Parse led lamps, we need compare lm/w and lm/rub', () => {
+//     expect(
+//       parseTitle(
+//         'Лампа светодиодная E27 220-240 В 10 Вт ' + 'груша матовая 1000 лм нейтральный белый свет',
+//       ),
+//     ).toStrictEqual({
+//       quantity: 1,
+//       units: [
+//         {
+//           value: 1000,
+//           unit: 'лм',
+//           total: 1000,
+//         },
+//         {
+//           value: 10,
+//           unit: 'Вт',
+//           total: 10,
+//         },
+//       ],
+//     });
+//   });
+// });

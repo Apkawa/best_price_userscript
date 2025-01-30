@@ -1,23 +1,21 @@
-import {initCatalog} from '../../../src/best_price/sites/lenta_com';
-import {CleanUpCallback, prepareJsdomSnapshot, displayHtmlInBrowser} from '../helpers';
+import {afterEach, describe, it} from 'node:test';
+import {expect} from 'playwright/test';
+import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
+import '@tests/test_utils/globalHooks';
 
-describe.skip('jsdom Lenta.com', () => {
+import {initCatalog} from '@/best_price/sites/lenta_com';
+import {displayHtmlInBrowser} from '@tests/jsdom/helpers';
+
+describe('jsdom Lenta.com', () => {
   describe('Check catalog', () => {
-    let cleanup: CleanUpCallback;
-    beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('lenta.com', 'catalog');
-    });
-    afterEach(async () => {
-      // For debug
-      await displayHtmlInBrowser(document)
-      cleanup()
-    })
+    prepareJsdomSnapshotHook('lenta.com', 'catalog');
     it('Page content', () => {
       expect(
         document.querySelector('title')?.textContent).toMatch('Лента');
     });
     it('Check buttons', async () => {
       initCatalog();
+      // await displayHtmlInBrowser()
       expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
     });
     it('Checks price', async () => {

@@ -42,7 +42,7 @@
     }
     function waitCompletePage(callback, options = {}) {
         const {root = document.body, runOnce = true, sync = true, delay = 150} = options;
-        let t = null;
+        let t;
         let lock = false;
         const run = () => {
             const stop = waitElement((() => true), (() => {
@@ -297,8 +297,11 @@
     function storeParsedTitleToElement(cardEl, parsedTitle) {
         cardEl.classList.add(BEST_PRICE_WRAP_CLASS_NAME);
         if (!parsedTitle) return;
-        const ds = cardEl.dataset;
-        for (const [k, v] of entries(parsedTitle)) ds[PREFIX + k] = JSON.stringify(v);
+        storeDataToElement(cardEl, parsedTitle);
+    }
+    function storeDataToElement(el, data) {
+        const ds = el.dataset;
+        for (const [k, v] of entries(data)) ds[PREFIX + k] = JSON.stringify(v);
     }
     function loadParsedTitleFromElement(cardEl) {
         const pairs = Object.entries(cardEl.dataset).map((([k, v]) => {
@@ -309,8 +312,11 @@
         return null;
     }
     const BEST_ORDER_BUTTON_CLASS_NAME = "GM-best-price-button-wrap";
-    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
-    GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
+    function addStyles() {
+        GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME} {\nborder: 1px solid gray !important; padding: 5px !important; margin: 3px !important; }\n`);
+        GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
+    }
+    addStyles();
     function initReorderCatalog(catalogRoot, buttonRoot) {
         var _a, _b, _c;
         const buttonWrap = buttonRoot;
@@ -323,15 +329,18 @@
                 console.warn("!", el);
                 continue;
             }
-            const ds = Object.assign(Object.assign({}, loadParsedTitleFromElement(el)), {
+            const ds = Object.assign({
                 initial_order: "0"
-            });
+            }, loadParsedTitleFromElement(el));
             if (!ds) continue;
             i += 1;
             let initial_order = parseInt(ds.initial_order || "0");
             if (!initial_order) {
                 initial_order = i;
                 ds.initial_order = i.toString();
+                storeDataToElement(el, {
+                    initial_order: i
+                });
             }
             const record = {
                 el: wrapEl,
@@ -487,66 +496,58 @@
         });
     })();
     function lenta_com_initProductPage() {
-        const init = () => {
-            var _a, _b, _c;
-            const title = (_b = (_a = document.querySelector(".sku-page__title")) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
-            let price = getPrice(".sku-price--primary");
-            if (!price || !title) return;
-            price /= 100;
-            console.log(title, price);
-            const parsedTitle = parseTitleWithPrice(title, price);
-            (_c = document.querySelector(".sku-prices-block")) === null || _c === void 0 ? void 0 : _c.after(renderBestPrice(parsedTitle));
-        };
-        waitCompletePage((() => {
-            init();
-        }));
+        const productRoot = document.querySelector(".product-page_info-block");
+        if (!productRoot) return;
+        processProductCard(productRoot, {
+            price_sel: ".product-price .main-price",
+            title_sel: "lu-product-page-name h1",
+            to_render: {
+                sel: ".product-base-info_content",
+                pos: "after"
+            },
+            force: false
+        });
     }
-    function lenta_com_processProductCard(cardEl) {
-        var _a, _b, _c;
+    function processProductCardCatalog(cardEl) {
+        var _a, _b;
         if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
-        let price = getPriceFromElement(cardEl.querySelector(".lui-priceText--view_secondary"));
-        const title = (_b = (_a = cardEl.querySelector(".lui-sku-product-card-text--view-primary")) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
+        const price = getPriceFromElement(cardEl.querySelector(".product-price .main-price"));
+        const title = (_b = (_a = cardEl.querySelector(".lu-product-card-name")) === null || _a === void 0 ? void 0 : _a.textContent) === null || _b === void 0 ? void 0 : _b.trim();
         if (!title || !price) {
             storeParsedTitleToElement(cardEl, null);
             return;
         }
-        price /= 100;
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        (_c = cardEl.querySelector(".lui-sku-product-card-price")) === null || _c === void 0 ? void 0 : _c.after(renderBestPrice(parsedTitle));
+        cardEl === null || cardEl === void 0 ? void 0 : cardEl.appendChild(renderBestPrice(parsedTitle));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function lenta_com_initCatalog() {
-        const init = () => {
-            const cardList = document.querySelectorAll(".lui-sku-product-card");
-            for (const cardEl of cardList) lenta_com_processProductCard(cardEl);
-            const catalogWrapEl = document.querySelector(".catalog-grid__grid");
-            const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-sorting"), {
-                pos: "before"
-            });
-            if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
-            const catalogEl = document.querySelector(".catalog-view__main");
-            const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-                pos: "before",
-                className: "GM-pagination-clone"
-            });
-            paginationRootWrap && copyElementToNewRoot(catalogEl === null || catalogEl === void 0 ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
-            waitCompletePage((() => {
-                init();
-            }), {
-                root: document.querySelector(".catalog-view__grid-container")
-            });
-        };
-        waitCompletePage((() => {
-            init();
-        }));
+        const cardList = document.querySelectorAll("lu-grid .lu-grid__item:has(:not(lu-placeholder))" + ",lu-slider .product-card:has(:not(lu-placeholder))");
+        for (const cardEl of cardList) processProductCardCatalog(cardEl);
+        const catalogWrapEl = document.querySelector("lu-catalog-list lu-grid > div");
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector("lu-catalog-list .catalog-list"), {
+            pos: "before"
+        });
+        if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
+        const catalogEl = document.querySelector("lu-catalog-list .catalog-list");
+        const paginationRootWrap = ElementGetOrCreate(catalogEl, {
+            pos: "before",
+            className: "GM-pagination-clone"
+        });
+        paginationRootWrap && copyElementToNewRoot(catalogEl === null || catalogEl === void 0 ? void 0 : catalogEl.querySelectorAll(".pagination"), paginationRootWrap);
     }
     (function() {
         "use strict";
         if (!matchLocation("^https://lenta\\.com/.*")) return;
+        GM_addStyle(`:root {\n    --product-card-height-mobile: 384px !important;\n    --products-slider-height: 400px !important;\n  }`);
         console.log("Lenta.com");
-        if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
-        if (matchLocation("^https://lenta\\.com/(catalog|search|brand)/.*")) lenta_com_initCatalog();
+        waitCompletePage((() => {
+            if (matchLocation("^https://lenta\\.com/product/.*")) lenta_com_initProductPage();
+            if (matchLocation("^https://lenta\\.com/(catalog|search|brand|product)/.*")) lenta_com_initCatalog();
+        }), {
+            runOnce: false
+        });
     })();
     function okeydostavka_ru_initProductPage() {
         const init = () => {

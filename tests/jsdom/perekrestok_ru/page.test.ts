@@ -1,16 +1,15 @@
-import {initProductPage} from '../../../src/best_price/sites/wildberries_ru';
-import {CleanUpCallback, prepareJsdomSnapshot} from '../helpers';
+import {describe, it} from 'node:test';
+import {expect} from 'playwright/test';
+import '@tests/test_utils/globalHooks';
+import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
+
+import {initProductPage} from '@/best_price/sites/wildberries_ru';
 
 
 describe.skip('jsdom perekrestok.ru', () => {
   describe('Check catalog', () => {
-    let cleanup: CleanUpCallback
-    beforeEach(async () => {
-      cleanup = await prepareJsdomSnapshot('example.com', 'page');
-    });
-    afterEach(() => {
-      cleanup()
-    })
+    prepareJsdomSnapshotHook('example.com', 'page');
+
     it('Page content', () => {
       expect(
         document.querySelector('title')?.textContent).toMatch('');

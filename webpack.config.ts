@@ -105,7 +105,7 @@ const config: webpack.Configuration = {
   },
   resolve: {
     alias: {
-      "app": path.resolve(__dirname, 'src')
+      "@": path.resolve(__dirname, 'src')
     },
     modules: [
       'node_modules',

@@ -1,13 +1,18 @@
 {
   "compilerOptions": {
+    "noEmit": true,
     "target": "es2017",
     "module": "esnext",
     "moduleResolution": "node",
+    "skipLibCheck": true,
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@app/*": [
+      "@/*": [
         "./src/*"
+      ],
+      "@tests/*": [
+        "./tests/*"
       ]
     },
     "strict": true,
@@ -19,5 +24,11 @@
     ],
     "removeComments": true,
     "experimentalDecorators": true,
-  }
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "playwright.config.ts",
+    "globals.d.ts",
+  ]
 }

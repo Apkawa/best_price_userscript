@@ -1,5 +1,5 @@
 import path from 'node:path';
-import {Page} from "patchright"
+import {Page} from "playwright"
 import fs from 'fs';
 import {AutoScrollOptions} from '../e2e/helpers';
 import {WaitForNetworkIdleOptions} from './helpers';
@@ -24,9 +24,6 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
   'debug': {
     fingerprint: {
       url: 'https://fingerprint.com/products/bot-detection/',
-      async setup(page) {
-        console.log(1)
-      }
     },
     sannysoft: {
       url: 'https://bot.sannysoft.com/',
@@ -66,6 +63,9 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       url: 'https://lenta.com/catalog/bakaleya/sahar-sol/sahar/',
       waitOptions: {
         maxInflightRequests: 5,
+      },
+      setup: async (page: Page) => {
+        await page.waitForSelector('lu-product-card');
       },
     },
     page: {

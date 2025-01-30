@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'node:path';
 
 // обходим проверки на ботов
-import {chromium, Page} from 'patchright';
+import {chromium, Page} from 'playwright';
 
-import {autoScroll, AutoScrollOptions} from '../e2e/helpers';
-import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT, SiteConfType} from './jsdom_snapshot';
+import {autoScroll} from '../e2e/helpers';
+import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
 import {waitForNetworkIdle} from './helpers';
 

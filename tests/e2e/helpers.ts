@@ -1,36 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
-
-import {Page} from 'patchright';
+import { Page } from "playwright";
 
 export interface WaitForOptions {
-  /**
-   * Referer header value. If provided it will take preference over the referer header value set by
-   * [page.setExtraHTTPHeaders(headers)](https://playwright.dev/docs/api/class-page#page-set-extra-http-headers).
-   */
   referer?: string;
-
-  /**
-   * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
-   * `navigationTimeout` option in the config, or by using the
-   * [browserContext.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-navigation-timeout),
-   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout),
-   * [page.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-navigation-timeout)
-   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
-   */
   timeout?: number;
-
-  /**
-   * When to consider operation succeeded, defaults to `load`. Events can be either:
-   * - `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-   * - `'load'` - consider operation to be finished when the `load` event is fired.
-   * - `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for
-   *   at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
-   * - `'commit'` - consider operation to be finished when network response is received and the document started
-   *   loading.
-   */
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
 }
 
+
+const USERSCRIPT_PATH = require.resolve('@/../dist/best_price/best_price.user.js')
 
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
   const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
@@ -43,7 +20,7 @@ export async function prepareAndGoTo(page: Page, url: string, options?: WaitForO
   //
   // await page.setBypassCSP(true);
   await page.goto(url, {...options});
-  await page.addScriptTag({path: require.resolve(process.env.USERSCRIPT_PATH as string)});
+  await page.addScriptTag({path: USERSCRIPT_PATH});
 }
 
 interface ElementInfo extends Pick<Element, 'textContent' | 'outerHTML'> {

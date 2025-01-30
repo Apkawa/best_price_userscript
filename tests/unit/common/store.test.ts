@@ -1,11 +1,18 @@
+import {describe, it} from 'node:test';
+import {expect} from '@tests/test_utils/expect';
+import {jsdomHook} from '@tests/test_utils/jsdom/hooks';
+
 import {
   loadParsedTitleFromElement,
   storeParsedTitleToElement
-} from '../../../src/best_price/common/store';
-import {ParseTitlePriceResult} from '../../../src/best_price/common/parseTitle';
+} from '@/best_price/common/store';
+import {ParseTitlePriceResult} from '@/best_price/common/parseTitle';
+
+
 
 describe('storeParsedTitleToElement', () => {
-  test('generic', () => {
+  jsdomHook()
+  it('generic', () => {
     const el = document.createElement('div');
     storeParsedTitleToElement(el, {
       quantity: 1,
@@ -20,7 +27,7 @@ describe('storeParsedTitleToElement', () => {
       bp_units: '[]',
     });
   });
-  test('with units', () => {
+  it('with units', () => {
     const el = document.createElement('div');
     storeParsedTitleToElement(el, {
       quantity: 1,
@@ -46,7 +53,8 @@ describe('storeParsedTitleToElement', () => {
 });
 
 describe('loadParsedTitleFromElement', () => {
-  test('generic', () => {
+  jsdomHook()
+  it('generic', () => {
     const el = document.createElement('div');
     const ds1 = {
       quantity: 1,
@@ -56,9 +64,9 @@ describe('loadParsedTitleFromElement', () => {
     };
     storeParsedTitleToElement(el, ds1);
     const ds2 = loadParsedTitleFromElement(el);
-    expect(ds1).toStrictEqual(ds2);
+    expect(ds2).toStrictEqual(ds1);
   });
-  test('with units', () => {
+  it('with units', () => {
     const el = document.createElement('div');
     const ds1: ParseTitlePriceResult = {
       quantity: 1,
@@ -76,6 +84,6 @@ describe('loadParsedTitleFromElement', () => {
     };
     storeParsedTitleToElement(el, ds1);
     const ds2 = loadParsedTitleFromElement(el);
-    expect(ds1).toStrictEqual(ds2);
+    expect(ds2).toStrictEqual(ds1);
   });
 });
