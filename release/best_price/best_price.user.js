@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
-// @version      0.5.11
+// @version      0.5.12
 // ==/UserScript==
 (() => {
     "use strict";
@@ -326,6 +326,14 @@
         const ds = el.dataset;
         for (const [k, v] of entries(data)) ds[PREFIX + k] = JSON.stringify(v);
     }
+    function readDataFromElement(el) {
+        const pairs = Object.entries(el.dataset).map((([k, v]) => {
+            if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
+            return [ null, null ];
+        })).filter((([k]) => k));
+        if (pairs.length > 0) return Object.fromEntries(pairs);
+        return {};
+    }
     function loadParsedTitleFromElement(cardEl) {
         const pairs = Object.entries(cardEl.dataset).map((([k, v]) => {
             if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
@@ -414,10 +422,19 @@
             class: BEST_ORDER_BUTTON_CLASS_NAME
         }, ...values(buttons)));
     }
-    function getPriceFromElement(el) {
+    function parsePrice(text) {
         var _a, _b;
-        const priceText = (_b = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.split("₽")[0]) === null || _b === void 0 ? void 0 : _b.trim();
-        if (priceText) return parseFloat(priceText.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, ""));
+        text = (_a = text.split("₽")[0]) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!text) return null;
+        text = text.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, "");
+        const price = (_b = text.match(/\d+(\s*[,.]\s*\d+)?/)) === null || _b === void 0 ? void 0 : _b[0].trim();
+        if (price) return parseFloat(price);
+        return null;
+    }
+    function getPriceFromElement(el) {
+        var _a;
+        const priceText = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.trim();
+        if (priceText) return parsePrice(priceText);
         return null;
     }
     function getPrice(sel, root = document.body) {
@@ -490,21 +507,38 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
-        const catalogEl = document.querySelector(".widget-search-result-container > div");
-        if (catalogEl === null || catalogEl === void 0 ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
+        var _a;
         const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
+        let catalogEl = document.querySelector(".widget-search-result-container > div");
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
-        if (catalogEl) {
-            const el = catalogEl.querySelector(":scope > div");
-            const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
-            if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-            const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
-            const paginatorWrap = document.querySelector(".widget-search-result-container");
-            if (paginator === null || paginator === void 0 ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
-                pos: "before"
-            });
+        if (!catalogEl) return;
+        const el = catalogEl.querySelector(":scope > div");
+        const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
+        if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else {
+            const catalogs = document.querySelectorAll(".widget-search-result-container > div");
+            const items = [];
+            for (const catEl of catalogs) {
+                items.push(...catEl.querySelectorAll(":scope > div"));
+                catEl.innerHTML = "";
+            }
+            console.log(readDataFromElement(catalogEl));
+            if (!((_a = readDataFromElement(catalogEl)) === null || _a === void 0 ? void 0 : _a["cloned"])) {
+                const newCatEl = catalogEl.cloneNode(true);
+                catalogEl.replaceWith(newCatEl);
+                catalogEl = newCatEl;
+                storeDataToElement(catalogEl, {
+                    cloned: true
+                });
+            }
+            catalogEl.append(...items);
+            buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
         }
+        const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
+        const paginatorWrap = document.querySelector(".widget-search-result-container");
+        if (paginator === null || paginator === void 0 ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
+            pos: "before"
+        });
     }
     (function() {
         "use strict";
@@ -600,7 +634,11 @@
         }
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        priceEl === null || priceEl === void 0 ? void 0 : priceEl.after(renderBestPrice(parsedTitle));
+        const productEl = (cardEl === null || cardEl === void 0 ? void 0 : cardEl.querySelector(".product")) || cardEl;
+        productEl === null || productEl === void 0 ? void 0 : productEl.appendChild(renderBestPrice(parsedTitle));
+        cardEl.querySelectorAll("[onclick^='gtm']").forEach((el => {
+            el.removeAttribute("onclick");
+        }));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function okeydostavka_ru_initCatalog() {
@@ -687,8 +725,9 @@
     (function() {
         "use strict";
         if (!matchLocation("^https://(www\\.|)auchan\\.ru/.*")) return;
+        console.log("Auchan.ru");
         waitCompletePage((() => {
-            if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-products")) initSearchResults(); else auchan_ru_initCatalog();
+            if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-product")) initSearchResults(); else auchan_ru_initCatalog();
         }), {
             runOnce: false
         });
@@ -783,7 +822,7 @@
         });
     }
     function wildberries_ru_initCatalog() {
-        const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
+        const cardList = document.querySelectorAll(".product-card");
         for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: ".price__lower-price",
             title_sel: ".product-card__name",
