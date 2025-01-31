@@ -4,7 +4,7 @@ import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {getPriceFromElement} from '../common/price_parse';
 import {copyElementToNewRoot} from '../../utils/dom';
-import {storeParsedTitleToElement} from '../common/store';
+import {readDataFromElement, storeDataToElement, storeParsedTitleToElement} from '../common/store';
 import {processProductCard} from '../common/common_parser';
 
 export function initProductPage(): void {
@@ -69,7 +69,7 @@ export function initCatalog(): void {
     processProductCardOld(cardEl);
   }
 
-  const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
+  let catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
   const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
   if (!catalogEl) {
     return;
@@ -85,18 +85,22 @@ export function initCatalog(): void {
     const catalogs = document.querySelectorAll<HTMLElement>(
       '.widget-search-result-container > div',
     );
-    if (catalogs.length > 1) {
-      const items: HTMLElement[] = [];
-      let i = 0;
-      for (const catEl of catalogs) {
-        if (i > 0) {
-          items.push(...catEl.querySelectorAll<HTMLElement>(':scope > div'));
-          catEl.innerHTML = '';
-        }
-        i++;
-      }
-      catalogEl.append(...items);
+    // Конец исправления
+    const items: HTMLElement[] = [];
+    for (const catEl of catalogs) {
+      items.push(...catEl.querySelectorAll<HTMLElement>(':scope > div'));
+      catEl.innerHTML = '';
     }
+    // Исправляем проблему с битыми ссылками после пересортировки.
+    console.log(readDataFromElement(catalogEl));
+    if (!readDataFromElement(catalogEl)?.['cloned']) {
+      const newCatEl = catalogEl.cloneNode(true) as HTMLElement;
+      catalogEl.replaceWith(newCatEl);
+      catalogEl = newCatEl;
+      storeDataToElement(catalogEl, {cloned: true});
+    }
+
+    catalogEl.append(...items);
     // reorder
     buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
   }

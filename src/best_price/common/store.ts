@@ -25,6 +25,22 @@ export function storeDataToElement(el: HTMLElement, data: DataInfoType) {
   }
 }
 
+export function readDataFromElement(el: HTMLElement): DataInfoType {
+  const pairs = Object.entries(el.dataset)
+    .map(([k, v]) => {
+      if (k.startsWith(PREFIX)) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return [k.replace(RegExp('^' + PREFIX), ''), JSON.parse(v || '')];
+      }
+      return [null, null];
+    })
+    .filter(([k]) => k);
+  if (pairs.length > 0) {
+    return Object.fromEntries(pairs) as ParseTitlePriceResult;
+  }
+  return {};
+}
+
 export function loadParsedTitleFromElement(cardEl: HTMLElement): ParseTitlePriceResult | null {
   const pairs = Object.entries(cardEl.dataset)
     .map(([k, v]) => {

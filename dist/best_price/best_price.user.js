@@ -326,6 +326,14 @@
         const ds = el.dataset;
         for (const [k, v] of entries(data)) ds[PREFIX + k] = JSON.stringify(v);
     }
+    function readDataFromElement(el) {
+        const pairs = Object.entries(el.dataset).map((([k, v]) => {
+            if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
+            return [ null, null ];
+        })).filter((([k]) => k));
+        if (pairs.length > 0) return Object.fromEntries(pairs);
+        return {};
+    }
     function loadParsedTitleFromElement(cardEl) {
         const pairs = Object.entries(cardEl.dataset).map((([k, v]) => {
             if (k.startsWith(PREFIX)) return [ k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "") ];
@@ -499,27 +507,31 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
+        var _a;
         const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
-        const catalogEl = document.querySelector(".widget-search-result-container > div");
+        let catalogEl = document.querySelector(".widget-search-result-container > div");
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (!catalogEl) return;
         const el = catalogEl.querySelector(":scope > div");
         const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
         if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else {
             const catalogs = document.querySelectorAll(".widget-search-result-container > div");
-            if (catalogs.length > 1) {
-                const items = [];
-                let i = 0;
-                for (const catEl of catalogs) {
-                    if (i > 0) {
-                        items.push(...catEl.querySelectorAll(":scope > div"));
-                        catEl.innerHTML = "";
-                    }
-                    i++;
-                }
-                catalogEl.append(...items);
+            const items = [];
+            for (const catEl of catalogs) {
+                items.push(...catEl.querySelectorAll(":scope > div"));
+                catEl.innerHTML = "";
             }
+            console.log(readDataFromElement(catalogEl));
+            if (!((_a = readDataFromElement(catalogEl)) === null || _a === void 0 ? void 0 : _a["cloned"])) {
+                const newCatEl = catalogEl.cloneNode(true);
+                catalogEl.replaceWith(newCatEl);
+                catalogEl = newCatEl;
+                storeDataToElement(catalogEl, {
+                    cloned: true
+                });
+            }
+            catalogEl.append(...items);
             buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
         }
         const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
