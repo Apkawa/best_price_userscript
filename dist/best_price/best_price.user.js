@@ -415,18 +415,18 @@
         }, ...values(buttons)));
     }
     function parsePrice(text) {
-        var _a;
-        const price = (_a = text.match(/\d+\s*[,.]\s*\d+/)) === null || _a === void 0 ? void 0 : _a[0];
+        var _a, _b;
+        text = (_a = text.split("₽")[0]) === null || _a === void 0 ? void 0 : _a.trim();
+        if (!text) return null;
+        text = text.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, "");
+        const price = (_b = text.match(/\d+(\s*[,.]\s*\d+)?/)) === null || _b === void 0 ? void 0 : _b[0].trim();
         if (price) return parseFloat(price);
         return null;
     }
     function getPriceFromElement(el) {
-        var _a, _b;
-        let priceText = (_b = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.split("₽")[0]) === null || _b === void 0 ? void 0 : _b.trim();
-        if (priceText) {
-            priceText = priceText.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, "");
-            return parsePrice(priceText);
-        }
+        var _a;
+        const priceText = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.trim();
+        if (priceText) return parsePrice(priceText);
         return null;
     }
     function getPrice(sel, root = document.body) {
@@ -809,7 +809,7 @@
         });
     }
     function wildberries_ru_initCatalog() {
-        const cardList = document.querySelectorAll(".product-card > .product-card__wrapper");
+        const cardList = document.querySelectorAll(".product-card");
         for (const cardEl of cardList) processProductCard(cardEl, {
             price_sel: ".price__lower-price",
             title_sel: ".product-card__name",

@@ -4,7 +4,6 @@ import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
 import '@tests/test_utils/globalHooks';
 
 import {initCatalog} from '@/best_price/sites/wildberries_ru';
-import {displayHtmlInBrowser} from '../helpers';
 
 
 // !!! remove .skip
@@ -19,7 +18,7 @@ describe.skip('jsdom example.com', () => {
     it('Check buttons', async () => {
       initCatalog();
       // For debug
-      await displayHtmlInBrowser(document);
+      // await displayHtmlInBrowser(document);
       expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
     });
     it('Checks price', async () => {

@@ -1,5 +1,10 @@
 export function parsePrice(text: string): number | null {
-  const price = text.match(/\d+\s*[,.]\s*\d+/)?.[0];
+  text = text.split('₽')[0]?.trim();
+  if (!text) {
+    return null;
+  }
+  text = text.replace('&thinsp;', '').replace(' ', '').replace(' ', '').replace(/\s/g, '');
+  const price = text.match(/\d+(\s*[,.]\s*\d+)?/)?.[0].trim();
   if (price) {
     return parseFloat(price);
   }
@@ -7,13 +12,8 @@ export function parsePrice(text: string): number | null {
 }
 
 export function getPriceFromElement(el: HTMLElement | null | undefined): number | null {
-  let priceText = el?.textContent?.split('₽')[0]?.trim();
+  const priceText = el?.textContent?.trim();
   if (priceText) {
-    priceText = priceText
-      .replace('&thinsp;', '')
-      .replace(' ', '')
-      .replace(' ', '')
-      .replace(/\s/g, '');
     return parsePrice(priceText);
   }
   return null;

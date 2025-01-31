@@ -45,7 +45,7 @@ export function initPopup(): void {
 
 export function initCatalog(): void {
   // Каталог
-  const cardList = document.querySelectorAll<HTMLElement>('.product-card > .product-card__wrapper');
+  const cardList = document.querySelectorAll<HTMLElement>('.product-card');
   for (const cardEl of cardList) {
     processProductCard(cardEl, {
       price_sel: '.price__lower-price',
