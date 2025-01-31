@@ -19,7 +19,7 @@
 |-----------------------------|--------------------|
 | https://ozon.ru/            | 2025-01-31         |
 | https://lenta.com/          | 2025-01-30         |
-| https://okeydostavka.ru/    | ?                  |
+| https://okeydostavka.ru/    | 2025-01-31         |
 | https://perekrestok.ru/     | ?                  |
 | https://www.wildberries.ru/ | ?                  |
 

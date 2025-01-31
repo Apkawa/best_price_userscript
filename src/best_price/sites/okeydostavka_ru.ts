@@ -39,7 +39,12 @@ function processProductCard(cardEl: HTMLElement): void {
   }
   console.log(title, price);
   const parsedTitle = parseTitleWithPrice(title, price);
-  priceEl?.after(renderBestPrice(parsedTitle));
+  const productEl = cardEl?.querySelector<HTMLElement>('.product') || cardEl;
+  productEl?.appendChild(renderBestPrice(parsedTitle));
+  // Fix onclick='gtm.' если у нас удалены отслеживания
+  cardEl.querySelectorAll<HTMLElement>("[onclick^='gtm']").forEach((el) => {
+    el.removeAttribute('onclick');
+  });
   storeParsedTitleToElement(cardEl, parsedTitle);
 }
 

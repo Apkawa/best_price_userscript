@@ -613,7 +613,11 @@
         }
         console.log(title, price);
         const parsedTitle = parseTitleWithPrice(title, price);
-        priceEl === null || priceEl === void 0 ? void 0 : priceEl.after(renderBestPrice(parsedTitle));
+        const productEl = (cardEl === null || cardEl === void 0 ? void 0 : cardEl.querySelector(".product")) || cardEl;
+        productEl === null || productEl === void 0 ? void 0 : productEl.appendChild(renderBestPrice(parsedTitle));
+        cardEl.querySelectorAll("[onclick^='gtm']").forEach((el => {
+            el.removeAttribute("onclick");
+        }));
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function okeydostavka_ru_initCatalog() {
