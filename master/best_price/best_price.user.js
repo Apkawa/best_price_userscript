@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js
-// @version      0.5.11
+// @version      0.5.12
 // ==/UserScript==
 (() => {
     "use strict";
