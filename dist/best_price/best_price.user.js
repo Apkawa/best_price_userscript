@@ -414,10 +414,19 @@
             class: BEST_ORDER_BUTTON_CLASS_NAME
         }, ...values(buttons)));
     }
+    function parsePrice(text) {
+        var _a;
+        const price = (_a = text.match(/\d+\s*[,.]\s*\d+/)) === null || _a === void 0 ? void 0 : _a[0];
+        if (price) return parseFloat(price);
+        return null;
+    }
     function getPriceFromElement(el) {
         var _a, _b;
-        const priceText = (_b = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.split("₽")[0]) === null || _b === void 0 ? void 0 : _b.trim();
-        if (priceText) return parseFloat(priceText.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, ""));
+        let priceText = (_b = (_a = el === null || el === void 0 ? void 0 : el.textContent) === null || _a === void 0 ? void 0 : _a.split("₽")[0]) === null || _b === void 0 ? void 0 : _b.trim();
+        if (priceText) {
+            priceText = priceText.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, "");
+            return parsePrice(priceText);
+        }
         return null;
     }
     function getPrice(sel, root = document.body) {

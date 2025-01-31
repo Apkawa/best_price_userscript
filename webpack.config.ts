@@ -5,6 +5,7 @@ import glob from 'glob';
 import TerserPlugin from 'terser-webpack-plugin';
 import {PackageJson} from 'type-fest';
 import fromEntries from 'fromentries';
+import {Configuration as DevServerConfiguration} from 'webpack-dev-server'
 
 const packageJson: PackageJson = require('./package.json');
 
@@ -76,10 +77,16 @@ function buildUserScriptMeta(data: BannerDataType): string {
 
 }
 
+const devServerConfig: DevServerConfiguration = {
+  static: path.join(__dirname, 'dist'),
+  port: 9000,
+}
+
 const config: webpack.Configuration = {
   entry: collectUserScripts(),
   target: 'browserslist',
   devtool: false,
+  devServer: devServerConfig,
   module: {
     rules: [{
       test: /\.ts$/,

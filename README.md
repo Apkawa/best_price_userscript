@@ -20,7 +20,7 @@
 | https://ozon.ru/            | 2025-01-31         |
 | https://lenta.com/          | 2025-01-30         |
 | https://okeydostavka.ru/    | 2025-01-31         |
-| https://perekrestok.ru/     | ?                  |
+| https://perekrestok.ru/     | 2025-01-31         |
 | https://www.wildberries.ru/ | ?                  |
 
 **Предупреждение: т.к. есть проблема с e2e тестированием, то сайты проверяются нерегулярно и могут сломаться в любой момент после изменений на сайтах**

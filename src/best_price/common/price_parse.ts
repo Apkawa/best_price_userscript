@@ -1,9 +1,20 @@
+export function parsePrice(text: string): number | null {
+  const price = text.match(/\d+\s*[,.]\s*\d+/)?.[0];
+  if (price) {
+    return parseFloat(price);
+  }
+  return null;
+}
+
 export function getPriceFromElement(el: HTMLElement | null | undefined): number | null {
-  const priceText = el?.textContent?.split('₽')[0]?.trim();
+  let priceText = el?.textContent?.split('₽')[0]?.trim();
   if (priceText) {
-    return parseFloat(
-      priceText.replace('&thinsp;', '').replace(' ', '').replace(' ', '').replace(/\s/g, ''),
-    );
+    priceText = priceText
+      .replace('&thinsp;', '')
+      .replace(' ', '')
+      .replace(' ', '')
+      .replace(/\s/g, '');
+    return parsePrice(priceText);
   }
   return null;
 }
