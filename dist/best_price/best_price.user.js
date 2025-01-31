@@ -490,21 +490,34 @@
         storeParsedTitleToElement(cardEl, parsedTitle);
     }
     function initCatalog() {
-        const catalogEl = document.querySelector(".widget-search-result-container > div");
-        if (catalogEl === null || catalogEl === void 0 ? void 0 : catalogEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME)) return;
         const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
+        const catalogEl = document.querySelector(".widget-search-result-container > div");
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
-        if (catalogEl) {
-            const el = catalogEl.querySelector(":scope > div");
-            const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
-            if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-            const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
-            const paginatorWrap = document.querySelector(".widget-search-result-container");
-            if (paginator === null || paginator === void 0 ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
-                pos: "before"
-            });
+        if (!catalogEl) return;
+        const el = catalogEl.querySelector(":scope > div");
+        const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
+        if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else {
+            const catalogs = document.querySelectorAll(".widget-search-result-container > div");
+            if (catalogs.length > 1) {
+                const items = [];
+                let i = 0;
+                for (const catEl of catalogs) {
+                    if (i > 0) {
+                        items.push(...catEl.querySelectorAll(":scope > div"));
+                        catEl.innerHTML = "";
+                    }
+                    i++;
+                }
+                catalogEl.append(...items);
+            }
+            buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
         }
+        const paginator = document.querySelector('[data-widget="megaPaginator"] > div:nth-child(2)');
+        const paginatorWrap = document.querySelector(".widget-search-result-container");
+        if (paginator === null || paginator === void 0 ? void 0 : paginator.querySelector("a")) paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {
+            pos: "before"
+        });
     }
     (function() {
         "use strict";

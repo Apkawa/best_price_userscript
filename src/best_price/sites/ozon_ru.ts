@@ -4,7 +4,6 @@ import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {getPriceFromElement} from '../common/price_parse';
 import {copyElementToNewRoot} from '../../utils/dom';
-import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 import {storeParsedTitleToElement} from '../common/store';
 import {processProductCard} from '../common/common_parser';
 
@@ -54,12 +53,6 @@ function processProductCardOld(cardEl: HTMLElement): void {
 }
 
 export function initCatalog(): void {
-  const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
-
-  if (catalogEl?.querySelector('.' + BEST_PRICE_WRAP_CLASS_NAME)) {
-    return;
-  }
-
   const cardList = document.querySelectorAll<HTMLElement>(
     '.widget-search-result-container > div > div' +
       ",[data-widget='skuLine'] > div:nth-child(2) > div" +
@@ -76,26 +69,44 @@ export function initCatalog(): void {
     processProductCardOld(cardEl);
   }
 
+  const catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
   const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
-  if (catalogEl) {
-    const el = catalogEl.querySelector<HTMLElement>(':scope > div');
-    const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === 'span 12';
-    if (isDetailCatalog) {
-      // TODO reorder detail catalog like
-      //  https://www.ozon.ru/category/besprovodnye-pylesosy-10657/
-      console.warn('is detail catalog, reorder disabled');
-    } else {
-      // reorder
-      buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
-    }
-    // Copy paginator on top
-    const paginator = document.querySelector<HTMLElement>(
-      '[data-widget="megaPaginator"] > div:nth-child(2)',
+  if (!catalogEl) {
+    return;
+  }
+  const el = catalogEl.querySelector<HTMLElement>(':scope > div');
+  const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === 'span 12';
+  if (isDetailCatalog) {
+    // TODO reorder detail catalog like
+    //  https://www.ozon.ru/category/besprovodnye-pylesosy-10657/
+    console.warn('is detail catalog, reorder disabled');
+  } else {
+    // Бесконечный скролл создает кучу контейнеров по 12 товаров
+    const catalogs = document.querySelectorAll<HTMLElement>(
+      '.widget-search-result-container > div',
     );
-    const paginatorWrap = document.querySelector<HTMLElement>('.widget-search-result-container');
-    if (paginator?.querySelector('a')) {
-      paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {pos: 'before'});
+    if (catalogs.length > 1) {
+      const items: HTMLElement[] = [];
+      let i = 0;
+      for (const catEl of catalogs) {
+        if (i > 0) {
+          items.push(...catEl.querySelectorAll<HTMLElement>(':scope > div'));
+          catEl.innerHTML = '';
+        }
+        i++;
+      }
+      catalogEl.append(...items);
     }
+    // reorder
+    buttonWrapEl && initReorderCatalog(catalogEl, buttonWrapEl);
+  }
+  // Copy paginator on top
+  const paginator = document.querySelector<HTMLElement>(
+    '[data-widget="megaPaginator"] > div:nth-child(2)',
+  );
+  const paginatorWrap = document.querySelector<HTMLElement>('.widget-search-result-container');
+  if (paginator?.querySelector('a')) {
+    paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {pos: 'before'});
   }
 }
 
