@@ -713,8 +713,9 @@
     (function() {
         "use strict";
         if (!matchLocation("^https://(www\\.|)auchan\\.ru/.*")) return;
+        console.log("Auchan.ru");
         waitCompletePage((() => {
-            if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-products")) initSearchResults(); else auchan_ru_initCatalog();
+            if (document.querySelector("#productName")) auchan_ru_initProductPage(); else if (document.querySelector(".digi-product")) initSearchResults(); else auchan_ru_initCatalog();
         }), {
             runOnce: false
         });

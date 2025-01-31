@@ -108,13 +108,14 @@ export function initSearchResults(): void {
   if (!matchLocation('^https://(www\\.|)auchan\\.ru/.*')) {
     return;
   }
+  console.log('Auchan.ru');
 
   waitCompletePage(
     () => {
       if (document.querySelector('#productName')) {
         initProductPage();
       } else {
-        if (document.querySelector('.digi-products')) {
+        if (document.querySelector('.digi-product')) {
           initSearchResults();
         } else {
           initCatalog();
