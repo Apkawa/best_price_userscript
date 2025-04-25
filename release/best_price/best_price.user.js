@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
-// @version      0.5.12
+// @version      0.5.13
 // ==/UserScript==
 (() => {
     "use strict";
@@ -508,15 +508,15 @@
     }
     function initCatalog() {
         var _a;
-        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
+        const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
-        let catalogEl = document.querySelector(".widget-search-result-container > div");
+        let catalogEl = document.querySelector("#contentScrollPaginator div[data-widget='tileGridDesktop']");
         const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (!catalogEl) return;
         const el = catalogEl.querySelector(":scope > div");
         const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
         if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else {
-            const catalogs = document.querySelectorAll(".widget-search-result-container > div");
+            const catalogs = document.querySelectorAll("#contentScrollPaginator div[data-widget='tileGridDesktop']");
             const items = [];
             for (const catEl of catalogs) {
                 items.push(...catEl.querySelectorAll(":scope > div"));
