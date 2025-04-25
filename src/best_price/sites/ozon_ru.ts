@@ -55,6 +55,7 @@ function processProductCardOld(cardEl: HTMLElement): void {
 export function initCatalog(): void {
   const cardList = document.querySelectorAll<HTMLElement>(
     '.widget-search-result-container > div > div' +
+      ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div" +
       ",[data-widget='skuLine'] > div:nth-child(2) > div" +
       ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + // Товары на главной
       ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + // Товары на главной
@@ -69,7 +70,9 @@ export function initCatalog(): void {
     processProductCardOld(cardEl);
   }
 
-  let catalogEl = document.querySelector<HTMLElement>('.widget-search-result-container > div');
+  let catalogEl = document.querySelector<HTMLElement>(
+    "#contentScrollPaginator div[data-widget='tileGridDesktop']",
+  );
   const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
   if (!catalogEl) {
     return;
@@ -83,7 +86,7 @@ export function initCatalog(): void {
   } else {
     // Бесконечный скролл создает кучу контейнеров по 12 товаров
     const catalogs = document.querySelectorAll<HTMLElement>(
-      '.widget-search-result-container > div',
+      "#contentScrollPaginator div[data-widget='tileGridDesktop']",
     );
     // Конец исправления
     const items: HTMLElement[] = [];
