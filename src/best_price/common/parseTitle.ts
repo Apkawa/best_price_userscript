@@ -14,7 +14,7 @@ export interface ParseTitleResult {
 }
 
 // const WORD_BOUNDARY_BEGIN = /(?:^|\s)/
-const WORD_BOUNDARY_END = /(?=\s*|[.,);/]|$)/;
+const WORD_BOUNDARY_END = /(?=\s+|[.,);/]|[хx]|[^\u0400-\u04ff]|$)/;
 const WEIGHT_REGEXP = mRegExp([
   /(?<value>\d+[,.]\d+|\d+)/, // Value
   /\s?/, // Space
@@ -26,15 +26,21 @@ const WEIGHT_REGEXP = mRegExp([
   WORD_BOUNDARY_END,
 ]);
 
+function plural(name: string, plurals: string[] = ['ок', 'ки', 'ка']): string {
+  return `${name}(?:${plurals.join('|')})`;
+}
+
 const QUANTITY_UNITS = [
   'шт',
   'рулон',
   'пакет',
   'уп',
-  'упаков(?:ок|ки|ка)',
-  'салфет(?:ок|ки|ка)',
+  plural('упаков'),
+  plural('салфет'),
   'таб',
   'капсул',
+  plural('флакон', ['', 'a', 'ов']),
+  plural('пар', ['', 'a', 'ы']),
 ];
 
 const QUANTITY_REGEXP = RegExp(

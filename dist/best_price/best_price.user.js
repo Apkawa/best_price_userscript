@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price/best_price.user.js
-// @version      0.5.12
+// @version      0.5.13
 // ==/UserScript==
 (() => {
     "use strict";
@@ -152,7 +152,7 @@
         return RegExp(regExps.map((function(r) {
             if (isRegexp(r)) return r.source;
             return r;
-        })).join(""));
+        })).join(""), "i");
     }
     function round(n, parts = 2) {
         const i = Math.pow(10, parts);
@@ -170,9 +170,12 @@
         }
         return t;
     };
-    const WORD_BOUNDARY_END = /(?=\s*|[.,);/]|$)/;
+    const WORD_BOUNDARY_END = /(?=\s+|[.,);/]|[хx]|[^\u0400-\u04ff]|$)/;
     const WEIGHT_REGEXP = mRegExp([ /(?<value>\d+[,.]\d+|\d+)/, /\s?/, "(?<unit>", "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)", "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)", "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))", ")\\.?", WORD_BOUNDARY_END ]);
-    const QUANTITY_UNITS = [ "шт", "рулон", "пакет", "уп", "упаков(?:ок|ки|ка)", "салфет(?:ок|ки|ка)", "таб", "капсул" ];
+    function plural(name, plurals = [ "ок", "ки", "ка" ]) {
+        return `${name}(?:${plurals.join("|")})`;
+    }
+    const QUANTITY_UNITS = [ "шт", "рулон", "пакет", "уп", plural("упаков"), plural("салфет"), "таб", "капсул", plural("флакон", [ "", "a", "ов" ]), plural("пар", [ "", "a", "ы" ]) ];
     const QUANTITY_REGEXP = RegExp(`(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join("|")})\\.?`);
     const QUANTITY_2_REGEXP = RegExp(`(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join("|")})\\.?`);
     const COMBINE_DELIMETER_REGEXP = /\s*?(?:[xх*×/]|по)\s*?/;

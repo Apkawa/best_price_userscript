@@ -1,7 +1,12 @@
 import {describe, it} from 'node:test';
 import {expect} from '@tests/test_utils/expect';
 
-import {parseTitle, parseTitleWithPrice, Unit} from '@/best_price/common/parseTitle';
+import {
+  parseTitle,
+  ParseTitleResult,
+  parseTitleWithPrice,
+  Unit,
+} from '@/best_price/common/parseTitle';
 
 describe('weight', () => {
   it('Extract weight/volume', () => {
@@ -127,7 +132,7 @@ describe('Extract quantity and weight', () => {
       кг: ['г', 'грамм', 'гр'],
       л: ['мл'],
     };
-    const delimiter = ['по', '×', 'х', '*'];
+    const delimiter = ['по', '×', 'х', 'x', '*'];
     for (const q_u of quantity_units) {
       for (const [unit, unit_displays] of Object.entries(weight_units)) {
         for (const u_d of unit_displays) {
@@ -262,6 +267,44 @@ describe('Parse with price', () => {
     });
   });
 });
+
+describe('Problem title parses', () => {
+  const TESTS_PARAMETERS: {title: string, expected: ParseTitleResult}[] = [
+    {
+      title: "Молоко ультрапастеризованное детское ТЕМА 3,2% с 3 лет, без змж, 500мл",
+      expected: {
+        quantity: 1,
+        units: [
+          {
+            total: 0.5,
+            unit: 'л',
+            value: 0.5
+          }
+        ]
+      }
+    },
+    {
+      title: "Cheese Gallery Сыр Пармезан, 32%, кусок, 6 месяцев выдержки, 175 г",
+      expected: {
+        quantity: 1,
+        units: [
+          {
+            total: 0.175,
+            unit: 'кг',
+            value: 0.175
+          }
+        ]
+      }
+    }
+  ]
+
+  for (const t of TESTS_PARAMETERS) {
+    it(t.title, () => {
+      expect(parseTitle(t.title)).toStrictEqual(t.expected)
+    })
+
+  }
+})
 
 // describe.skip('Multi-units', () => {
 //   it('Parse led lamps, we need compare lm/w and lm/rub', () => {

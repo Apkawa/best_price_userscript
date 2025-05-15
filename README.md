@@ -88,4 +88,13 @@
 По вопросам самостоятельной сборки и доработок см в [CONTRIBUTING](./CONTRIBUTING.md)
 
 
+# Похожие проекты
 
+* https://github.com/SyrnikovPavel/zaKilo-extension
+* https://poiskkupon.github.io/poisk_tovarov/ 
+  - https://github.com/poiskkupon/poiskkupon.github.io 
+
+* https://github.com/hatredholder/Ozon-Checker
+* https://github.com/oditynet/seetoprice
+* https://github.com/TimNekk/MarketplacesGoodsTracker
+* https://github.com/default-g/ozon-price-tracker

@@ -25,6 +25,7 @@ export function mRegExp(regExps: (RegExp | string)[]): RegExp {
         return r;
       })
       .join(''),
+    'i',
   );
 }
 
