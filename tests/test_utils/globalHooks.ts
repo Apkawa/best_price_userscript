@@ -1,3 +1,2 @@
-import './jsdom/globalHooks'
-import './localStorage/globalHook'
-
+import './jsdom/globalHooks';
+import './localStorage/globalHook';

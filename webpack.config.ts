@@ -1,28 +1,29 @@
-import webpack from 'webpack';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import fromEntries from 'fromentries';
 import glob from 'glob';
 import TerserPlugin from 'terser-webpack-plugin';
 import {PackageJson} from 'type-fest';
-import fromEntries from 'fromentries';
-import {Configuration as DevServerConfiguration} from 'webpack-dev-server'
+import webpack from 'webpack';
+import {Configuration as DevServerConfiguration} from 'webpack-dev-server';
 
 const packageJson: PackageJson = require('./package.json');
 
-
-const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`
+const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`;
 const DOWNLOAD_ROOT = `${packageJson.repository}${DOWNLOAD_SUFFIX}`;
 
-console.log(`DOWNLOAD_ROOT=${DOWNLOAD_ROOT}`)
+console.log(`DOWNLOAD_ROOT=${DOWNLOAD_ROOT}`);
 
 function collectUserScripts() {
-  let root = path.resolve(__dirname, 'src');
-  return fromEntries(glob.sync(root + '/**/*.user.[tj]s').map(f => {
-    let relPath = path.relative(root, f);
-    let bName = path.basename(path.basename(relPath, '.js'), '.ts');
-    let name = `${path.dirname(relPath)}/${bName}`;
-    return [name, f];
-  }));
+  const root = path.resolve(__dirname, 'src');
+  return fromEntries(
+    glob.sync(root + '/**/*.user.[tj]s').map((f) => {
+      const relPath = path.relative(root, f);
+      const bName = path.basename(path.basename(relPath, '.js'), '.ts');
+      const name = `${path.dirname(relPath)}/${bName}`;
+      return [name, f];
+    }),
+  );
 }
 
 function getExtraInfo(data: BannerDataType) {
@@ -49,23 +50,26 @@ function getExtraInfo(data: BannerDataType) {
   };
 }
 
-type BannerDataType = {hash?: string; chunk: webpack.Chunk; filename: string}
+type BannerDataType = {hash?: string; chunk: webpack.Chunk; filename: string};
 
 function buildUserScriptMeta(data: BannerDataType): string {
   let src_path = path.resolve(__dirname, `src/${data.chunk.name}.ts`);
   if (!fs.existsSync(src_path)) {
     src_path = path.resolve(__dirname, `src/${data.chunk.name}.js`);
   }
-  let text = fs.readFileSync(src_path, 'utf-8')
+  let text = fs
+    .readFileSync(src_path, 'utf-8')
     .replace(/(==\/UserScript==)[\s\S]+$/, '$1')
     .replace(/^.*==\/UserScript==.*$/gm, '');
-  let extraInfo = getExtraInfo(data);
-  let columnWidth = 13;
-  for (let [k, v] of Object.entries(extraInfo)) {
-    let re = RegExp(`^//.*@${k}\\b.*$`, 'gm');
+  const extraInfo = getExtraInfo(data);
+  const columnWidth = 13;
+  for (const [k, v] of Object.entries(extraInfo)) {
+    const re = RegExp(`^//.*@${k}\\b.*$`, 'gm');
     let f_k = `@${k}`;
-    f_k += Array(columnWidth - f_k.length).fill(' ').join('');
-    let s = `// ${f_k} ${v}`;
+    f_k += Array(columnWidth - f_k.length)
+      .fill(' ')
+      .join('');
+    const s = `// ${f_k} ${v}`;
     if (re.test(text)) {
       text = text.replace(re, s);
     } else {
@@ -74,13 +78,12 @@ function buildUserScriptMeta(data: BannerDataType): string {
   }
 
   return text + '// ==/UserScript==';
-
 }
 
 const devServerConfig: DevServerConfiguration = {
   static: path.join(__dirname, 'dist'),
   port: 9000,
-}
+};
 
 const config: webpack.Configuration = {
   entry: collectUserScripts(),
@@ -88,19 +91,20 @@ const config: webpack.Configuration = {
   devtool: false,
   devServer: devServerConfig,
   module: {
-    rules: [{
-      test: /\.ts$/,
-      exclude: /node_modules/,
-      use: {
-        loader: 'ts-loader',
-        options: {
-          transpileOnly: true,
+    rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+          },
         },
       },
-    },
       {
         test: /\.svg$/,
-        loader: 'raw-loader'
+        loader: 'raw-loader',
         // type: 'asset/inline'
       },
     ],
@@ -112,12 +116,9 @@ const config: webpack.Configuration = {
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, 'src')
+      '@': path.resolve(__dirname, 'src'),
     },
-    modules: [
-      'node_modules',
-      'src',
-    ],
+    modules: ['node_modules', 'src'],
     extensions: ['.ts', '.js'],
     fallback: {
       path: require.resolve('path-browserify'),
@@ -140,15 +141,15 @@ const config: webpack.Configuration = {
           },
         },
         extractComments: false,
-      })],
-
+      }),
+    ],
   },
   plugins: [
     new webpack.BannerPlugin({
       banner: buildUserScriptMeta,
       entryOnly: true,
       raw: true,
-      stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER
+      stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_TRANSFER,
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',

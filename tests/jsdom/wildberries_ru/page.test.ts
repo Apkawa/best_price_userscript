@@ -10,20 +10,15 @@ describe('jsdom wildberries.ru', () => {
     prepareJsdomSnapshotHook('wildberries.ru', 'page');
 
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('Wildberries');
+      expect(document.querySelector('title')?.textContent).toMatch('Wildberries');
     });
     it('Checks main price', async () => {
       initProductPage();
-      expect(
-        document.querySelector('.product-page .GM-best-price'),
-      ).toBeTruthy();
+      expect(document.querySelector('.product-page .GM-best-price')).toBeTruthy();
     });
     it.skip('Checks recommends block', async () => {
       initProductPage();
-      expect(
-        document.querySelector('.cards-list__container .GM-best-price'),
-      ).toBeTruthy();
+      expect(document.querySelector('.cards-list__container .GM-best-price')).toBeTruthy();
     });
   });
 });

@@ -1,4 +1,4 @@
-import { Page } from "playwright";
+import {Page} from 'playwright';
 
 export interface WaitForOptions {
   referer?: string;
@@ -6,8 +6,7 @@ export interface WaitForOptions {
   waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
 }
 
-
-const USERSCRIPT_PATH = require.resolve('@/../dist/best_price/best_price.user.js')
+const USERSCRIPT_PATH = require.resolve('@/../dist/best_price/best_price.user.js');
 
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
   const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
@@ -27,9 +26,10 @@ interface ElementInfo extends Pick<Element, 'textContent' | 'outerHTML'> {
   // attributes: {[k: string]: string}
 }
 
-
 export async function waitForSelectorAndGetElementInfo(
-  page: Page, sel: string): Promise<ElementInfo | null> {
+  page: Page,
+  sel: string,
+): Promise<ElementInfo | null> {
   await page.waitForSelector(sel);
   const element = await page.$(sel);
   let value: ElementInfo | null = null;
@@ -44,22 +44,23 @@ export async function waitForSelectorAndGetElementInfo(
       }
       return null;
     }, element);
-
   }
   return Promise.resolve(value);
 }
 
 export async function waitForSelectorAndGetTextContent(
-  page: Page, sel: string): Promise<string | null> {
+  page: Page,
+  sel: string,
+): Promise<string | null> {
   const el = await waitForSelectorAndGetElementInfo(page, sel);
   return Promise.resolve(el?.textContent || null);
 }
 
 export interface AutoScrollOptions {
-  wait?: number,
-  timeout?: number,
-  maxHeight?: number,
-  setup?: (page: Page) => Promise<void>,
+  wait?: number;
+  timeout?: number;
+  maxHeight?: number;
+  setup?: (page: Page) => Promise<void>;
 }
 
 export async function autoScroll(page: Page, options: AutoScrollOptions = {}) {

@@ -1,27 +1,27 @@
-import path from 'node:path';
-import {Page} from "playwright"
 import fs from 'fs';
+import path from 'node:path';
+import {Page} from 'playwright';
 import {AutoScrollOptions} from '../e2e/helpers';
 import {WaitForNetworkIdleOptions} from './helpers';
 
 export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, './snapshots/');
 
 export interface ConfType {
-  url: string,
-  replace?: boolean,
-  setup?: (page: Page) => Promise<void>
-  scrollOptions?: AutoScrollOptions,
-  waitOptions?: WaitForNetworkIdleOptions,
+  url: string;
+  replace?: boolean;
+  setup?: (page: Page) => Promise<void>;
+  scrollOptions?: AutoScrollOptions;
+  waitOptions?: WaitForNetworkIdleOptions;
 }
 
 export interface SnapshotConf {
   [site: string]: {
-    [page: string]: ConfType
-  }
+    [page: string]: ConfType;
+  };
 }
 
 export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
-  'debug': {
+  debug: {
     fingerprint: {
       url: 'https://fingerprint.com/products/bot-detection/',
     },
@@ -54,7 +54,8 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       url: 'https://www.perekrestok.ru/cat/c/114/moloko',
     },
     page: {
-      url: 'https://www.perekrestok.ru/cat/370/p/' +
+      url:
+        'https://www.perekrestok.ru/cat/370/p/' +
         'moloko-pasterizovannoe-domik-v-derevne-2-5-1-4l-3467790',
     },
   },
@@ -97,7 +98,7 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
         await page.waitForSelector('.cards-list__container .product-card');
         await page.evaluate(() => window.scrollTo(0, 0));
         const el = await page.waitForSelector('.product-card__fast-view');
-        await el?.evaluate(e => (e as HTMLButtonElement).click());
+        await el?.evaluate((e) => (e as HTMLButtonElement).click());
         await page.waitForSelector('.popup.j-product-popup.shown');
       },
     },
@@ -112,7 +113,8 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       },
     },
     page: {
-      url: 'https://www.okeydostavka.ru/spb/' +
+      url:
+        'https://www.okeydostavka.ru/spb/' +
         'makaronnye-izdeliia-shebekinskie-babochki-vysshii-sort-',
       waitOptions: {
         timeout: 60 * 1000,
@@ -131,25 +133,30 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
   },
 } as const;
 
-export type SiteNameType = keyof typeof JSDOM_SNAPSHOT_CONF
-export type PageNameType<K extends SiteNameType> = keyof typeof JSDOM_SNAPSHOT_CONF[K]
-export type SiteConfType<K extends SiteNameType,
-  P extends PageNameType<K>> = typeof JSDOM_SNAPSHOT_CONF[K][P]
-
+export type SiteNameType = keyof typeof JSDOM_SNAPSHOT_CONF;
+export type PageNameType<K extends SiteNameType> = keyof (typeof JSDOM_SNAPSHOT_CONF)[K];
+export type SiteConfType<
+  K extends SiteNameType,
+  P extends PageNameType<K>,
+> = (typeof JSDOM_SNAPSHOT_CONF)[K][P];
 
 export interface SnapshotResult {
-  url: string,
-  content: string,
+  url: string;
+  content: string;
 }
 
 export function getPageFilePath(site: string, page: string) {
   return path.join(JSDOM_SNAPSHOT_FILE_ROOT, site, `${page}.html`);
 }
 
-export const getSnapshot = <T extends typeof JSDOM_SNAPSHOT_CONF,
+export const getSnapshot = <
+  T extends typeof JSDOM_SNAPSHOT_CONF,
   SITE_NAME extends keyof T,
-  PAGE extends keyof T[SITE_NAME]>(site: SITE_NAME, page: PAGE): SnapshotResult => {
-
+  PAGE extends keyof T[SITE_NAME],
+>(
+  site: SITE_NAME,
+  page: PAGE,
+): SnapshotResult => {
   const {url} = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
   const filepath = getPageFilePath(site as string, page as string);
   const content = fs.readFileSync(filepath, 'utf-8');
@@ -158,6 +165,3 @@ export const getSnapshot = <T extends typeof JSDOM_SNAPSHOT_CONF,
     content,
   };
 };
-
-
-

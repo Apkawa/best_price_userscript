@@ -2,16 +2,11 @@ import {describe, it} from 'node:test';
 import {expect} from '@tests/test_utils/expect';
 import {jsdomHook} from '@tests/test_utils/jsdom/hooks';
 
-import {
-  loadParsedTitleFromElement,
-  storeParsedTitleToElement
-} from '@/best_price/common/store';
 import {ParseTitlePriceResult} from '@/best_price/common/parseTitle';
-
-
+import {loadParsedTitleFromElement, storeParsedTitleToElement} from '@/best_price/common/store';
 
 describe('storeParsedTitleToElement', () => {
-  jsdomHook()
+  jsdomHook();
   it('generic', () => {
     const el = document.createElement('div');
     storeParsedTitleToElement(el, {
@@ -53,7 +48,7 @@ describe('storeParsedTitleToElement', () => {
 });
 
 describe('loadParsedTitleFromElement', () => {
-  jsdomHook()
+  jsdomHook();
   it('generic', () => {
     const el = document.createElement('div');
     const ds1 = {

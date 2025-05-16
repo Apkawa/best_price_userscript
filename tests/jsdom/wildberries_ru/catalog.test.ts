@@ -10,8 +10,7 @@ describe('jsdom wildberries.ru', () => {
     prepareJsdomSnapshotHook('wildberries.ru', 'catalog');
 
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+      expect(document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
     });
     it('Check buttons', async () => {
       initCatalog();
@@ -19,9 +18,7 @@ describe('jsdom wildberries.ru', () => {
     });
     it('Checks price', async () => {
       initCatalog();
-      expect(
-        document.querySelector('.GM-best-price')
-      ).toBeTruthy()
+      expect(document.querySelector('.GM-best-price')).toBeTruthy();
     });
   });
 });

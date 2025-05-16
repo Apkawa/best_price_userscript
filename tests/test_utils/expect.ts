@@ -1,6 +1,5 @@
 import {deepEqual} from 'node:assert';
 
-
 export class Expect<T = unknown> {
   private value: T;
   private message?: string;
@@ -15,7 +14,6 @@ export class Expect<T = unknown> {
   }
 }
 
-
-export function expect<T=unknown> (value: T, message?: string): Expect<T> {
+export function expect<T = unknown>(value: T, message?: string): Expect<T> {
   return new Expect(value, message);
-};
+}

@@ -8,27 +8,14 @@
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@tests/*": [
-        "./tests/*"
-      ]
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
     },
     "strict": true,
     "esModuleInterop": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2018"
-    ],
+    "lib": ["dom", "dom.iterable", "es2018"],
     "removeComments": true,
-    "experimentalDecorators": true,
+    "experimentalDecorators": true
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "playwright.config.ts",
-    "globals.d.ts",
-  ]
+  "include": ["src/**/*", "tests/**/*", "playwright.config.ts", "globals.d.ts"]
 }

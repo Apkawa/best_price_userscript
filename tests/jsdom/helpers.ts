@@ -1,7 +1,8 @@
-import {chromium, Page} from 'playwright';
+import {Page, chromium} from 'playwright';
 
-
-export async function displayHtmlInBrowser(html: string | Document | undefined = undefined): Promise<Page> {
+export async function displayHtmlInBrowser(
+  html: string | Document | undefined = undefined,
+): Promise<Page> {
   // TODO reuse browser
   const browser = await chromium.launch({
     headless: false,
@@ -9,7 +10,7 @@ export async function displayHtmlInBrowser(html: string | Document | undefined =
   });
   const page = await browser.newPage();
   // disable scripts on page
-  await page.route('**/*', route => {
+  await page.route('**/*', (route) => {
     route.request().resourceType() === 'script' ? route.abort() : route.continue();
   });
   let _html;
@@ -26,20 +27,15 @@ export async function displayHtmlInBrowser(html: string | Document | undefined =
   return Promise.resolve(page);
 }
 
-
 export interface WaitForNetworkIdleOptions {
-  timeout?: number,
-  waitForFirstRequest?: number,
-  waitForLastRequest?: number,
-  maxInflightRequests?: number,
+  timeout?: number;
+  waitForFirstRequest?: number;
+  waitForLastRequest?: number;
+  maxInflightRequests?: number;
 }
 
 export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOptions = {}) {
-  const {
-    timeout = 30000,
-    waitForFirstRequest = 1000,
-    waitForLastRequest = 200,
-  } = options;
+  const {timeout = 30000, waitForFirstRequest = 1000, waitForLastRequest = 200} = options;
   const maxInflightRequests = Math.max(options?.maxInflightRequests || 0, 0);
 
   let inflight = 0;

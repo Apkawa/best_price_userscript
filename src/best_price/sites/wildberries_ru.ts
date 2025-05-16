@@ -1,6 +1,6 @@
 import {matchLocation, waitCompletePage} from '../../utils';
+import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
 import {initReorderCatalog} from '../common/bestPriceReorder';
-import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
 import {processProductCard} from '../common/common_parser';
 
 const extraStyle = {
@@ -76,7 +76,6 @@ export function initCatalog(): void {
       paginationRootWrap,
     );
 }
-
 (function () {
   'use strict';
   const prefix = 'https://(www\\.|)wildberries\\.ru/';

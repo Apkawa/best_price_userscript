@@ -1,12 +1,12 @@
-import {GM_addStyle, matchLocation, waitCompletePage} from '../../utils';
-import {getPriceFromElement} from '../common/price_parse';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {renderBestPrice} from '../common/price_render';
-import {initReorderCatalog} from '../common/bestPriceReorder';
-import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
-import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
-import {storeParsedTitleToElement} from '../common/store';
 import {processProductCard} from '@/best_price/common/common_parser';
+import {GM_addStyle, matchLocation, waitCompletePage} from '../../utils';
+import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
+import {initReorderCatalog} from '../common/bestPriceReorder';
+import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
+import {parseTitleWithPrice} from '../common/parseTitle';
+import {getPriceFromElement} from '../common/price_parse';
+import {renderBestPrice} from '../common/price_render';
+import {storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
   const productRoot = document.querySelector<HTMLElement>('.product-page_info-block');
@@ -96,7 +96,6 @@ export function initCatalog(): void {
   //   },
   // );
 }
-
 (function () {
   'use strict';
   if (!matchLocation('^https://lenta\\.com/.*')) {

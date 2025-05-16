@@ -10,15 +10,12 @@ describe('jsdom wildberries.ru', () => {
     prepareJsdomSnapshotHook('wildberries.ru', 'popup');
 
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('Wildberries');
+      expect(document.querySelector('title')?.textContent).toMatch('Wildberries');
     });
     it('Checks main price', async () => {
       initPopup();
       // await displayHtmlInBrowser(document)
-      expect(
-        document.querySelector('.popup .GM-best-price'),
-      ).toBeTruthy();
+      expect(document.querySelector('.popup .GM-best-price')).toBeTruthy();
     });
   });
 });

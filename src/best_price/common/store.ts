@@ -1,6 +1,6 @@
-import {ParseTitlePriceResult} from './parseTitle';
-import {BEST_PRICE_WRAP_CLASS_NAME} from './constants';
 import {entries} from '../../utils';
+import {BEST_PRICE_WRAP_CLASS_NAME} from './constants';
+import {ParseTitlePriceResult} from './parseTitle';
 
 const PREFIX = 'bp_';
 
@@ -15,6 +15,7 @@ export function storeParsedTitleToElement(
 
 type DataInfoType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: это интерфейс KV
   [key: string]: any;
 };
 

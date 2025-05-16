@@ -2,12 +2,12 @@ import fs from 'fs';
 import path from 'node:path';
 
 // обходим проверки на ботов
-import {chromium, Page} from 'playwright';
+import {Page, chromium} from 'playwright';
 
-import {autoScroll} from '../e2e/helpers';
-import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT} from './jsdom_snapshot';
 import {entries} from '../../src/utils';
+import {autoScroll} from '../e2e/helpers';
 import {waitForNetworkIdle} from './helpers';
+import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT} from './jsdom_snapshot';
 
 async function preparePage(page: Page) {
   page.setDefaultTimeout(0);
@@ -21,26 +21,23 @@ async function preparePage(page: Page) {
 }
 
 interface SavePageOptions extends ConfType {
-  filepath: string,
+  filepath: string;
 }
-
 
 async function replaceAssetsUrlToAbsolute(page: Page) {
   await page.evaluate(() => {
-    document.querySelectorAll('img,script,link,style')
-      .forEach(e => {
-        let attrName = 'href';
-        if (e.tagName == 'link') {
-          attrName = 'src';
-        }
-        const href = e.getAttribute(attrName);
-        if (href) {
-          const u = new URL(href, document.location.origin);
-          console.log(href, u.toString());
-          e.setAttribute(attrName, u.toString());
-        }
-      });
-
+    document.querySelectorAll('img,script,link,style').forEach((e) => {
+      let attrName = 'href';
+      if (e.tagName == 'link') {
+        attrName = 'src';
+      }
+      const href = e.getAttribute(attrName);
+      if (href) {
+        const u = new URL(href, document.location.origin);
+        console.log(href, u.toString());
+        e.setAttribute(attrName, u.toString());
+      }
+    });
   });
 }
 
@@ -64,10 +61,8 @@ async function savePage(page: Page, options: SavePageOptions) {
   }
   fs.writeFileSync(filepath, bodyHTML);
 }
-
-
 (async () => {
-  const browser = await chromium.launch({headless: false})
+  const browser = await chromium.launch({headless: false});
 
   for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
     for (const [page, conf] of entries(pages)) {
@@ -85,7 +80,6 @@ async function savePage(page: Page, options: SavePageOptions) {
       const p = await browser.newPage();
       await savePage(p, options);
       await p.close();
-
     }
   }
 

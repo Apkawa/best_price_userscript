@@ -1,4 +1,4 @@
-import {E, entries, GM_addStyle, values} from '../../utils';
+import {E, GM_addStyle, entries, values} from '../../utils';
 import {sort} from '../../utils/sort';
 import {BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE} from './constants';
 import {loadParsedTitleFromElement, storeDataToElement} from './store';

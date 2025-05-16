@@ -10,8 +10,7 @@ describe.skip('jsdom perekrestok.ru', () => {
     prepareJsdomSnapshotHook('perekrestok.ru', 'catalog');
 
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+      expect(document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
     });
     it('Check buttons', async () => {
       initCatalog();
@@ -20,9 +19,7 @@ describe.skip('jsdom perekrestok.ru', () => {
     });
     it('Checks price', async () => {
       initCatalog();
-      expect(
-        document.querySelector('.GM-best-price'),
-      ).toBeTruthy();
+      expect(document.querySelector('.GM-best-price')).toBeTruthy();
     });
   });
 });

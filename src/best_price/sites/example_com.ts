@@ -1,6 +1,6 @@
 import {matchLocation, waitCompletePage} from '../../utils';
+import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
 import {initReorderCatalog} from '../common/bestPriceReorder';
-import {copyElementToNewRoot, ElementGetOrCreate} from '../../utils/dom';
 import {processProductCard} from '../common/common_parser';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 
@@ -81,7 +81,6 @@ export function initCatalog(): void {
     {runOnce: false, delay: 200},
   );
 }
-
 (function () {
   'use strict';
   console.error('No implemented');

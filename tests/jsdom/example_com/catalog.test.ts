@@ -1,19 +1,16 @@
 import {describe, it} from 'node:test';
-import {expect} from 'playwright/test';
 import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
+import {expect} from 'playwright/test';
 import '@tests/test_utils/globalHooks';
 
 import {initCatalog} from '@/best_price/sites/wildberries_ru';
-
 
 // !!! remove .skip
 describe.skip('jsdom example.com', () => {
   prepareJsdomSnapshotHook('example.com', 'catalog');
   describe('Check catalog', () => {
-
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+      expect(document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
     });
     it('Check buttons', async () => {
       initCatalog();
@@ -23,9 +20,7 @@ describe.skip('jsdom example.com', () => {
     });
     it('Checks price', async () => {
       initCatalog();
-      expect(
-        document.querySelector('.GM-best-price'),
-      ).toBeTruthy();
+      expect(document.querySelector('.GM-best-price')).toBeTruthy();
     });
   });
 });

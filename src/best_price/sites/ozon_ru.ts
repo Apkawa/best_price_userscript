@@ -1,11 +1,11 @@
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {renderBestPrice} from '../common/price_render';
 import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
-import {initReorderCatalog} from '../common/bestPriceReorder';
-import {getPriceFromElement} from '../common/price_parse';
 import {copyElementToNewRoot} from '../../utils/dom';
-import {readDataFromElement, storeDataToElement, storeParsedTitleToElement} from '../common/store';
+import {initReorderCatalog} from '../common/bestPriceReorder';
 import {processProductCard} from '../common/common_parser';
+import {parseTitleWithPrice} from '../common/parseTitle';
+import {getPriceFromElement} from '../common/price_parse';
+import {renderBestPrice} from '../common/price_render';
+import {readDataFromElement, storeDataToElement, storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
   const productRoot = document.querySelector<HTMLElement>('[data-widget="container"]');
@@ -116,7 +116,6 @@ export function initCatalog(): void {
     paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {pos: 'before'});
   }
 }
-
 (function () {
   'use strict';
   if (!matchLocation('^https://(www\\.|)ozon\\.ru/.*')) {

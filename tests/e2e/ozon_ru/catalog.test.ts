@@ -1,5 +1,4 @@
-import {test, expect} from 'playwright/test';
-
+import {expect, test} from 'playwright/test';
 
 import {
   prepareAndGoTo,
@@ -24,12 +23,11 @@ test.describe('ozon.ru', () => {
     });
 
     test('Checks price', async ({page}) => {
-      const el = await waitForSelectorAndGetElementInfo(page,
-        '.widget-search-result-container .GM-best-price');
+      const el = await waitForSelectorAndGetElementInfo(
+        page,
+        '.widget-search-result-container .GM-best-price',
+      );
       expect(el?.textContent).toBeTruthy();
     });
-
   });
 });
-
-

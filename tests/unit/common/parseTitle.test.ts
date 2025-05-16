@@ -2,10 +2,10 @@ import {describe, it} from 'node:test';
 import {expect} from '@tests/test_utils/expect';
 
 import {
-  parseTitle,
   ParseTitleResult,
-  parseTitleWithPrice,
   Unit,
+  parseTitle,
+  parseTitleWithPrice,
 } from '@/best_price/common/parseTitle';
 
 describe('weight', () => {
@@ -175,7 +175,7 @@ describe('Extract quantity and weight', () => {
     }
   });
   it('Priority parse weight with quantity', () => {
-    expect(parseTitle('Кофе молотый 500 г, Peppo\'s набор 2 упаковки по 250 гр')).toStrictEqual({
+    expect(parseTitle("Кофе молотый 500 г, Peppo's набор 2 упаковки по 250 гр")).toStrictEqual({
       quantity: 2,
       units: [
         {
@@ -269,42 +269,41 @@ describe('Parse with price', () => {
 });
 
 describe('Problem title parses', () => {
-  const TESTS_PARAMETERS: {title: string, expected: ParseTitleResult}[] = [
+  const TESTS_PARAMETERS: {title: string; expected: ParseTitleResult}[] = [
     {
-      title: "Молоко ультрапастеризованное детское ТЕМА 3,2% с 3 лет, без змж, 500мл",
+      title: 'Молоко ультрапастеризованное детское ТЕМА 3,2% с 3 лет, без змж, 500мл',
       expected: {
         quantity: 1,
         units: [
           {
             total: 0.5,
             unit: 'л',
-            value: 0.5
-          }
-        ]
-      }
+            value: 0.5,
+          },
+        ],
+      },
     },
     {
-      title: "Cheese Gallery Сыр Пармезан, 32%, кусок, 6 месяцев выдержки, 175 г",
+      title: 'Cheese Gallery Сыр Пармезан, 32%, кусок, 6 месяцев выдержки, 175 г',
       expected: {
         quantity: 1,
         units: [
           {
             total: 0.175,
             unit: 'кг',
-            value: 0.175
-          }
-        ]
-      }
-    }
-  ]
+            value: 0.175,
+          },
+        ],
+      },
+    },
+  ];
 
   for (const t of TESTS_PARAMETERS) {
     it(t.title, () => {
-      expect(parseTitle(t.title)).toStrictEqual(t.expected)
-    })
-
+      expect(parseTitle(t.title)).toStrictEqual(t.expected);
+    });
   }
-})
+});
 
 // describe.skip('Multi-units', () => {
 //   it('Parse led lamps, we need compare lm/w and lm/rub', () => {

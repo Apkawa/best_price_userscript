@@ -10,6 +10,7 @@
   "readme": "README.md",
   "devDependencies": {
     "@babel/plugin-proposal-pipeline-operator": "^7.18.9",
+    "@biomejs/biome": "1.9.4",
     "@types/eslint": "^8.4.10",
     "@types/eslint-plugin-prettier": "^3.1.0",
     "@types/glob": "^8.0.0",
@@ -56,7 +57,7 @@
     "build:serve": "npm run webpack:base -- serve --mode=production",
     "prepare": "husky install",
     "synctypes": "typesync && npm i",
-    "prettier": "prettier src/ --write",
+    "format": "biome format --fix",
     "test": "npm run test:unit",
     "test:jsdom:snapshot-sync": "node --import tsx ./tests/jsdom/snapshot_sync.ts",
     "test:base": "func() { npm run check:type:tests && node $@ --import tsx ; } ; func $@",
@@ -64,11 +65,11 @@
     "test:e2e": "playwright test --config playwright.config.ts tests/e2e/",
     "test:coverage": "npm run test -- --experimental-test-coverage",
     "test:coverage:lcov": "npm run test -- --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=lcov.info",
-    "lint": "eslint --ext js,ts,tsx --max-warnings=0 --fix src",
+    "lint": "biome check src/ --fix --error-on-warnings ",
     "check": "npm run check:type && npm run test && npm run lint",
     "check:type": "tsc",
     "check:type:tests": "tsc",
-    "pre-commit": "npm run prettier && npm run check && npm run build && git add -A ."
+    "pre-commit": "npm run format && npm run check && npm run build && git add -A ."
   },
   "engines": {
     "npm": ">=9.0.0",
@@ -79,11 +80,7 @@
       "pre-commit": "npm run pre-commit"
     }
   },
-  "browserslist": [
-    "last 2 years",
-    "> 1%",
-    "not dead"
-  ],
+  "browserslist": ["last 2 years", "> 1%", "not dead"],
   "babel": {
     "plugins": [
       [
@@ -119,10 +116,7 @@
       "project": "tsconfig.json",
       "tsconfigRootDir": "."
     },
-    "plugins": [
-      "@typescript-eslint",
-      "prettier"
-    ],
+    "plugins": ["@typescript-eslint", "prettier"],
     "rules": {
       "prettier/prettier": "off",
       "max-len": [

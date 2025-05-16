@@ -1,6 +1,6 @@
 import {matchLocation, waitCompletePage} from '../../utils';
-import {initReorderCatalog} from '../common/bestPriceReorder';
 import {ElementGetOrCreate} from '../../utils/dom';
+import {initReorderCatalog} from '../common/bestPriceReorder';
 import {processProductCard} from '../common/common_parser';
 import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
 
@@ -56,7 +56,6 @@ export function initCatalog(): void {
     }
   }
 }
-
 (function () {
   'use strict';
   const prefix = 'https://(www\\.|)perekrestok\\.ru';

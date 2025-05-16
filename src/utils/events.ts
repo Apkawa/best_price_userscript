@@ -1,22 +1,22 @@
 /* eslint-disable */
-type ElementNode = HTMLElement | Window | Document;
+// type ElementNode = HTMLElement | Window | Document
 
-type FilterNotStartingWith<Set, Needle extends string> = Set extends `${Needle}${infer _X}`
-  ? never
-  : Set;
-type FilterStartingWith<Set, Needle extends string> = Set extends `${Needle}${infer _X}`
-  ? Set
-  : never;
+// export type FilterNotStartingWith<Set, Needle extends string> = Set extends `${Needle}${infer _X}`
+//   ? never
+//   : Set
+// export type FilterStartingWith<Set, Needle extends string> = Set extends `${Needle}${infer _X}`
+//   ? Set
+//   : never
+//
+// type EventHandler = Pick<GlobalEventHandlers, FilterStartingWith<keyof GlobalEventHandlers, 'on'>>
 
-type EventHandler = Pick<GlobalEventHandlers, FilterStartingWith<keyof GlobalEventHandlers, 'on'>>;
-
-type EventHandlerName = keyof EventHandler;
-
-export interface EventListenersResult {
-  node: ElementNode;
-  type: keyof EventHandler;
-  func: EventHandler[keyof EventHandler];
-}
+// type EventHandlerName = keyof EventHandler
+//
+// export interface EventListenersResult {
+//   node: ElementNode
+//   type: keyof EventHandler
+//   func: EventHandler[keyof EventHandler]
+// }
 
 // export function listAllEventListeners() {
 //   const allElements: ElementNode[] = [];

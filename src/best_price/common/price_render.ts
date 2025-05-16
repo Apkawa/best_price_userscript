@@ -1,6 +1,6 @@
-import {ParseTitlePriceResult} from './parseTitle';
-import {BEST_PRICE_CLASS_NAME} from './constants';
 import {entries} from '../../utils';
+import {BEST_PRICE_CLASS_NAME} from './constants';
+import {ParseTitlePriceResult} from './parseTitle';
 
 export type RenderBestPriceExtraStyle = Omit<
   Partial<CSSStyleDeclaration>,

@@ -1,7 +1,6 @@
 import {after, before} from 'node:test';
-import jsdomGlobal from 'jsdom-global';
 import {ConstructorOptions} from 'jsdom';
-
+import jsdomGlobal from 'jsdom-global';
 
 export function jsdomGlobalHook(html?: string | Buffer, options?: ConstructorOptions): void {
   let cleanup: () => void;
@@ -13,4 +12,4 @@ export function jsdomGlobalHook(html?: string | Buffer, options?: ConstructorOpt
   });
 }
 
-jsdomGlobalHook()
+jsdomGlobalHook();

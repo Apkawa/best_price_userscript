@@ -1,16 +1,15 @@
-import {ConfType, getPageFilePath, JSDOM_SNAPSHOT_CONF} from '../../jsdom/jsdom_snapshot';
+import {ConfType, JSDOM_SNAPSHOT_CONF, getPageFilePath} from '../../jsdom/jsdom_snapshot';
 
-import {ConstructorOptions} from 'jsdom';
 import fs from 'fs';
+import {ConstructorOptions} from 'jsdom';
 import jsdomGlobal from 'jsdom-global';
 
 jsdomGlobal();
 
-export type CleanUpCallbackType = () => void
-
+export type CleanUpCallbackType = () => void;
 
 interface PrepareJsDomOptions extends ConstructorOptions {
-  path: string,
+  path: string;
 }
 
 export function prepareJsdom(options: PrepareJsDomOptions): Promise<CleanUpCallbackType> {
@@ -21,9 +20,14 @@ export function prepareJsdom(options: PrepareJsDomOptions): Promise<CleanUpCallb
   });
 }
 
-export const prepareJsdomSnapshot = <T extends typeof JSDOM_SNAPSHOT_CONF,
+export const prepareJsdomSnapshot = <
+  T extends typeof JSDOM_SNAPSHOT_CONF,
   SITE_NAME extends keyof T,
-  PAGE extends keyof T[SITE_NAME]>(site: SITE_NAME, page: PAGE, options?: ConstructorOptions,
+  PAGE extends keyof T[SITE_NAME],
+>(
+  site: SITE_NAME,
+  page: PAGE,
+  options?: ConstructorOptions,
 ): Promise<CleanUpCallbackType> => {
   return new Promise((resolve) => {
     // const snapshot = getSnapshot(site, name) // TODO победить типы

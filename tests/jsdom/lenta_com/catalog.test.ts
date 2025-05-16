@@ -1,6 +1,6 @@
 import {afterEach, describe, it} from 'node:test';
-import {expect} from 'playwright/test';
 import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
+import {expect} from 'playwright/test';
 import '@tests/test_utils/globalHooks';
 
 import {initCatalog} from '@/best_price/sites/lenta_com';
@@ -10,8 +10,7 @@ describe('jsdom Lenta.com', () => {
   describe('Check catalog', () => {
     prepareJsdomSnapshotHook('lenta.com', 'catalog');
     it('Page content', () => {
-      expect(
-        document.querySelector('title')?.textContent).toMatch('Лента');
+      expect(document.querySelector('title')?.textContent).toMatch('Лента');
     });
     it('Check buttons', async () => {
       initCatalog();
@@ -20,9 +19,7 @@ describe('jsdom Lenta.com', () => {
     });
     it('Checks price', async () => {
       initCatalog();
-      expect(
-        document.querySelector('.GM-best-price')
-      ).toBeTruthy()
+      expect(document.querySelector('.GM-best-price')).toBeTruthy();
     });
   });
 });

@@ -1,8 +1,8 @@
 import {describe, it} from 'node:test';
 import {expect} from 'playwright/test';
 
-import {matchLocation} from './location';
 import {jsdomHook} from '@tests/test_utils/jsdom/hooks';
+import {matchLocation} from './location';
 
 describe('matchLocation', () => {
   // beforeEach(() => {
