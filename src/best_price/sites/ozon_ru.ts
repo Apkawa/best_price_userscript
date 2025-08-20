@@ -1,5 +1,5 @@
 import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
-import {copyElementToNewRoot} from '../../utils/dom';
+import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
 import {initReorderCatalog} from '../common/bestPriceReorder';
 import {processProductCard} from '../common/common_parser';
 import {parseTitleWithPrice} from '../common/parseTitle';
@@ -73,10 +73,13 @@ export function initCatalog(): void {
   let catalogEl = document.querySelector<HTMLElement>(
     "#contentScrollPaginator div[data-widget='tileGridDesktop']",
   );
-  const buttonWrapEl = document.querySelector<HTMLElement>('[data-widget="searchResultsSort"]');
   if (!catalogEl) {
     return;
   }
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('#paginator'), {
+    className: 'GM-button-wrap',
+    pos: 'before',
+  });
   const el = catalogEl.querySelector<HTMLElement>(':scope > div');
   const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === 'span 12';
   if (isDetailCatalog) {
@@ -95,7 +98,7 @@ export function initCatalog(): void {
       catEl.innerHTML = '';
     }
     // Исправляем проблему с битыми ссылками после пересортировки.
-    console.log(readDataFromElement(catalogEl));
+    // console.log(readDataFromElement(catalogEl));
     if (!readDataFromElement(catalogEl)?.['cloned']) {
       const newCatEl = catalogEl.cloneNode(true) as HTMLElement;
       catalogEl.replaceWith(newCatEl);
