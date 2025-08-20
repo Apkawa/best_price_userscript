@@ -514,8 +514,11 @@
         const cardList = document.querySelectorAll(".widget-search-result-container > div > div" + ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div" + ",[data-widget='skuLine'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + ",[data-widget='skuLine'] > div:nth-child(1) > div" + ",[data-widget='skuLineLR'] > div:nth-child(2) > div" + ",[data-widget='skuGrid'][style] > div:nth-child(2) > div" + ",[data-widget='skuGrid'] > div:nth-child(2) > div" + ",[data-widget='skuGrid']:not([style]) > div:nth-child(1) > div" + ",[data-widget='skuShelfGoods'] > div:nth-child(2) > div > div > div > div");
         for (const cardEl of cardList) processProductCardOld(cardEl);
         let catalogEl = document.querySelector("#contentScrollPaginator div[data-widget='tileGridDesktop']");
-        const buttonWrapEl = document.querySelector('[data-widget="searchResultsSort"]');
         if (!catalogEl) return;
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector("#paginator"), {
+            className: "GM-button-wrap",
+            pos: "before"
+        });
         const el = catalogEl.querySelector(":scope > div");
         const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
         if (isDetailCatalog) console.warn("is detail catalog, reorder disabled"); else {
@@ -525,7 +528,6 @@
                 items.push(...catEl.querySelectorAll(":scope > div"));
                 catEl.innerHTML = "";
             }
-            console.log(readDataFromElement(catalogEl));
             if (!((_a = readDataFromElement(catalogEl)) === null || _a === void 0 ? void 0 : _a["cloned"])) {
                 const newCatEl = catalogEl.cloneNode(true);
                 catalogEl.replaceWith(newCatEl);
