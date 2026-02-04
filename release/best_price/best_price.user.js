@@ -19,7 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js
-// @version      0.5.15
+// @version      0.5.16
 // ==/UserScript==
 (() => {
     "use strict";
@@ -564,7 +564,7 @@
             price_sel: ".product-price .main-price",
             title_sel: "lu-product-page-name h1",
             to_render: {
-                sel: ".product-base-info_content",
+                sel: "lu-product-card-counter",
                 pos: "after"
             },
             force: false
@@ -587,8 +587,8 @@
     function lenta_com_initCatalog() {
         const cardList = document.querySelectorAll("lu-grid .lu-grid__item:has(:not(lu-placeholder))" + ",lu-slider .product-card:has(:not(lu-placeholder))");
         for (const cardEl of cardList) processProductCardCatalog(cardEl);
-        const catalogWrapEl = document.querySelector("lu-catalog-list lu-grid > div");
-        const buttonWrapEl = ElementGetOrCreate(document.querySelector("lu-catalog-list .catalog-list"), {
+        const catalogWrapEl = document.querySelector("lu-catalog-list-old lu-grid > div");
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector("lu-catalog-list-old .catalog-list"), {
             pos: "before"
         });
         if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
