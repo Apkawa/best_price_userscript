@@ -16,7 +16,7 @@ export function initProductPage(): void {
     price_sel: '.product-price .main-price',
     title_sel: 'lu-product-page-name h1',
     to_render: {
-      sel: '.product-base-info_content',
+      sel: 'lu-product-card-counter',
       pos: 'after',
     },
     force: false,
@@ -48,10 +48,10 @@ export function initCatalog(): void {
     processProductCardCatalog(cardEl);
   }
 
-  const catalogWrapEl = document.querySelector<HTMLElement>('lu-catalog-list lu-grid > div');
+  const catalogWrapEl = document.querySelector<HTMLElement>('lu-catalog-list-old lu-grid > div');
 
   const buttonWrapEl = ElementGetOrCreate(
-    document.querySelector<HTMLElement>('lu-catalog-list .catalog-list'),
+    document.querySelector<HTMLElement>('lu-catalog-list-old .catalog-list'),
     {
       pos: 'before',
     },
