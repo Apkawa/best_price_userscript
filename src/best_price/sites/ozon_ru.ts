@@ -55,7 +55,7 @@ function processProductCardOld(cardEl: HTMLElement): void {
 export function initCatalog(): void {
   const cardList = document.querySelectorAll<HTMLElement>(
     '.widget-search-result-container > div > div' +
-      ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div" +
+      ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div > div" +
       ",[data-widget='skuLine'] > div:nth-child(2) > div" +
       ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + // Товары на главной
       ",[data-widget='skuGridSimple'] > div:nth-child(1) > div" + // Товары на главной
