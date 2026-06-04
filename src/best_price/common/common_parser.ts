@@ -1,9 +1,9 @@
-import {InsertPosition} from '../../utils/dom';
-import {BEST_PRICE_CLASS_NAME, BEST_PRICE_WRAP_CLASS_NAME} from './constants';
-import {parseTitleWithPrice} from './parseTitle';
-import {getPrice} from './price_parse';
-import {RenderBestPriceExtraStyle, renderBestPrice} from './price_render';
-import {storeParsedTitleToElement} from './store';
+import type { InsertPosition } from "../../utils/dom";
+import { BEST_PRICE_CLASS_NAME, BEST_PRICE_WRAP_CLASS_NAME } from "./constants";
+import { parseTitleWithPrice } from "./parseTitle";
+import { getPrice } from "./price_parse";
+import { type RenderBestPriceExtraStyle, renderBestPrice } from "./price_render";
+import { storeParsedTitleToElement } from "./store";
 
 export interface ProcessProductCardOptions {
   price_sel: string;
@@ -19,13 +19,13 @@ export interface ProcessProductCardOptions {
 }
 
 export function processProductCard(cardEl: HTMLElement, options: ProcessProductCardOptions): void {
-  const {price_sel, title_sel, to_render, force} = options;
+  const { price_sel, title_sel, to_render, force } = options;
   if (!force && cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
 
   const price = getPrice(price_sel, cardEl);
   const title = cardEl.querySelector(title_sel)?.textContent?.trim();
   if (!title || !price) {
-    console.warn('Not found price or title', title, price, cardEl);
+    console.warn("Not found price or title", title, price, cardEl);
     storeParsedTitleToElement(cardEl, null);
     return;
   }
@@ -34,9 +34,9 @@ export function processProductCard(cardEl: HTMLElement, options: ProcessProductC
   const parsedTitle = parseTitleWithPrice(title, price);
 
   const renderedPrice = renderBestPrice(parsedTitle, options.extra_style);
-  let to_render_sel = '';
-  let to_render_pos: InsertPosition = 'after';
-  if (typeof to_render === 'string') {
+  let to_render_sel = "";
+  let to_render_pos: InsertPosition = "after";
+  if (typeof to_render === "string") {
     to_render_sel = to_render;
   } else {
     to_render_sel = to_render.sel;
@@ -45,7 +45,7 @@ export function processProductCard(cardEl: HTMLElement, options: ProcessProductC
   const to_render_els = cardEl.querySelectorAll(to_render_sel);
   // Cleanup
   for (const to_render_el of to_render_els) {
-    for (const e of to_render_el?.parentElement?.querySelectorAll('.' + BEST_PRICE_CLASS_NAME) ||
+    for (const e of to_render_el?.parentElement?.querySelectorAll("." + BEST_PRICE_CLASS_NAME) ||
       []) {
       e.remove();
     }

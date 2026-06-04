@@ -1,10 +1,10 @@
-import fs from 'fs';
-import path from 'node:path';
-import {Page} from 'playwright';
-import {AutoScrollOptions} from '../e2e/helpers';
-import {WaitForNetworkIdleOptions} from './helpers';
+import fs from "fs";
+import path from "node:path";
+import type { Page } from "playwright";
+import type { AutoScrollOptions } from "../e2e/helpers";
+import type { WaitForNetworkIdleOptions } from "./helpers";
 
-export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, './snapshots/');
+export const JSDOM_SNAPSHOT_FILE_ROOT = path.resolve(__dirname, "./snapshots/");
 
 export interface ConfType {
   url: string;
@@ -23,15 +23,15 @@ export interface SnapshotConf {
 export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
   debug: {
     fingerprint: {
-      url: 'https://fingerprint.com/products/bot-detection/',
+      url: "https://fingerprint.com/products/bot-detection/",
     },
     sannysoft: {
-      url: 'https://bot.sannysoft.com/',
+      url: "https://bot.sannysoft.com/",
     },
   },
-  'ozon.ru': {
+  "ozon.ru": {
     catalog: {
-      url: 'https://www.ozon.ru/category/korm-dlya-koshek-12348/',
+      url: "https://www.ozon.ru/category/korm-dlya-koshek-12348/",
       setup: async (page: Page) => {
         await page.waitForSelector('[data-widget="searchResultsSort"]');
       },
@@ -43,69 +43,69 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       },
     },
     page: {
-      url: 'https://www.ozon.ru/product/153929230/?oos_search=false',
+      url: "https://www.ozon.ru/product/153929230/?oos_search=false",
       scrollOptions: {
         timeout: 10 * 1000, // там бесконечный скролл с оценками, 10 секунд скроллим и хватит.
       },
     },
   },
-  'perekrestok.ru': {
+  "perekrestok.ru": {
     catalog: {
-      url: 'https://www.perekrestok.ru/cat/c/114/moloko',
+      url: "https://www.perekrestok.ru/cat/c/114/moloko",
     },
     page: {
       url:
-        'https://www.perekrestok.ru/cat/370/p/' +
-        'moloko-pasterizovannoe-domik-v-derevne-2-5-1-4l-3467790',
+        "https://www.perekrestok.ru/cat/370/p/" +
+        "moloko-pasterizovannoe-domik-v-derevne-2-5-1-4l-3467790",
     },
   },
-  'lenta.com': {
+  "lenta.com": {
     catalog: {
-      url: 'https://lenta.com/catalog/bakaleya/sahar-sol/sahar/',
+      url: "https://lenta.com/catalog/bakaleya/sahar-sol/sahar/",
       waitOptions: {
         maxInflightRequests: 5,
       },
       setup: async (page: Page) => {
-        await page.waitForSelector('lu-product-card');
+        await page.waitForSelector("lu-product-card");
       },
     },
     page: {
-      url: 'https://lenta.com/product/sahar-rossiya-1kg-006128/',
+      url: "https://lenta.com/product/sahar-rossiya-1kg-006128/",
     },
   },
-  'wildberries.ru': {
+  "wildberries.ru": {
     catalog: {
-      url: 'https://www.wildberries.ru/catalog/pitanie/chay-kofe/kofe#c34640737',
+      url: "https://www.wildberries.ru/catalog/pitanie/chay-kofe/kofe#c34640737",
       waitOptions: {
         maxInflightRequests: 5,
       },
       setup: async (page: Page) => {
-        await page.waitForSelector('.product-card__wrapper');
+        await page.waitForSelector(".product-card__wrapper");
       },
     },
     page: {
-      url: 'https://www.wildberries.ru/catalog/164419278/detail.aspx',
+      url: "https://www.wildberries.ru/catalog/164419278/detail.aspx",
       waitOptions: {
         maxInflightRequests: 5,
       },
       setup: async (page: Page) => {
-        await page.waitForSelector('.product-page__aside-container.j-price-block');
+        await page.waitForSelector(".product-page__aside-container.j-price-block");
       },
     },
     popup: {
-      url: 'https://www.wildberries.ru/catalog/34640737/detail.aspx',
+      url: "https://www.wildberries.ru/catalog/34640737/detail.aspx",
       setup: async (page: Page) => {
-        await page.waitForSelector('.cards-list__container .product-card');
+        await page.waitForSelector(".cards-list__container .product-card");
         await page.evaluate(() => window.scrollTo(0, 0));
-        const el = await page.waitForSelector('.product-card__fast-view');
+        const el = await page.waitForSelector(".product-card__fast-view");
         await el?.evaluate((e) => (e as HTMLButtonElement).click());
-        await page.waitForSelector('.popup.j-product-popup.shown');
+        await page.waitForSelector(".popup.j-product-popup.shown");
       },
     },
   },
-  'okeydostavka.ru': {
+  "okeydostavka.ru": {
     catalog: {
-      url: 'https://www.okeydostavka.ru/spb/bakaleia-i-konservy/muka-smesi-dlia-vypechki-20',
+      url: "https://www.okeydostavka.ru/spb/bakaleia-i-konservy/muka-smesi-dlia-vypechki-20",
       waitOptions: {
         timeout: 0,
         maxInflightRequests: 2,
@@ -114,8 +114,8 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
     },
     page: {
       url:
-        'https://www.okeydostavka.ru/spb/' +
-        'makaronnye-izdeliia-shebekinskie-babochki-vysshii-sort-',
+        "https://www.okeydostavka.ru/spb/" +
+        "makaronnye-izdeliia-shebekinskie-babochki-vysshii-sort-",
       waitOptions: {
         timeout: 60 * 1000,
         maxInflightRequests: 0,
@@ -123,12 +123,12 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       },
     },
   },
-  'example.com': {
+  "example.com": {
     catalog: {
-      url: '',
+      url: "",
     },
     page: {
-      url: '',
+      url: "",
     },
   },
 } as const;
@@ -157,9 +157,9 @@ export const getSnapshot = <
   site: SITE_NAME,
   page: PAGE,
 ): SnapshotResult => {
-  const {url} = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
+  const { url } = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
   const filepath = getPageFilePath(site as string, page as string);
-  const content = fs.readFileSync(filepath, 'utf-8');
+  const content = fs.readFileSync(filepath, "utf-8");
   return {
     url,
     content,

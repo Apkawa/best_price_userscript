@@ -1,21 +1,21 @@
-import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
-import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
-import {initReorderCatalog} from '../common/bestPriceReorder';
-import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {getPrice, getPriceFromElement} from '../common/price_parse';
-import {renderBestPrice} from '../common/price_render';
-import {storeParsedTitleToElement} from '../common/store';
+import { getElementByXpath, matchLocation, waitCompletePage } from "../../utils";
+import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { initReorderCatalog } from "../common/bestPriceReorder";
+import { BEST_PRICE_WRAP_CLASS_NAME } from "../common/constants";
+import { parseTitleWithPrice } from "../common/parseTitle";
+import { getPrice, getPriceFromElement } from "../common/price_parse";
+import { renderBestPrice } from "../common/price_render";
+import { storeParsedTitleToElement } from "../common/store";
 
 export function initProductPage(): void {
   const init = () => {
-    if (document.querySelector('main .GM-best-price')) return;
-    const title = document.querySelector('main h1#productName')?.textContent?.trim();
-    const price = getPrice('main .fullPricePDP');
+    if (document.querySelector("main .GM-best-price")) return;
+    const title = document.querySelector("main h1#productName")?.textContent?.trim();
+    const price = getPrice("main .fullPricePDP");
     if (!price || !title) return;
     console.log(title, price);
     const parsedTitle = parseTitleWithPrice(title, price);
-    document.querySelector('main .fullPricePDP')?.after(renderBestPrice(parsedTitle));
+    document.querySelector("main .fullPricePDP")?.after(renderBestPrice(parsedTitle));
   };
   init();
 }
@@ -41,24 +41,24 @@ function processProductCard(
 
 export function initCatalog(): void {
   const init = () => {
-    const cardList = document.querySelectorAll<HTMLElement>('article.productCard');
+    const cardList = document.querySelectorAll<HTMLElement>("article.productCard");
     for (const cardEl of cardList) {
       processProductCard(
         cardEl,
-        '.productCardPriceData > div',
-        '.linkToPDP',
-        '.productCardPriceData ',
+        ".productCardPriceData > div",
+        ".linkToPDP",
+        ".productCardPriceData ",
       );
     }
     // Reorder
     const catalogWrapEl = getElementByXpath(
       '//article[contains(@class,"productCard")]/ancestor::main//article/../..',
     );
-    if (!document.querySelector('.GM-wrap')) {
+    if (!document.querySelector(".GM-wrap")) {
       const buttonWrapEl = ElementGetOrCreate(
-        document.querySelector<HTMLElement>('#categoriesThirdLvlList'),
+        document.querySelector<HTMLElement>("#categoriesThirdLvlList"),
         {
-          pos: 'after',
+          pos: "after",
         },
       );
       if (catalogWrapEl && buttonWrapEl) {
@@ -67,34 +67,34 @@ export function initCatalog(): void {
     }
 
     // Copy pagination on top
-    const catalogEl = document.querySelector<HTMLElement>('.catalog-view__main');
+    const catalogEl = document.querySelector<HTMLElement>(".catalog-view__main");
     const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-      pos: 'before',
-      className: 'GM-pagination-clone',
+      pos: "before",
+      className: "GM-pagination-clone",
     });
     paginationRootWrap &&
-      copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
+      copyElementToNewRoot(catalogEl?.querySelectorAll(".pagination"), paginationRootWrap);
   };
   init();
 }
 
 export function initSearchResults(): void {
-  const cardList = document.querySelectorAll<HTMLElement>('.digi-product');
+  const cardList = document.querySelectorAll<HTMLElement>(".digi-product");
   for (const cardEl of cardList) {
     processProductCard(
       cardEl,
-      '.digi-product-price-variant_actual',
-      '.digi-product__label',
-      '.price-and-cart',
+      ".digi-product-price-variant_actual",
+      ".digi-product__label",
+      ".price-and-cart",
     );
   }
   // Reorder
-  const catalogWrapEl = document.querySelector<HTMLElement>('.digi-products-grid');
-  if (!document.querySelector('.digi-search .GM-wrap')) {
+  const catalogWrapEl = document.querySelector<HTMLElement>(".digi-products-grid");
+  if (!document.querySelector(".digi-search .GM-wrap")) {
     const buttonWrapEl = ElementGetOrCreate(
-      document.querySelector<HTMLElement>('.digi-main-results-actions'),
+      document.querySelector<HTMLElement>(".digi-main-results-actions"),
       {
-        pos: 'after',
+        pos: "after",
       },
     );
     if (catalogWrapEl && buttonWrapEl) {
@@ -102,19 +102,18 @@ export function initSearchResults(): void {
     }
   }
 }
-(function () {
-  'use strict';
-  if (!matchLocation('^https://(www\\.|)auchan\\.ru/.*')) {
+(() => {
+  if (!matchLocation("^https://(www\\.|)auchan\\.ru/.*")) {
     return;
   }
-  console.log('Auchan.ru');
+  console.log("Auchan.ru");
 
   waitCompletePage(
     () => {
-      if (document.querySelector('#productName')) {
+      if (document.querySelector("#productName")) {
         initProductPage();
       } else {
-        if (document.querySelector('.digi-product')) {
+        if (document.querySelector(".digi-product")) {
           initSearchResults();
         } else {
           initCatalog();

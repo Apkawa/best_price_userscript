@@ -1,9 +1,9 @@
 export function parsePrice(text: string): number | null {
-  text = text.split('₽')[0]?.trim();
+  text = text.split("₽")[0]?.trim();
   if (!text) {
     return null;
   }
-  text = text.replace('&thinsp;', '').replace(' ', '').replace(' ', '').replace(/\s/g, '');
+  text = text.replace("&thinsp;", "").replace(" ", "").replace(" ", "").replace(/\s/g, "");
   const price = text.match(/\d+(\s*[,.]\s*\d+)?/)?.[0].trim();
   if (price) {
     return parseFloat(price);

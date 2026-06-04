@@ -5,32 +5,32 @@ export {
   markElementHandled,
   waitElement,
   waitCompletePage,
-} from './dom';
+} from "./dom";
 
-export {parseSearch, mapLocation, matchLocation} from './location';
+export { parseSearch, mapLocation, matchLocation } from "./location";
 
-export {GM_addStyle} from './GM';
+export { GM_addStyle } from "./GM";
 
 export default function isRegexp(value: unknown): value is RegExp {
-  return toString.call(value) === '[object RegExp]';
+  return toString.call(value) === "[object RegExp]";
 }
 
 export function mRegExp(regExps: (RegExp | string)[]): RegExp {
   return RegExp(
     regExps
-      .map(function (r) {
+      .map((r) => {
         if (isRegexp(r)) {
           return r.source;
         }
         return r;
       })
-      .join(''),
-    'i',
+      .join(""),
+    "i",
   );
 }
 
 export function round(n: number, parts = 2): number {
-  const i = Math.pow(10, parts);
+  const i = 10 ** parts;
   return Math.round(n * i) / i;
 }
 

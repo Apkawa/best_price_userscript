@@ -1,13 +1,13 @@
-import fs from 'fs';
-import path from 'node:path';
+import fs from "fs";
+import path from "node:path";
 
 // обходим проверки на ботов
-import {Page, chromium} from 'playwright';
+import { type Page, chromium } from "playwright";
 
-import {entries} from '../../src/utils';
-import {autoScroll} from '../e2e/helpers';
-import {waitForNetworkIdle} from './helpers';
-import {ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT} from './jsdom_snapshot';
+import { entries } from "../../src/utils";
+import { autoScroll } from "../e2e/helpers";
+import { waitForNetworkIdle } from "./helpers";
+import { type ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT } from "./jsdom_snapshot";
 
 async function preparePage(page: Page) {
   page.setDefaultTimeout(0);
@@ -26,10 +26,10 @@ interface SavePageOptions extends ConfType {
 
 async function replaceAssetsUrlToAbsolute(page: Page) {
   await page.evaluate(() => {
-    document.querySelectorAll('img,script,link,style').forEach((e) => {
-      let attrName = 'href';
-      if (e.tagName == 'link') {
-        attrName = 'src';
+    document.querySelectorAll("img,script,link,style").forEach((e) => {
+      let attrName = "href";
+      if (e.tagName == "link") {
+        attrName = "src";
       }
       const href = e.getAttribute(attrName);
       if (href) {
@@ -42,10 +42,10 @@ async function replaceAssetsUrlToAbsolute(page: Page) {
 }
 
 async function savePage(page: Page, options: SavePageOptions) {
-  const {url, setup, filepath, scrollOptions = {}} = options;
+  const { url, setup, filepath, scrollOptions = {} } = options;
   await preparePage(page);
   await page.goto(url, {
-    waitUntil: 'domcontentloaded',
+    waitUntil: "domcontentloaded",
   });
   await waitForNetworkIdle(page, options.waitOptions);
   // TODO  проверка CF
@@ -57,12 +57,12 @@ async function savePage(page: Page, options: SavePageOptions) {
   const bodyHTML = await page.evaluate(() => document.documentElement.outerHTML);
   const dir = path.dirname(filepath);
   if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, {recursive: true});
+    fs.mkdirSync(dir, { recursive: true });
   }
   fs.writeFileSync(filepath, bodyHTML);
 }
 (async () => {
-  const browser = await chromium.launch({headless: false});
+  const browser = await chromium.launch({ headless: false });
 
   for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
     for (const [page, conf] of entries(pages)) {
@@ -74,7 +74,7 @@ async function savePage(page: Page, options: SavePageOptions) {
       console.log(site, page, options);
       if (!options.url) continue;
       if (!options.replace && fs.existsSync(options.filepath)) {
-        console.log('snapshot already exist. Skipped...');
+        console.log("snapshot already exist. Skipped...");
         continue;
       }
       const p = await browser.newPage();

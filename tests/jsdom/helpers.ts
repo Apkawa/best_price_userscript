@@ -1,4 +1,4 @@
-import {Page, chromium} from 'playwright';
+import { type Page, chromium } from "playwright";
 
 export async function displayHtmlInBrowser(
   html: string | Document | undefined = undefined,
@@ -6,15 +6,15 @@ export async function displayHtmlInBrowser(
   // TODO reuse browser
   const browser = await chromium.launch({
     headless: false,
-    devtools: false,
+    // devtools: false,
   });
   const page = await browser.newPage();
   // disable scripts on page
-  await page.route('**/*', (route) => {
-    route.request().resourceType() === 'script' ? route.abort() : route.continue();
+  await page.route("**/*", (route) => {
+    route.request().resourceType() === "script" ? route.abort() : route.continue();
   });
   let _html;
-  if (typeof html === 'string') {
+  if (typeof html === "string") {
     _html = html;
     await page.setContent(html);
   } else {
@@ -23,7 +23,7 @@ export async function displayHtmlInBrowser(
     }
     _html = html.documentElement.outerHTML;
   }
-  await page.setContent(_html, {waitUntil: 'networkidle'});
+  await page.setContent(_html, { waitUntil: "networkidle" });
   return Promise.resolve(page);
 }
 
@@ -35,7 +35,7 @@ export interface WaitForNetworkIdleOptions {
 }
 
 export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOptions = {}) {
-  const {timeout = 30000, waitForFirstRequest = 1000, waitForLastRequest = 200} = options;
+  const { timeout = 30000, waitForFirstRequest = 1000, waitForLastRequest = 200 } = options;
   const maxInflightRequests = Math.max(options?.maxInflightRequests || 0, 0);
 
   let inflight = 0;
@@ -49,9 +49,9 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
     clearTimeout(firstRequestTimeoutId);
     clearTimeout(lastRequestTimeoutId);
     /* eslint-disable no-use-before-define */
-    page.off('request', onRequestStarted);
-    page.off('requestfinished', onRequestFinished);
-    page.off('requestfailed', onRequestFinished);
+    page.off("request", onRequestStarted);
+    page.off("requestfinished", onRequestFinished);
+    page.off("requestfailed", onRequestFinished);
     /* eslint-enable no-use-before-define */
   }
 
@@ -75,7 +75,7 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
 
   function onTimeout() {
     cleanup();
-    reject(new Error('Timeout'));
+    reject(new Error("Timeout"));
   }
 
   function onFirstRequestTimeout() {
@@ -88,9 +88,9 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
     resolve();
   }
 
-  page.on('request', onRequestStarted);
-  page.on('requestfinished', onRequestFinished);
-  page.on('requestfailed', onRequestFinished);
+  page.on("request", onRequestStarted);
+  page.on("requestfinished", onRequestFinished);
+  page.on("requestfailed", onRequestFinished);
 
   if (timeout) {
     timeoutId = setTimeout(onTimeout, timeout); // Overall page timeout

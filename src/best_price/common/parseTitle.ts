@@ -1,6 +1,6 @@
-import {mRegExp, round} from '../../utils';
+import { mRegExp, round } from "../../utils";
 
-export type Unit = 'кг' | 'л' | 'м';
+export type Unit = "кг" | "л" | "м";
 
 export interface UnitValue {
   unit: Unit;
@@ -18,37 +18,37 @@ const WORD_BOUNDARY_END = /(?=\s+|[.,);/]|[хx]|[^\u0400-\u04ff]|$)/;
 const WEIGHT_REGEXP = mRegExp([
   /(?<value>\d+[,.]\d+|\d+)/, // Value
   /\s?/, // Space
-  '(?<unit>',
-  '(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)',
-  '|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)',
-  '|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))',
-  ')\\.?',
+  "(?<unit>",
+  "(?<weight_unit>(?<weight_SI>кг|килограмм(?:ов|а|))|г|грамм(?:ов|а|)|гр)",
+  "|(?<volume_unit>(?<volume_SI>л|литр(?:ов|а|))|мл)",
+  "|(?<length_unit>(?<length_SI>м|метр(?:ов|а|)))",
+  ")\\.?",
   WORD_BOUNDARY_END,
 ]);
 
-function plural(name: string, plurals: string[] = ['ок', 'ки', 'ка']): string {
-  return `${name}(?:${plurals.join('|')})`;
+function plural(name: string, plurals: string[] = ["ок", "ки", "ка"]): string {
+  return `${name}(?:${plurals.join("|")})`;
 }
 
 const QUANTITY_UNITS = [
-  'шт',
-  'рулон',
-  'пакет',
-  'уп',
-  plural('упаков'),
-  plural('салфет'),
-  'таб',
-  'капсул',
-  plural('флакон', ['', 'a', 'ов']),
-  plural('пар', ['', 'a', 'ы']),
+  "шт",
+  "рулон",
+  "пакет",
+  "уп",
+  plural("упаков"),
+  plural("салфет"),
+  "таб",
+  "капсул",
+  plural("флакон", ["", "a", "ов"]),
+  plural("пар", ["", "a", "ы"]),
 ];
 
 const QUANTITY_REGEXP = RegExp(
-  `(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join('|')})\\.?`,
+  `(?<quantity>\\d+)\\s?(?<quantity_unit>${QUANTITY_UNITS.join("|")})\\.?`,
 );
 
 const QUANTITY_2_REGEXP = RegExp(
-  `(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join('|')})\\.?`,
+  `(?<quantity_2>\\d+)\\s?(?<quantity_2_unit>${QUANTITY_UNITS.join("|")})\\.?`,
 );
 
 const COMBINE_DELIMETER_REGEXP = /\s*?(?:[xх*×/]|по)\s*?/;
@@ -87,29 +87,29 @@ function parseGroups(groups: MatchGroupsResult, allowSum = true): ParseTitleResu
     const valueStr: string | undefined = groups?.value;
     const unit = groups?.unit;
     if (valueStr && unit) {
-      let value = parseFloat(valueStr.replace(',', '.'));
+      let value = parseFloat(valueStr.replace(",", "."));
       let unit: Unit | null = null;
       // Всегда считаем в мл и г
       if (groups.weight_unit) {
         if (!groups.weight_SI) {
           value /= 1000;
         }
-        unit = 'кг';
+        unit = "кг";
       }
       if (groups.volume_unit) {
         if (!groups.volume_SI) {
           value /= 1000;
         }
-        unit = 'л';
+        unit = "л";
       }
       if (groups.length_unit) {
         if (!groups.length_SI) {
           value /= 1000;
         }
-        unit = 'м';
+        unit = "м";
       }
       if (!unit) {
-        throw 'Unknown unit';
+        throw "Unknown unit";
       }
 
       result.units.push({
@@ -163,7 +163,7 @@ export function parseTitle(title: string): ParseTitleResult {
   } else {
     const quantityMatch = QUANTITY_REGEXP.exec(title);
     if (quantityMatch?.groups) {
-      groups = {...groups, ...quantityMatch.groups};
+      groups = { ...groups, ...quantityMatch.groups };
     }
   }
   let allowSum = true;
@@ -189,7 +189,7 @@ export interface ParseTitlePriceResult extends ParseTitleResult {
 }
 
 export function parseTitleWithPrice(title: string, price: number): ParseTitlePriceResult | null {
-  const {units, ...titleParsed} = parseTitle(title);
+  const { units, ...titleParsed } = parseTitle(title);
   const res: ParseTitlePriceResult = {
     ...titleParsed,
     units: [],
@@ -205,7 +205,7 @@ export function parseTitleWithPrice(title: string, price: number): ParseTitlePri
     res.units.push({
       ...u,
       price: p,
-      price_display: `${p} ₽/${u.unit || '?'}`,
+      price_display: `${p} ₽/${u.unit || "?"}`,
     });
   }
   if (res.quantity > 1) {

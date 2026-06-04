@@ -13,7 +13,7 @@ export function byPropertiesOf<T extends Record<string, unknown>>(
   function compareByProperty(arg: sortArg<T>) {
     let key: keyof T;
     let sortOrder = 1;
-    if (typeof arg === 'string' && arg.startsWith('-')) {
+    if (typeof arg === "string" && arg.startsWith("-")) {
       sortOrder = -1;
       // Typescript is not yet smart enough to infer that substring is keyof T
       key = arg.substr(1) as keyof T;
@@ -21,14 +21,14 @@ export function byPropertiesOf<T extends Record<string, unknown>>(
       // Likewise it is not yet smart enough to infer that arg here is keyof T
       key = arg as keyof T;
     }
-    return function (a: T, b: T): number {
+    return (a: T, b: T): number => {
       const result = a[key] < b[key] ? -1 : a[key] > b[key] ? 1 : 0;
 
       return result * sortOrder;
     };
   }
 
-  return function (obj1: T, obj2: T) {
+  return (obj1: T, obj2: T) => {
     let i = 0;
     let result = 0;
     const numberOfProperties = sortBy?.length;

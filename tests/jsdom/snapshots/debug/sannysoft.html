@@ -54,7 +54,7 @@
 <body>
 <!-- Yandex.Metrika counter -->
 <script type="text/javascript">
-    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    ((m,e,t,r,i,k,a)=> {m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
         m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
     (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
@@ -619,7 +619,7 @@
   fpCollect.generateFingerprint().then((fingerprint) => {
     $("#fp").text(JSON.stringify(fingerprint, null, 5));
 
-    let xscanner = fpscanner;
+    const xscanner = fpscanner;
     scannerResults = xscanner.analyseFingerprint(fingerprint);
 
     for (name in scannerResults) {
@@ -701,7 +701,7 @@
 </script>
 
 <script>
-  runBotDetection = function () {
+  runBotDetection = () => {
     var documentDetectionKeys = [
       "__webdriver_evaluate",
       "__selenium_evaluate",
@@ -919,7 +919,7 @@
   const brokenImageDimensionsElement = document.getElementById('broken-image-dimensions');
   const body = document.body;
   const image = document.createElement('img');
-  image.onerror = function () {
+  image.onerror = () => {
     brokenImageDimensionsElement.innerHTML = `${image.width}x${image.height}`;
     if (image.width == 0 && image.height == 0) {
       brokenImageDimensionsElement.classList.add('failed');
@@ -930,7 +930,7 @@
   body.appendChild(image);
   image.src = 'https://intoli.com/nonexistent-image.png';
 
-  let drawCanvas2 = function (num, useIframe = false) {
+  const drawCanvas2 = (num, useIframe = false) => {
     var canvas2d;
 
     /** @type {boolean} */
@@ -939,8 +939,8 @@
     /** @type {string} */
     var canvasText = "Bot test <canvas> 1.1";
 
-    let canvasContainer = document.getElementById("canvas" + num);
-    let iframe = document.getElementById("canvas" + num + "-iframe");
+    const canvasContainer = document.getElementById("canvas" + num);
+    const iframe = document.getElementById("canvas" + num + "-iframe");
     //canvasContainer.appendChild(iframe);
 
     var canvasElement = useIframe ? iframe.contentDocument.createElement("canvas") : document.createElement("canvas");
@@ -1015,12 +1015,12 @@
 
 
     if (isOkCanvas) {
-      let newDiv = document.createElement("div");
+      const newDiv = document.createElement("div");
       newDiv.innerHTML = "Hash: " + datUrl.hashCode();
       canvasContainer.appendChild(canvasElement);
       canvasContainer.appendChild(newDiv);
     } else {
-      let newDiv = document.createElement("div");
+      const newDiv = document.createElement("div");
       newDiv.innerHTML = "Canvas failed";
       canvasContainer.appendChild(newDiv);
     }

@@ -1,11 +1,15 @@
-import {getElementByXpath, matchLocation, waitCompletePage} from '../../utils';
-import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
-import {initReorderCatalog} from '../common/bestPriceReorder';
-import {processProductCard} from '../common/common_parser';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {getPriceFromElement} from '../common/price_parse';
-import {renderBestPrice} from '../common/price_render';
-import {readDataFromElement, storeDataToElement, storeParsedTitleToElement} from '../common/store';
+import { getElementByXpath, matchLocation, waitCompletePage } from "../../utils";
+import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { initReorderCatalog } from "../common/bestPriceReorder";
+import { processProductCard } from "../common/common_parser";
+import { parseTitleWithPrice } from "../common/parseTitle";
+import { getPriceFromElement } from "../common/price_parse";
+import { renderBestPrice } from "../common/price_render";
+import {
+  readDataFromElement,
+  storeDataToElement,
+  storeParsedTitleToElement,
+} from "../common/store";
 
 export function initProductPage(): void {
   const productRoot = document.querySelector<HTMLElement>('[data-widget="container"]');
@@ -19,27 +23,27 @@ export function initProductPage(): void {
     title_sel: '[data-widget="webProductHeading"]',
     to_render: {
       sel: '[data-widget="webPrice"]',
-      pos: 'appendChild',
+      pos: "appendChild",
     },
     force: false,
   });
 }
 
 function processProductCardOld(cardEl: HTMLElement): void {
-  const wrapEl = getElementByXpath('(a|div/a)/following-sibling::div[1]', cardEl);
+  const wrapEl = getElementByXpath("(a|div/a)/following-sibling::div[1]", cardEl);
 
-  if (!wrapEl || wrapEl?.querySelector('.GM-best-price')) {
+  if (!wrapEl || wrapEl?.querySelector(".GM-best-price")) {
     storeParsedTitleToElement(cardEl, null);
     return;
   }
 
-  const price = getPriceFromElement(wrapEl.querySelector('div'));
+  const price = getPriceFromElement(wrapEl.querySelector("div"));
   const titleEl = wrapEl.querySelector(
-    'a span.tsBodyL, ' +
-      'a span.tsBodyM:not([style]), ' + //
+    "a span.tsBodyL, " +
+      "a span.tsBodyM:not([style]), " + //
       'a span.tsBodyM[style="color:;"], ' + // Возможно вам понравится (в заказе)
-      'a span.tsBody500Medium ' +
-      '',
+      "a span.tsBody500Medium " +
+      "",
   );
   const title = titleEl?.textContent;
   if (!title || !price) {
@@ -54,7 +58,7 @@ function processProductCardOld(cardEl: HTMLElement): void {
 
 export function initCatalog(): void {
   const cardList = document.querySelectorAll<HTMLElement>(
-    '.widget-search-result-container > div > div' +
+    ".widget-search-result-container > div > div" +
       ", #contentScrollPaginator div[data-widget='tileGridDesktop'] > div > div" +
       ",[data-widget='skuLine'] > div:nth-child(2) > div" +
       ",[data-widget='skuGridSimple'] > div:nth-child(2) > div" + // Товары на главной
@@ -76,16 +80,16 @@ export function initCatalog(): void {
   if (!catalogEl) {
     return;
   }
-  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('#paginator'), {
-    className: 'GM-button-wrap',
-    pos: 'before',
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>("#paginator"), {
+    className: "GM-button-wrap",
+    pos: "before",
   });
-  const el = catalogEl.querySelector<HTMLElement>(':scope > div');
-  const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === 'span 12';
+  const el = catalogEl.querySelector<HTMLElement>(":scope > div");
+  const isDetailCatalog = el && getComputedStyle(el).gridColumnStart === "span 12";
   if (isDetailCatalog) {
     // TODO reorder detail catalog like
     //  https://www.ozon.ru/category/besprovodnye-pylesosy-10657/
-    console.warn('is detail catalog, reorder disabled');
+    console.warn("is detail catalog, reorder disabled");
   } else {
     // Бесконечный скролл создает кучу контейнеров по 12 товаров
     const catalogs = document.querySelectorAll<HTMLElement>(
@@ -94,16 +98,16 @@ export function initCatalog(): void {
     // Конец исправления
     const items: HTMLElement[] = [];
     for (const catEl of catalogs) {
-      items.push(...catEl.querySelectorAll<HTMLElement>(':scope > div'));
-      catEl.innerHTML = '';
+      items.push(...catEl.querySelectorAll<HTMLElement>(":scope > div"));
+      catEl.innerHTML = "";
     }
     // Исправляем проблему с битыми ссылками после пересортировки.
     // console.log(readDataFromElement(catalogEl));
-    if (!readDataFromElement(catalogEl)?.['cloned']) {
+    if (!readDataFromElement(catalogEl)?.["cloned"]) {
       const newCatEl = catalogEl.cloneNode(true) as HTMLElement;
       catalogEl.replaceWith(newCatEl);
       catalogEl = newCatEl;
-      storeDataToElement(catalogEl, {cloned: true});
+      storeDataToElement(catalogEl, { cloned: true });
     }
 
     catalogEl.append(...items);
@@ -114,29 +118,28 @@ export function initCatalog(): void {
   const paginator = document.querySelector<HTMLElement>(
     '[data-widget="megaPaginator"] > div:nth-child(2)',
   );
-  const paginatorWrap = document.querySelector<HTMLElement>('.widget-search-result-container');
-  if (paginator?.querySelector('a')) {
-    paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, {pos: 'before'});
+  const paginatorWrap = document.querySelector<HTMLElement>(".widget-search-result-container");
+  if (paginator?.querySelector("a")) {
+    paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, { pos: "before" });
   }
 }
-(function () {
-  'use strict';
-  if (!matchLocation('^https://(www\\.|)ozon\\.ru/.*')) {
+(() => {
+  if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) {
     return;
   }
-  console.log('OZON.ru');
+  console.log("OZON.ru");
 
   waitCompletePage(
     () => {
-      if (matchLocation('^https://(www\\.|)ozon\\.ru/product/.*')) {
+      if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) {
         initProductPage();
       }
 
-      if (matchLocation('^https://(www\\.|)ozon\\.ru/')) {
+      if (matchLocation("^https://(www\\.|)ozon\\.ru/")) {
         initCatalog();
       }
       if (
-        matchLocation('^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*')
+        matchLocation("^https://(www\\.|)ozon\\.ru/(category|highlight|search|my|product|brand)/.*")
       ) {
         initCatalog();
       }

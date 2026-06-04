@@ -1,11 +1,11 @@
-type Store = {[key: string]: string};
+type Store = { [key: string]: string };
 
 export const intoString = (value: unknown): string => {
   /* eslint-disable-next-line @typescript-eslint/no-unsafe-return,
   @typescript-eslint/no-unsafe-member-access,
   @typescript-eslint/no-unsafe-call
   */
-  return (value as any)?.toString?.() ?? '';
+  return (value as any)?.toString?.() ?? "";
 };
 
 class LocalStorageMock {
@@ -18,7 +18,7 @@ class LocalStorageMock {
   }
 
   key(n: number): string | null {
-    if (typeof n === 'undefined') {
+    if (typeof n === "undefined") {
       throw new Error(
         "Uncaught TypeError: Failed to execute 'key' " +
           "on 'Storage': 1 argument required, but only 0 present.",
@@ -41,14 +41,14 @@ class LocalStorageMock {
   }
 
   setItem(key: string, value: unknown): void {
-    if (typeof key === 'undefined' && typeof value === 'undefined') {
+    if (typeof key === "undefined" && typeof value === "undefined") {
       throw new Error(
         "Uncaught TypeError: Failed to execute 'setItem' " +
           "on 'Storage': 2 arguments required, but only 0 present.",
       );
     }
 
-    if (typeof value === 'undefined') {
+    if (typeof value === "undefined") {
       throw new Error(
         "Uncaught TypeError: Failed to execute 'setItem' " +
           "on 'Storage': 2 arguments required, but only 1 present.",
@@ -64,7 +64,7 @@ class LocalStorageMock {
   }
 
   removeItem(key: string): undefined {
-    if (typeof key === 'undefined') {
+    if (typeof key === "undefined") {
       throw new Error(
         "Uncaught TypeError: Failed to execute 'removeItem' " +
           "on 'Storage': 1 argument required, but only 0 present.",

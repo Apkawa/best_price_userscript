@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "es2017",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"]
+    },
+    "types": ["bun", "bun-types", "./tampermonkey-module.d.ts"],
+    "strict": true,
+    "esModuleInterop": true,
+    "lib": ["dom", "dom.iterable", "es2018"],
+    "removeComments": true,
+    "experimentalDecorators": true
+  },
+  "include": ["src/**/*", "tests/**/*", "playwright.config.ts", "globals.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,17 +1,17 @@
-import {describe, it} from 'node:test';
-import {expect} from 'playwright/test';
+import { describe, it } from "node:test";
+import { expect } from "playwright/test";
 
-import {jsdomHook} from '@tests/test_utils/jsdom/hooks';
-import {matchLocation} from './location';
+import { jsdomHook } from "@tests/test_utils/jsdom/hooks";
+import { matchLocation } from "./location";
 
-describe('matchLocation', () => {
+describe("matchLocation", () => {
   // beforeEach(() => {
   //   location = document.location;
   //   jest.spyOn(document, 'location', 'get').mockRestore();
   // });
   jsdomHook();
-  it('matchLocation', () => {
-    expect(matchLocation('^https://example.com/.*')).toBe(false);
+  it("matchLocation", () => {
+    expect(matchLocation("^https://example.com/.*")).toBe(false);
     // const mockedLocation = {
     //   ...location,
     //   protocol: 'https:',

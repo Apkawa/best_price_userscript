@@ -1,8 +1,8 @@
-import {ConfType, JSDOM_SNAPSHOT_CONF, getPageFilePath} from '../../jsdom/jsdom_snapshot';
+import { type ConfType, JSDOM_SNAPSHOT_CONF, getPageFilePath } from "../../jsdom/jsdom_snapshot";
 
-import fs from 'fs';
-import {ConstructorOptions} from 'jsdom';
-import jsdomGlobal from 'jsdom-global';
+import fs from "fs";
+import type { ConstructorOptions } from "jsdom";
+import jsdomGlobal from "jsdom-global";
 
 jsdomGlobal();
 
@@ -14,7 +14,7 @@ interface PrepareJsDomOptions extends ConstructorOptions {
 
 export function prepareJsdom(options: PrepareJsDomOptions): Promise<CleanUpCallbackType> {
   return new Promise((resolve) => {
-    const {path, ...jsdom_options} = options;
+    const { path, ...jsdom_options } = options;
     const cleanup = jsdomGlobal(fs.readFileSync(path), jsdom_options);
     resolve(cleanup);
   });
@@ -31,10 +31,10 @@ export const prepareJsdomSnapshot = <
 ): Promise<CleanUpCallbackType> => {
   return new Promise((resolve) => {
     // const snapshot = getSnapshot(site, name) // TODO победить типы
-    const {url} = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
+    const { url } = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
     const filepath = getPageFilePath(site as string, page as string);
-    const content = fs.readFileSync(filepath, 'utf-8');
-    const cleanup = jsdomGlobal(content, {url, ...options});
+    const content = fs.readFileSync(filepath, "utf-8");
+    const cleanup = jsdomGlobal(content, { url, ...options });
     resolve(cleanup);
   });
 };

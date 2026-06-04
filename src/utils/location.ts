@@ -1,4 +1,4 @@
-import {isFunction} from 'rxjs/internal-compatibility';
+import { isFunction } from "rxjs/internal-compatibility";
 
 type MatchPattern = string | RegExp | ((s: string) => boolean);
 
@@ -15,7 +15,7 @@ export function matchLocation(...patterns: MatchPattern[]): boolean {
   return false;
 }
 
-type MapUrlType = {[K: string]: () => void};
+type MapUrlType = { [K: string]: () => void };
 
 /**
  * mapLocation({
@@ -32,6 +32,6 @@ export function mapLocation(map: MapUrlType): void {
   }
 }
 
-export function parseSearch(): {[key: string]: string} {
+export function parseSearch(): { [key: string]: string } {
   return Object.fromEntries(new URLSearchParams(window.location.search).entries());
 }

@@ -1,8 +1,8 @@
-import {entries} from '../../utils';
-import {BEST_PRICE_WRAP_CLASS_NAME} from './constants';
-import {ParseTitlePriceResult} from './parseTitle';
+import { entries } from "../../utils";
+import { BEST_PRICE_WRAP_CLASS_NAME } from "./constants";
+import type { ParseTitlePriceResult } from "./parseTitle";
 
-const PREFIX = 'bp_';
+const PREFIX = "bp_";
 
 export function storeParsedTitleToElement(
   cardEl: HTMLElement,
@@ -31,7 +31,7 @@ export function readDataFromElement(el: HTMLElement): DataInfoType {
     .map(([k, v]) => {
       if (k.startsWith(PREFIX)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return [k.replace(RegExp('^' + PREFIX), ''), JSON.parse(v || '')];
+        return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
       }
       return [null, null];
     })
@@ -47,7 +47,7 @@ export function loadParsedTitleFromElement(cardEl: HTMLElement): ParseTitlePrice
     .map(([k, v]) => {
       if (k.startsWith(PREFIX)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return [k.replace(RegExp('^' + PREFIX), ''), JSON.parse(v || '')];
+        return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
       }
       return [null, null];
     })

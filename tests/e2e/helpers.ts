@@ -1,12 +1,12 @@
-import {Page} from 'playwright';
+import type { Page } from "playwright";
 
 export interface WaitForOptions {
   referer?: string;
   timeout?: number;
-  waitUntil?: 'load' | 'domcontentloaded' | 'networkidle' | 'commit';
+  waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 }
 
-const USERSCRIPT_PATH = require.resolve('@/../dist/best_price/best_price.user.js');
+const USERSCRIPT_PATH = require.resolve("@/../dist/best_price/best_price.user.js");
 
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
   const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
@@ -18,11 +18,11 @@ export async function prepareAndGoTo(page: Page, url: string, options?: WaitForO
   // );
   //
   // await page.setBypassCSP(true);
-  await page.goto(url, {...options});
-  await page.addScriptTag({path: USERSCRIPT_PATH});
+  await page.goto(url, { ...options });
+  await page.addScriptTag({ path: USERSCRIPT_PATH });
 }
 
-interface ElementInfo extends Pick<Element, 'textContent' | 'outerHTML'> {
+interface ElementInfo extends Pick<Element, "textContent" | "outerHTML"> {
   // attributes: {[k: string]: string}
 }
 
@@ -65,7 +65,7 @@ export interface AutoScrollOptions {
 
 export async function autoScroll(page: Page, options: AutoScrollOptions = {}) {
   await page.evaluate(async (options: AutoScrollOptions) => {
-    const {wait = 100, timeout = 0, maxHeight = 0, setup} = options;
+    const { wait = 100, timeout = 0, maxHeight = 0, setup } = options;
     if (setup) {
       await setup(page);
     }

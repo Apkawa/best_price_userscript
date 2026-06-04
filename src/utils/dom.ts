@@ -1,4 +1,4 @@
-import {Optional} from './types';
+import type { Optional } from "./types";
 
 export function getElementByXpath<T extends Node = HTMLElement>(
   xpath: string,
@@ -36,13 +36,13 @@ export function getElementsByXpath<T extends Node = HTMLElement>(
 
 export function markElementHandled(
   wrapFn: (el: HTMLElement) => void,
-  attrName = '_handled',
+  attrName = "_handled",
 ): (el: HTMLElement) => void {
-  return function (el) {
+  return (el) => {
     if (el.getAttribute(attrName)) {
       return;
     }
-    el.setAttribute(attrName, '1');
+    el.setAttribute(attrName, "1");
     wrapFn(el);
   };
 }
@@ -109,7 +109,7 @@ export function waitCompletePage(
   callback: () => void,
   options: WaitCompletePageOptions = {},
 ): StopCallback {
-  const {root = document.body, runOnce = true, sync = true, delay = 150} = options;
+  const { root = document.body, runOnce = true, sync = true, delay = 150 } = options;
   // На случай того что страница уже давно загружена
   // let t: NodeJS.Timeout = setTimeout(callback, delay);
   let t: NodeJS.Timeout;
@@ -143,7 +143,7 @@ export function waitCompletePage(
 
 export function E(
   tag: string,
-  attributes: {[K: string]: string} = {},
+  attributes: { [K: string]: string } = {},
   ...children: (Node | string)[]
 ): HTMLElement {
   const element = document.createElement(tag);
@@ -152,7 +152,7 @@ export function E(
   }
   const fragment = document.createDocumentFragment();
   children.forEach((child) => {
-    if (typeof child === 'string') {
+    if (typeof child === "string") {
       child = document.createTextNode(child);
     }
     fragment.appendChild(child);
@@ -161,7 +161,7 @@ export function E(
   return element;
 }
 
-export type InsertPosition = 'before' | 'after' | 'appendChild';
+export type InsertPosition = "before" | "after" | "appendChild";
 
 export interface ElementGetOrCreateOptions {
   className?: string;
@@ -172,11 +172,11 @@ export function ElementGetOrCreate(
   root: Optional<HTMLElement>,
   options: ElementGetOrCreateOptions = {},
 ): HTMLElement | null {
-  const {className = 'GM-wrap', pos = 'appendChild'} = options;
+  const { className = "GM-wrap", pos = "appendChild" } = options;
   if (!root) return null;
-  let wrapEl = root.parentElement?.querySelector<HTMLElement>('.' + className);
+  let wrapEl = root.parentElement?.querySelector<HTMLElement>("." + className);
   if (!wrapEl) {
-    wrapEl = E('div', {class: className});
+    wrapEl = E("div", { class: className });
     root[pos](wrapEl);
   }
   return wrapEl;
@@ -184,7 +184,7 @@ export function ElementGetOrCreate(
 
 export interface copyElementToNewRootOptions {
   className?: string;
-  pos?: 'before' | 'after' | 'appendChild';
+  pos?: "before" | "after" | "appendChild";
 }
 
 export function copyElementToNewRoot(
@@ -192,7 +192,7 @@ export function copyElementToNewRoot(
   toRoot: HTMLElement,
   options: copyElementToNewRootOptions = {},
 ): void {
-  const {className = 'GM-cloned', pos = 'appendChild'} = options;
+  const { className = "GM-cloned", pos = "appendChild" } = options;
   if (!el) {
     console.warn(`el is ${typeof el}`);
     return;
@@ -204,7 +204,7 @@ export function copyElementToNewRoot(
   } else {
     elList = el;
   }
-  for (const e of toRoot.parentElement?.querySelectorAll('.' + className) || []) {
+  for (const e of toRoot.parentElement?.querySelectorAll("." + className) || []) {
     e.remove();
   }
 

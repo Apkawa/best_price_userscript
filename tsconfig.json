@@ -1,21 +1,23 @@
 {
   "compilerOptions": {
     "noEmit": true,
-    "target": "es2017",
+    "target": "es2021",
     "module": "esnext",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "types": ["bun", "bun-types", "./tampermonkey-module.d.ts"],
+    "allowImportingTsExtensions": true,
     "rootDir": ".",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@tests/*": ["./tests/*"]
     },
     "strict": true,
     "esModuleInterop": true,
-    "lib": ["dom", "dom.iterable", "es2018"],
+    "lib": ["dom", "dom.iterable", "ESNext"],
     "removeComments": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*", "tests/**/*", "playwright.config.ts", "globals.d.ts"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

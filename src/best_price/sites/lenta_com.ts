@@ -1,26 +1,26 @@
-import {processProductCard} from '@/best_price/common/common_parser';
-import {GM_addStyle, matchLocation, waitCompletePage} from '../../utils';
-import {ElementGetOrCreate, copyElementToNewRoot} from '../../utils/dom';
-import {initReorderCatalog} from '../common/bestPriceReorder';
-import {BEST_PRICE_WRAP_CLASS_NAME} from '../common/constants';
-import {parseTitleWithPrice} from '../common/parseTitle';
-import {getPriceFromElement} from '../common/price_parse';
-import {renderBestPrice} from '../common/price_render';
-import {storeParsedTitleToElement} from '../common/store';
+import { processProductCard } from "@/best_price/common/common_parser";
+import { GM_addStyle, matchLocation, waitCompletePage } from "../../utils";
+import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { initReorderCatalog } from "../common/bestPriceReorder";
+import { BEST_PRICE_WRAP_CLASS_NAME } from "../common/constants";
+import { parseTitleWithPrice } from "../common/parseTitle";
+import { getPriceFromElement } from "../common/price_parse";
+import { renderBestPrice } from "../common/price_render";
+import { storeParsedTitleToElement } from "../common/store";
 
 export function initProductPage(): void {
-  const productRoot = document.querySelector<HTMLElement>('lu-product-page-new');
+  const productRoot = document.querySelector<HTMLElement>("lu-product-page-new");
   if (!productRoot) {
-    console.error('not found product detail');
+    console.error("not found product detail");
     return;
   }
 
   processProductCard(productRoot, {
-    price_sel: '.product-price .main-price',
-    title_sel: 'lu-product-page-name-new h1',
+    price_sel: ".product-price .main-price",
+    title_sel: "lu-product-page-name-new h1",
     to_render: {
-      sel: 'lu-availability-product-detail',
-      pos: 'before',
+      sel: "lu-availability-product-detail",
+      pos: "before",
     },
     force: false,
   });
@@ -29,9 +29,9 @@ export function initProductPage(): void {
 function processProductCardCatalog(cardEl: HTMLElement) {
   if (cardEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)) return;
   const price = getPriceFromElement(
-    cardEl.querySelector<HTMLElement>('.product-price .main-price'),
+    cardEl.querySelector<HTMLElement>(".product-price .main-price"),
   );
-  const title = cardEl.querySelector('.lu-product-card-name')?.textContent?.trim();
+  const title = cardEl.querySelector(".lu-product-card-name")?.textContent?.trim();
   if (!title || !price) {
     storeParsedTitleToElement(cardEl, null);
     return;
@@ -44,29 +44,29 @@ function processProductCardCatalog(cardEl: HTMLElement) {
 
 export function initCatalog(): void {
   const cardList = document.querySelectorAll<HTMLElement>(
-    'lu-grid .lu-grid__item:has(:not(lu-placeholder))' +
-      ',lu-slider .product-card:has(:not(lu-placeholder))', // Рекомендации
+    "lu-grid .lu-grid__item:has(:not(lu-placeholder))" +
+      ",lu-slider .product-card:has(:not(lu-placeholder))", // Рекомендации
   );
   for (const cardEl of cardList) {
     processProductCardCatalog(cardEl);
   }
 
-  const catalogWrapEl = document.querySelector<HTMLElement>('lu-grid > div');
+  const catalogWrapEl = document.querySelector<HTMLElement>("lu-grid > div");
 
-  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('.catalog-list'), {
-    pos: 'before',
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>(".catalog-list"), {
+    pos: "before",
   });
   if (catalogWrapEl && buttonWrapEl) {
     initReorderCatalog(catalogWrapEl, buttonWrapEl);
   }
 
-  const catalogEl = document.querySelector<HTMLElement>('lu-listing .catalog-list');
+  const catalogEl = document.querySelector<HTMLElement>("lu-listing .catalog-list");
   const paginationRootWrap = ElementGetOrCreate(catalogEl, {
-    pos: 'before',
-    className: 'GM-pagination-clone',
+    pos: "before",
+    className: "GM-pagination-clone",
   });
   paginationRootWrap &&
-    copyElementToNewRoot(catalogEl?.querySelectorAll('.pagination'), paginationRootWrap);
+    copyElementToNewRoot(catalogEl?.querySelectorAll(".pagination"), paginationRootWrap);
 
   // // Infinity scroll
   // // waitElement(el => {
@@ -96,26 +96,25 @@ export function initCatalog(): void {
   //   },
   // );
 }
-(function () {
-  'use strict';
-  if (!matchLocation('^https://lenta\\.com/.*')) {
+(() => {
+  if (!matchLocation("^https://lenta\\.com/.*")) {
     return;
   }
   GM_addStyle(`:root {
     --product-card-height-mobile: 384px !important;
     --products-slider-height: 400px !important;
   }`);
-  console.log('Lenta.com');
+  console.log("Lenta.com");
   waitCompletePage(
     () => {
-      if (matchLocation('^https://lenta\\.com/product/.*')) {
+      if (matchLocation("^https://lenta\\.com/product/.*")) {
         initProductPage();
       }
 
-      if (matchLocation('^https://lenta\\.com/(catalog|search|brand|product)/.*')) {
+      if (matchLocation("^https://lenta\\.com/(catalog|search|brand|product)/.*")) {
         initCatalog();
       }
     },
-    {runOnce: false},
+    { runOnce: false },
   );
 })();

@@ -16,4 +16,4 @@
 // @match        https://www.wildberries.ru/*
 // ==/UserScript==
 
-import './sites';
+import "./sites";

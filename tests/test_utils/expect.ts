@@ -1,4 +1,4 @@
-import {deepEqual} from 'node:assert';
+import { deepEqual } from "node:assert";
 
 export class Expect<T = unknown> {
   private value: T;

@@ -1,8 +1,8 @@
-import {afterEach, beforeEach} from 'node:test';
-import {JSDOM_SNAPSHOT_CONF} from '@tests/jsdom/jsdom_snapshot';
-import {CleanUpCallbackType, prepareJsdomSnapshot} from '@tests/test_utils/jsdom/helpers';
-import {ConstructorOptions} from 'jsdom';
-import jsdomGlobal from 'jsdom-global';
+import { afterEach, beforeEach } from "node:test";
+import type { JSDOM_SNAPSHOT_CONF } from "@tests/jsdom/jsdom_snapshot";
+import { type CleanUpCallbackType, prepareJsdomSnapshot } from "@tests/test_utils/jsdom/helpers";
+import type { ConstructorOptions } from "jsdom";
+import jsdomGlobal from "jsdom-global";
 
 export function jsdomHook(html?: string | Buffer, options?: ConstructorOptions): void {
   let cleanup: () => void;

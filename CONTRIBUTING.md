@@ -8,6 +8,11 @@
 * jest
 * puppeteer
 
+### Обновление зависимостей
+
+1) `bun update --interactive`
+2) `bunx knip`
+
 ## Установка
 
 ### Tampermonkey
@@ -24,6 +29,8 @@
   A: Разрешить расширению доступ по локальным ссылкам
 - Q: Не обновляется внешний скрипт в @require \\
   A:
+
+
 
 ### Greasemonkey
 
@@ -65,5 +72,4 @@ https://docs.npmjs.com/about-semantic-versioning
 
 1) Install Ubuntu-24.04 via [windows store](https://apps.microsoft.com/detail/9NZ3KLHXDJP5?hl=en-us&gl=RU&ocid=pdpshare) or wsl console
 2) Install node via [jetbrains instructions](https://www.jetbrains.com/help/webstorm/how-to-use-wsl-development-environment-in-product.html#create_project_for_wsl)
-3) 
-
+3)

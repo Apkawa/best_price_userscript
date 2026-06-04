@@ -1,26 +1,26 @@
-import {describe, it} from 'node:test';
-import {prepareJsdomSnapshotHook} from '@tests/test_utils/jsdom/hooks';
-import {expect} from 'playwright/test';
-import '@tests/test_utils/globalHooks';
+import { describe, it } from "node:test";
+import { prepareJsdomSnapshotHook } from "@tests/test_utils/jsdom/hooks";
+import { expect } from "playwright/test";
+import "@tests/test_utils/globalHooks";
 
-import {initCatalog} from '@/best_price/sites/wildberries_ru';
+import { initCatalog } from "@/best_price/sites/wildberries_ru";
 
 // !!! remove .skip
-describe.skip('jsdom example.com', () => {
-  prepareJsdomSnapshotHook('example.com', 'catalog');
-  describe('Check catalog', () => {
-    it('Page content', () => {
-      expect(document.querySelector('title')?.textContent).toMatch('WildBerries.ru');
+describe.skip("jsdom example.com", () => {
+  prepareJsdomSnapshotHook("example.com", "catalog");
+  describe("Check catalog", () => {
+    it("Page content", () => {
+      expect(document.querySelector("title")?.textContent).toMatch("WildBerries.ru");
     });
-    it('Check buttons', async () => {
+    it("Check buttons", async () => {
       initCatalog();
       // For debug
       // await displayHtmlInBrowser(document);
-      expect(document.querySelector('.GM-best-price-button-wrap')).toBeTruthy();
+      expect(document.querySelector(".GM-best-price-button-wrap")).toBeTruthy();
     });
-    it('Checks price', async () => {
+    it("Checks price", async () => {
       initCatalog();
-      expect(document.querySelector('.GM-best-price')).toBeTruthy();
+      expect(document.querySelector(".GM-best-price")).toBeTruthy();
     });
   });
 });
