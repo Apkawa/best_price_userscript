@@ -9,15 +9,18 @@ import {renderBestPrice} from '../common/price_render';
 import {storeParsedTitleToElement} from '../common/store';
 
 export function initProductPage(): void {
-  const productRoot = document.querySelector<HTMLElement>('.product-page_info-block');
-  if (!productRoot) return;
+  const productRoot = document.querySelector<HTMLElement>('lu-product-page-new');
+  if (!productRoot) {
+    console.error('not found product detail');
+    return;
+  }
 
   processProductCard(productRoot, {
     price_sel: '.product-price .main-price',
-    title_sel: 'lu-product-page-name h1',
+    title_sel: 'lu-product-page-name-new h1',
     to_render: {
-      sel: 'lu-product-card-counter',
-      pos: 'after',
+      sel: 'lu-availability-product-detail',
+      pos: 'before',
     },
     force: false,
   });
@@ -48,19 +51,16 @@ export function initCatalog(): void {
     processProductCardCatalog(cardEl);
   }
 
-  const catalogWrapEl = document.querySelector<HTMLElement>('lu-catalog-list-old lu-grid > div');
+  const catalogWrapEl = document.querySelector<HTMLElement>('lu-grid > div');
 
-  const buttonWrapEl = ElementGetOrCreate(
-    document.querySelector<HTMLElement>('lu-catalog-list-old .catalog-list'),
-    {
-      pos: 'before',
-    },
-  );
+  const buttonWrapEl = ElementGetOrCreate(document.querySelector<HTMLElement>('.catalog-list'), {
+    pos: 'before',
+  });
   if (catalogWrapEl && buttonWrapEl) {
     initReorderCatalog(catalogWrapEl, buttonWrapEl);
   }
 
-  const catalogEl = document.querySelector<HTMLElement>('lu-catalog-list .catalog-list');
+  const catalogEl = document.querySelector<HTMLElement>('lu-listing .catalog-list');
   const paginationRootWrap = ElementGetOrCreate(catalogEl, {
     pos: 'before',
     className: 'GM-pagination-clone',

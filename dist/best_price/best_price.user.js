@@ -558,14 +558,17 @@
         });
     })();
     function lenta_com_initProductPage() {
-        const productRoot = document.querySelector(".product-page_info-block");
-        if (!productRoot) return;
+        const productRoot = document.querySelector("lu-product-page-new");
+        if (!productRoot) {
+            console.error("not found product detail");
+            return;
+        }
         processProductCard(productRoot, {
             price_sel: ".product-price .main-price",
-            title_sel: "lu-product-page-name h1",
+            title_sel: "lu-product-page-name-new h1",
             to_render: {
-                sel: "lu-product-card-counter",
-                pos: "after"
+                sel: "lu-availability-product-detail",
+                pos: "before"
             },
             force: false
         });
@@ -587,12 +590,12 @@
     function lenta_com_initCatalog() {
         const cardList = document.querySelectorAll("lu-grid .lu-grid__item:has(:not(lu-placeholder))" + ",lu-slider .product-card:has(:not(lu-placeholder))");
         for (const cardEl of cardList) processProductCardCatalog(cardEl);
-        const catalogWrapEl = document.querySelector("lu-catalog-list-old lu-grid > div");
-        const buttonWrapEl = ElementGetOrCreate(document.querySelector("lu-catalog-list-old .catalog-list"), {
+        const catalogWrapEl = document.querySelector("lu-grid > div");
+        const buttonWrapEl = ElementGetOrCreate(document.querySelector(".catalog-list"), {
             pos: "before"
         });
         if (catalogWrapEl && buttonWrapEl) initReorderCatalog(catalogWrapEl, buttonWrapEl);
-        const catalogEl = document.querySelector("lu-catalog-list .catalog-list");
+        const catalogEl = document.querySelector("lu-listing .catalog-list");
         const paginationRootWrap = ElementGetOrCreate(catalogEl, {
             pos: "before",
             className: "GM-pagination-clone"
