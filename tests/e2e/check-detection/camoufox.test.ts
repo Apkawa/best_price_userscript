@@ -1,6 +1,7 @@
 import { waitForNetworkIdle } from "@tests/jsdom/helpers";
-import { expect, test } from "../rtfox_browser-test.ts";
+import { expect, test } from "../rtfox_test.ts";
 
+// !NOT WORKING
 test.describe("detection", async () => {
   test.skip("browserscan bot-detection", async ({ page }) => {
     await page.goto("https://bot.sannysoft.com/", {

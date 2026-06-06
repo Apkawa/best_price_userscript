@@ -7,3 +7,4 @@ gen
 node_modules/
 coverage/
 test-results/
+test-tools/profiles/

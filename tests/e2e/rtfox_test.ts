@@ -2,6 +2,7 @@ import { test as baseTest } from "@playwright/test";
 import { chromium } from "playwright";
 import { ChildProcess, spawn } from "node:child_process";
 import net from "node:net";
+import { waitProcessReady } from "../helpers/process";
 
 /**
  * Проверяет, доступен ли порт (ожидание подключения к CDP).
@@ -56,33 +57,26 @@ interface RTFoxContext {
 export const test = baseTest.extend<RTFoxContext>({
   browser: async ({}, use) => {
     const port = 9222;
-    const profileDir = "/home/apkawa/code/best_price_userscript/test-tools/__rtfox_profile";
+    const profileDir =
+      "/home/apkawa/code/best_price_userscript/test-tools/profiles/__rtfox_profile";
 
-    // Запускаем Python скрипт rtfox.py
-    const rtfoxProcess = spawn(
-      "uv",
-      ["run", "tests/e2e/rtfox.py", "--port", String(port), "--profile", profileDir],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        detached: false,
-      },
-    );
+    const rtfoxProcessCall = () =>
+      spawn(
+        "uv",
+        ["run", "tests/e2e/rtfox-test.py", "--port", String(port), "--profile", profileDir],
+        {
+          stdio: ["ignore", "pipe", "pipe"],
+          detached: false,
+        },
+      );
 
-    let stderrOutput = "";
-    rtfoxProcess.stderr?.on("data", (data: Buffer) => {
-      stderrOutput += data.toString();
-      process.stderr.write(data);
-    });
-
-    let stdoutOutput = "";
-    rtfoxProcess.stdout?.on("data", (data: Buffer) => {
-      stdoutOutput += data.toString();
-      process.stdout.write(data);
+    const rtfoxProcess = await waitProcessReady(rtfoxProcessCall, {
+      stdout: "RTFox browser is ready on",
     });
 
     // Ждём пока браузер запустится и порт станет доступен
-    await waitForPort(port, 60000);
-
+    await waitForPort(port, 30 * 1000);
+    console.log(`node-test RTFox ready connection on port ${port}`);
     // Подключаемся к браузеру через CDP
     const browser = await chromium.connectOverCDP(`http://localhost:${port}`);
 
@@ -108,18 +102,13 @@ export const test = baseTest.extend<RTFoxContext>({
         rtfoxProcess.on("exit", resolve);
         setTimeout(resolve, 2000);
       });
-
-      console.log(`RTFox process terminated. Stdout: ${stdoutOutput}`);
-      if (stderrOutput.trim()) {
-        console.error(`RTFox process stderr: ${stderrOutput}`);
-      }
     }
   },
 
   // Автоматически создаём context и page для подключённого браузера
   context: async ({ browser }, use) => {
     // При подключении через CDP создаём новый контекст
-    const context = await browser.newContext();
+    const context = browser.contexts()[0];
     await use(context);
     await context.close();
   },

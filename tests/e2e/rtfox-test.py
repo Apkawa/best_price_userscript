@@ -26,18 +26,24 @@ def main():
     args = parser.parse_args()
 
     project_root = list(Path(__file__).parents)[2]
-    profile_path = Path(args.profile) if args.profile else (project_root / Path('test-tools/__rtfox_profile')).absolute()
+    profile_path = Path(args.profile) if args.profile else (project_root / Path('test-tools/profiles/__rtfox_profile')).absolute()
 
     # Настройка опций Chrome для включения remote debugging
     options = uc.ChromeOptions()
     options.add_argument(f'--remote-debugging-port={args.port}')
+    # ОТКЛЮЧАЕТ ВСЕ ВСТРОЕННЫЕ И ВНЕШНИЕ РАСШИРЕНИЯ GOOGLE
+    options.add_argument("--disable-extensions")
+    # Дополнительно можно отключить загрузку дефолтных компонентов (опционально)
+    # options.add_argument("--disable-component-update")
+    options.debugger_address = f"127.0.0.1:{args.port}"
 
         # Запускаем браузер, привязав его к этой папке
     driver = uc.Chrome(
         user_data_dir=str(profile_path),
         options=options,
     )
-    print(f"RTFox browser is ready on port {args.port}", flush=True)
+    debug_address = driver.options.debugger_address
+    print(f"RTFox browser is ready on {debug_address}", flush=True)
     print("Press Ctrl+C to exit...", flush=True)
 
     # Обработчик для graceful shutdown

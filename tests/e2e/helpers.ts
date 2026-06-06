@@ -8,16 +8,18 @@ export interface WaitForOptions {
 
 const USERSCRIPT_PATH = require.resolve("@/../dist/best_price/best_price.user.js");
 
+export async function asyncSleep(delay: number): Promise<true> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, delay);
+  });
+}
+
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
   const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
   page.setDefaultTimeout(defaultTimeout);
   page.setDefaultNavigationTimeout(defaultTimeout);
-  // await page.setUserAgent(
-  //   'Mozilla/5.0 (X11; Linux x86_64) ' +
-  //   'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
-  // );
-  //
-  // await page.setBypassCSP(true);
   await page.goto(url, { ...options });
   await page.addScriptTag({ path: USERSCRIPT_PATH });
 }

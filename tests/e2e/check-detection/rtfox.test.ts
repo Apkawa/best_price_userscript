@@ -1,5 +1,6 @@
 import { waitForNetworkIdle } from "@tests/jsdom/helpers";
-import { expect, test } from "../camoufox-test.ts";
+import { expect, test } from "../rtfox_test";
+import { asyncSleep } from "../helpers";
 
 test.describe("detection", async () => {
   test.skip("browserscan bot-detection", async ({ page }) => {
@@ -21,8 +22,8 @@ test.describe("detection", async () => {
     await page.goto("https://www.ozon.ru/", {
       waitUntil: "domcontentloaded",
     });
-    await waitForNetworkIdle(page, { maxInflightRequests: 5 });
-    await page.pause();
+    await waitForNetworkIdle(page, { maxInflightRequests: 0 });
+    // await page.pause();
     await expect(page).toHaveTitle("OZON маркетплейс – миллионы товаров по выгодным ценам");
   });
 });
