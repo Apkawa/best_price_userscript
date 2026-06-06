@@ -1,5 +1,5 @@
 import { waitForNetworkIdle } from "@tests/jsdom/helpers";
-import { expect, test } from "../rtfox_browser-test.ts";
+import { expect, test } from "../camoufox-test.ts";
 
 test.describe("detection", async () => {
   test.skip("browserscan bot-detection", async ({ page }) => {

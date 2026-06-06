@@ -3,17 +3,13 @@
 #     "rtfox-browser",
 # ]
 # ///
-from pathlib import Path
 import sys
 import os
 import time
 
-# это форк undetected-chromedriver
 import rtfox_browser as uc
 
-project_root = list(Path(__file__).parents)[2]
-
-profile_path = (project_root / Path('test-tools/__rtfox_profile')).absolute()
+profile_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '__rtfox_profile'))
 
 # Запускаем браузер, привязав его к этой папке
 driver = uc.Chrome(
