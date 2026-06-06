@@ -25,16 +25,19 @@ def main():
     )
     args = parser.parse_args()
 
-    project_root = list(Path(__file__).parents)[2]
+    project_root = list(Path(__file__).parents)[1]
     profile_path = Path(args.profile) if args.profile else (project_root / Path('test-tools/profiles/__rtfox_profile')).absolute()
+    print(project_root, profile_path)
 
     # Настройка опций Chrome для включения remote debugging
     options = uc.ChromeOptions()
     options.add_argument(f'--remote-debugging-port={args.port}')
     # ОТКЛЮЧАЕТ ВСЕ ВСТРОЕННЫЕ И ВНЕШНИЕ РАСШИРЕНИЯ GOOGLE
     options.add_argument("--disable-extensions")
+    options.add_argument("--enable-logging")
+    options.add_argument("--v=1")
     # Дополнительно можно отключить загрузку дефолтных компонентов (опционально)
-    # options.add_argument("--disable-component-update")
+    options.add_argument("--disable-component-update")
     options.debugger_address = f"127.0.0.1:{args.port}"
 
         # Запускаем браузер, привязав его к этой папке

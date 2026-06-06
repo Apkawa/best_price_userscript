@@ -43,7 +43,12 @@ export const JSDOM_SNAPSHOT_CONF: SnapshotConf = {
       },
     },
     page: {
-      url: "https://www.ozon.ru/product/153929230/?oos_search=false",
+      url: "https://www.ozon.ru/product/153929230/",
+      setup: async (page: Page) => {
+        if ((await page.title()).includes("Antibot Captcha")) {
+          await page.pause();
+        }
+      },
       scrollOptions: {
         timeout: 10 * 1000, // там бесконечный скролл с оценками, 10 секунд скроллим и хватит.
       },

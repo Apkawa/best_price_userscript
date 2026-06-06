@@ -4,6 +4,7 @@ import { expect } from "playwright/test";
 import "@tests/test_utils/globalHooks";
 
 import { initCatalog, initProductPage } from "@/best_price/sites/ozon_ru";
+import { jsdomGlobalHook } from "../../test_utils/jsdom/globalHooks";
 
 describe("jsdom ozon.ru", () => {
   describe("Check page", () => {

@@ -4,7 +4,7 @@ import fs from "fs";
 import type { ConstructorOptions } from "jsdom";
 import jsdomGlobal from "jsdom-global";
 
-jsdomGlobal();
+// jsdomGlobal();
 
 export type CleanUpCallbackType = () => void;
 
@@ -30,7 +30,6 @@ export const prepareJsdomSnapshot = <
   options?: ConstructorOptions,
 ): Promise<CleanUpCallbackType> => {
   return new Promise((resolve) => {
-    // const snapshot = getSnapshot(site, name) // TODO победить типы
     const { url } = (JSDOM_SNAPSHOT_CONF as T)[site][page] as ConfType;
     const filepath = getPageFilePath(site as string, page as string);
     const content = fs.readFileSync(filepath, "utf-8");

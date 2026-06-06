@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "node:path";
 
-// обходим проверки на ботов
-import { type Page, chromium } from "playwright";
+import { type Page } from "playwright";
 
 import { entries } from "../../src/utils";
 import { autoScroll } from "../e2e/helpers";
 import { waitForNetworkIdle } from "./helpers";
 import { type ConfType, JSDOM_SNAPSHOT_CONF, JSDOM_SNAPSHOT_FILE_ROOT } from "./jsdom_snapshot";
+import { RTFoxManager } from "../helpers/rtfox";
 
 async function preparePage(page: Page) {
   page.setDefaultTimeout(0);
@@ -62,26 +62,32 @@ async function savePage(page: Page, options: SavePageOptions) {
   fs.writeFileSync(filepath, bodyHTML);
 }
 (async () => {
-  const browser = await chromium.launch({ headless: false });
+  const rtfox = new RTFoxManager({
+    port: 9222, // можно кастомизировать порты, чтобы не пересекаться с тестами
+  });
 
-  for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
-    for (const [page, conf] of entries(pages)) {
-      const page_filepath = path.join(JSDOM_SNAPSHOT_FILE_ROOT, site, `${page}.html`);
-      const options: SavePageOptions = {
-        filepath: page_filepath,
-        ...conf,
-      };
-      console.log(site, page, options);
-      if (!options.url) continue;
-      if (!options.replace && fs.existsSync(options.filepath)) {
-        console.log("snapshot already exist. Skipped...");
-        continue;
+  try {
+    const browser = await rtfox.start();
+
+    for (const [site, pages] of entries(JSDOM_SNAPSHOT_CONF)) {
+      for (const [page, conf] of entries(pages)) {
+        const page_filepath = path.join(JSDOM_SNAPSHOT_FILE_ROOT, site, `${page}.html`);
+        const options: SavePageOptions = {
+          filepath: page_filepath,
+          ...conf,
+        };
+        console.log(site, page, options);
+        if (!options.url) continue;
+        if (!options.replace && fs.existsSync(options.filepath)) {
+          console.log("snapshot already exist. Skipped...");
+          continue;
+        }
+        const p = await browser.newPage();
+        await savePage(p, options);
+        await p.close();
       }
-      const p = await browser.newPage();
-      await savePage(p, options);
-      await p.close();
     }
+  } finally {
+    rtfox.stop();
   }
-
-  await browser.close();
 })();
