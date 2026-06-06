@@ -60,12 +60,12 @@ https://docs.npmjs.com/about-semantic-versioning
 
 ### Порядок обновления снапшотов для тестов
 
-1) `npx playwright install`
-2) 
+1) `npx camoufox-js fetch`
+2) `sudo apt update && sudo apt install -y libgtk-3-0 libdbus-glib-1-2 libxt6 libx11-xcb1 libxcomposite1 xvfb`
+3) 
     * в папке `tests/jsdom/snapshots` удалить определенный снапшот или все снапшоты
     * или в `tests/jsdom/jsdom_snapshot.ts`  `JSDOM_SNAPSHOT_CONF` добавить флаг `replace` `true`  
-3) запустить обновление снапшота `npm run test:jsdom:snapshot-sync`
-
+4) запустить обновление снапшота `npm run test:jsdom:snapshot-sync`
 
 
 ## Windows
