@@ -61,14 +61,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Use Node.js 24.x
         uses: actions/setup-node@v1
         with:
           node-version: 24.x
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
         bun-version: latest
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
 
       - name: cache dependencies
         uses: actions/cache@v4
@@ -93,6 +100,7 @@ jobs:
           echo ${{ steps.extract_tag.outputs.tag }}
           echo ${{ steps.extract_branch.outputs.branch }}
 
+
       # Если мастер - деплоим в корень
       - name: Set target folder
         uses: haya14busa/action-cond@v1
@@ -114,7 +122,7 @@ jobs:
           export DOWNLOAD_SUFFIX=$DOWNLOAD_SUFFIX
           bun run build
         env:
-          DOWNLOAD_SUFFIX: '/raw/release/${{ steps.target_folder.outputs.value }}/'
+          DOWNLOAD_SUFFIX: '${{ github.repository }}/raw/release/${{ steps.target_folder.outputs.value }}/'
 
       - name: Deploy to release branch
         if: success()

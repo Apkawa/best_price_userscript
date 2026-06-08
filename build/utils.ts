@@ -9,14 +9,14 @@ export interface GetExtraInfoOpts {
 }
 
 export function getExtraInfo(srcPath: string, opts: GetExtraInfoOpts = {}) {
-  const { downloadSuffix = "/raw/master/dist/" } = opts;
+  const { downloadSuffix = `${packageJson.repository}/raw/master/dist/` } = opts;
   const name = path.basename(srcPath, ".ts");
   const homepage = packageJson.homepage;
   let supportUrl = packageJson.bugs;
   if (typeof supportUrl !== "string") {
     supportUrl = supportUrl?.url;
   }
-  const downloadUrl = `${packageJson.repository}${downloadSuffix}${name}.js`;
+  const downloadUrl = `${downloadSuffix}${name}.js`;
   let author = packageJson.author;
   if (typeof author !== "string") {
     author = author?.name;

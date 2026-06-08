@@ -6,7 +6,7 @@ import { buildUserScriptMeta, getUserscriptDebugLink } from "./utils";
 const projectRoot = path.resolve(path.dirname(import.meta.dir));
 const srcRoot = path.resolve(projectRoot, "src");
 
-const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || `/raw/master/dist/`;
+const DOWNLOAD_SUFFIX = process.env.DOWNLOAD_SUFFIX || undefined;
 
 console.log(`DOWNLOAD_SUFFIX=${DOWNLOAD_SUFFIX}`);
 
