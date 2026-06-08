@@ -45,7 +45,7 @@
 Откройте 
 
 - github [best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js)
-- gitverse [best_price.user.js](https://gitverse.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js)
+- gitverse [best_price.user.js](https://gitverse.ru/api/repos/Apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js)
 
 3. Предложат установить юзерскрипт, соглашайтесь
 
