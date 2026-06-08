@@ -117,7 +117,7 @@ jobs:
         if: success()
         with:
           cond: ${{ startsWith(github.server_url, 'https://gitverse.ru') }}
-          if_true: ${{ github.server_url }}/api/repos/${{ github.repository }}/raw/branch/release/${{ steps.target_folder.outputs.value }}/
+          if_true: https://gitverse.ru/api/repos/${{ github.repository }}/raw/branch/release/${{ steps.target_folder.outputs.value }}/
           if_false: ${{ github.server_url }}/${{ github.repository }}/raw/release/${{ steps.target_folder.outputs.value }}/
 
       - name: Install dependencies
