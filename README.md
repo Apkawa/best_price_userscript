@@ -39,14 +39,20 @@
 ## Установка
 
 1. Установите [Tampermonkey](https://www.tampermonkey.net/) (GreaseMonkey не тестировался, не уверен что работает)
+2. Откройте ссылку с юзерскриптом
 
+  - github
+    * [release/best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js)
+    * [master/best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/release/master/best_price/best_price.user.js)
+  - gitverse (зеркало, позволит обновляться при белых списках)
+    * [release/best_price.user.js](https://gitverse.ru/api/repos/Apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js)
+    * [master/best_price.user.js](https://gitverse.ru/api/repos/Apkawa/best_price_userscript/raw/branch/release/master/best_price/best_price.user.js)
 
-Откройте 
+  Отличия веток:
+  
+  - `release` - ветка с релизами, обновления попадают после обновления номера версии
+  - `master` - туда попадают промежуточные коммиты, типа ночных сборок. Может быть нестабильным
 
-- github [best_price.user.js](https://github.com/Apkawa/best_price_userscript/raw/release/release/best_price/best_price.user.js)
-- gitverse [best_price.user.js](https://gitverse.ru/api/repos/Apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js)
-https://gitverse.ru/api/repos/Apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js
-https://gitverse.ru/api/repos/apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js
 
 3. Предложат установить юзерскрипт, соглашайтесь
 
