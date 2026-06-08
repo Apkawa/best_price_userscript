@@ -73,10 +73,9 @@ export function initCatalog(): void {
   for (const cardEl of cardList) {
     processProductCardOld(cardEl);
   }
-
-  let catalogEl = document.querySelector<HTMLElement>(
-    "#contentScrollPaginator div[data-widget='tileGridDesktop']",
-  );
+  const catalogSel =
+    "#contentScrollPaginator div[data-widget='tileGridDesktop'] > div:nth-child(1)";
+  let catalogEl = document.querySelector<HTMLElement>(catalogSel);
   if (!catalogEl) {
     return;
   }
@@ -92,9 +91,7 @@ export function initCatalog(): void {
     console.warn("is detail catalog, reorder disabled");
   } else {
     // Бесконечный скролл создает кучу контейнеров по 12 товаров
-    const catalogs = document.querySelectorAll<HTMLElement>(
-      "#contentScrollPaginator div[data-widget='tileGridDesktop']",
-    );
+    const catalogs = document.querySelectorAll<HTMLElement>(catalogSel);
     // Конец исправления
     const items: HTMLElement[] = [];
     for (const catEl of catalogs) {

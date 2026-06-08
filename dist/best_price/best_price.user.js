@@ -644,7 +644,8 @@ function initCatalog() {
   for (const cardEl of cardList) {
     processProductCardOld(cardEl);
   }
-  let catalogEl = document.querySelector("#contentScrollPaginator div[data-widget='tileGridDesktop']");
+  const catalogSel = "#contentScrollPaginator div[data-widget='tileGridDesktop'] > div:nth-child(1)";
+  let catalogEl = document.querySelector(catalogSel);
   if (!catalogEl) {
     return;
   }
@@ -657,7 +658,7 @@ function initCatalog() {
   if (isDetailCatalog) {
     console.warn("is detail catalog, reorder disabled");
   } else {
-    const catalogs = document.querySelectorAll("#contentScrollPaginator div[data-widget='tileGridDesktop']");
+    const catalogs = document.querySelectorAll(catalogSel);
     const items = [];
     for (const catEl of catalogs) {
       items.push(...catEl.querySelectorAll(":scope > div"));
