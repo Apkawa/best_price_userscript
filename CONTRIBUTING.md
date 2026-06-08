@@ -3,10 +3,10 @@
 ## Стек технологий
 
 * typescript
-* webpack
-* eslint
-* jest
-* puppeteer
+* bun - для сборки юзерскрипта
+* biome - линтер и форматер
+* node - тестраннер для playwright 
+* playwright+rtfox-browser
 
 ### Обновление зависимостей
 
@@ -18,10 +18,13 @@
 ### Tampermonkey
 
 1. git clone
-2. `npm i`
-3. `npm run build:watch`
+2. `bun i`
+3. `bun run build:watch`
 4. Включить для Tampermonkey доступ к локальным урлам
 5. Добавить в Tampermonkey содержимое `./debug.js` отредактиров @require на актуальный путь скрипта из `./dist`
+
+> [!NOTE]
+> Во время сборки в консоль выводится актуальный путь к проекту. Просто скопируйте  строку начиная с `// @require` из консоли
 
 #### FAQ
 
@@ -35,8 +38,8 @@
 ### Greasemonkey
 
 1. git clone
-2. `npm i`
-3. `npm run build:serve`
+2. `bun i`
+3. `bun run build:serve`
 5. Добавить в Greasemonkey содержимое `./debug.js`
 5. Убедиться что `@require` содержит `http://localhost:9000/best_price/best_price.user.js`
 6. При изменениях добавлять к урлу get параметр с ревизией (@require сильно кешируется) https://github.com/Tampermonkey/tampermonkey/issues/723
@@ -56,16 +59,20 @@ https://docs.npmjs.com/about-semantic-versioning
 
 ## Тесты
 
-`npm run test` - запуск юнит тестов
+`bun run test` - запуск юнит тестов
 
-### Порядок обновления снапшотов для тестов
+### e2e
 
-1) `npx camoufox-js fetch`
+e2e тесты используют rtfox-browser
+
+#### Порядок обновления снапшотов для тестов
+
+1) Установите `uv`
 2) `sudo apt update && sudo apt install -y libgtk-3-0 libdbus-glib-1-2 libxt6 libx11-xcb1 libxcomposite1 xvfb`
 3) 
     * в папке `tests/jsdom/snapshots` удалить определенный снапшот или все снапшоты
     * или в `tests/jsdom/jsdom_snapshot.ts`  `JSDOM_SNAPSHOT_CONF` добавить флаг `replace` `true`  
-4) запустить обновление снапшота `npm run test:jsdom:snapshot-sync`
+4) запустить обновление снапшота `bun run test:jsdom:snapshot-sync`
 
 
 ## Windows
