@@ -56,7 +56,7 @@ async function buildAll() {
 }
 
 if (isWatchMode) {
-  fs.watch(srcRoot, { recursive: true }, (event, filename) => {
+  fs.watch(srcRoot, { recursive: true }, (_event, filename) => {
     if (filename?.endsWith(".ts") || filename?.endsWith(".js")) {
       console.log(`\n🔄 Файл ${filename} изменен...`);
       buildAll();

@@ -3,7 +3,7 @@ import { expect } from "playwright/test";
 import "@tests/test_utils/globalHooks";
 import { prepareJsdomSnapshotHook } from "@tests/test_utils/jsdom/hooks";
 
-import { initPopup, initProductPage } from "@/best_price/sites/wildberries_ru";
+import { initPopup } from "@/best_price/sites/wildberries_ru";
 
 describe("jsdom wildberries.ru", () => {
   describe("Check catalog", () => {

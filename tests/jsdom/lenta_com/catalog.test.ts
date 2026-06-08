@@ -1,10 +1,9 @@
-import { afterEach, describe, it } from "node:test";
+import { describe, it } from "node:test";
 import { prepareJsdomSnapshotHook } from "@tests/test_utils/jsdom/hooks";
 import { expect } from "playwright/test";
 import "@tests/test_utils/globalHooks";
 
 import { initCatalog } from "@/best_price/sites/lenta_com";
-import { displayHtmlInBrowser } from "@tests/jsdom/helpers";
 
 describe("jsdom Lenta.com", () => {
   describe("Check catalog", () => {

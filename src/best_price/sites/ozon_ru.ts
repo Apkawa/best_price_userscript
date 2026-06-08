@@ -1,5 +1,5 @@
 import { getElementByXpath, matchLocation, waitCompletePage } from "../../utils";
-import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { copyElementToNewRoot, ElementGetOrCreate } from "../../utils/dom";
 import { initReorderCatalog } from "../common/bestPriceReorder";
 import { processProductCard } from "../common/common_parser";
 import { parseTitleWithPrice } from "../common/parseTitle";
@@ -100,7 +100,7 @@ export function initCatalog(): void {
     }
     // Исправляем проблему с битыми ссылками после пересортировки.
     // console.log(readDataFromElement(catalogEl));
-    if (!readDataFromElement(catalogEl)?.["cloned"]) {
+    if (!readDataFromElement(catalogEl)?.cloned) {
       const newCatEl = catalogEl.cloneNode(true) as HTMLElement;
       catalogEl.replaceWith(newCatEl);
       catalogEl = newCatEl;

@@ -109,7 +109,7 @@ function ElementGetOrCreate(root, options = {}) {
   const { className = "GM-wrap", pos = "appendChild" } = options;
   if (!root)
     return null;
-  let wrapEl = root.parentElement?.querySelector("." + className);
+  let wrapEl = root.parentElement?.querySelector(`.${className}`);
   if (!wrapEl) {
     wrapEl = E("div", { class: className });
     root[pos](wrapEl);
@@ -128,7 +128,7 @@ function copyElementToNewRoot(el, toRoot, options = {}) {
   } else {
     elList = el;
   }
-  for (const e of toRoot.parentElement?.querySelectorAll("." + className) || []) {
+  for (const e of toRoot.parentElement?.querySelectorAll(`.${className}`) || []) {
     e.remove();
   }
   for (const _el of elList) {
@@ -136,6 +136,18 @@ function copyElementToNewRoot(el, toRoot, options = {}) {
     clonedEl.classList.add(className);
     toRoot[pos](clonedEl);
   }
+}
+// src/utils/GM.ts
+function GM_addStyle(css) {
+  const style = document.getElementById("GM_addStyleBy8626") || (() => {
+    const style2 = document.createElement("style");
+    style2.type = "text/css";
+    style2.id = "GM_addStyleBy8626";
+    document.head.appendChild(style2);
+    return style2;
+  })();
+  const sheet = style.sheet;
+  sheet?.insertRule(css, (sheet.rules || sheet.cssRules || []).length);
 }
 // node_modules/rxjs/_esm5/internal/util/isFunction.js
 function isFunction(x) {
@@ -153,18 +165,6 @@ function matchLocation(...patterns) {
     }
   }
   return false;
-}
-// src/utils/GM.ts
-function GM_addStyle(css) {
-  const style = document.getElementById("GM_addStyleBy8626") || (() => {
-    const style2 = document.createElement("style");
-    style2.type = "text/css";
-    style2.id = "GM_addStyleBy8626";
-    document.head.appendChild(style2);
-    return style2;
-  })();
-  const sheet = style.sheet;
-  sheet?.insertRule(css, (sheet.rules || sheet.cssRules || []).length);
 }
 
 // src/utils/index.ts
@@ -240,7 +240,7 @@ function storeDataToElement(el, data) {
 function readDataFromElement(el) {
   const pairs = Object.entries(el.dataset).map(([k, v]) => {
     if (k.startsWith(PREFIX)) {
-      return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
+      return [k.replace(RegExp(`^${PREFIX}`), ""), JSON.parse(v || "")];
     }
     return [null, null];
   }).filter(([k]) => k);
@@ -252,7 +252,7 @@ function readDataFromElement(el) {
 function loadParsedTitleFromElement(cardEl) {
   const pairs = Object.entries(cardEl.dataset).map(([k, v]) => {
     if (k.startsWith(PREFIX)) {
-      return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
+      return [k.replace(RegExp(`^${PREFIX}`), ""), JSON.parse(v || "")];
     }
     return [null, null];
   }).filter(([k]) => k);
@@ -278,7 +278,7 @@ function initReorderCatalog(catalogRoot, buttonRoot) {
   const catalogRecords = [];
   let i = 0;
   for (const wrapEl of catalogRoot.querySelectorAll(":scope > *")) {
-    const el = wrapEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME) ? wrapEl : wrapEl.querySelector("." + BEST_PRICE_WRAP_CLASS_NAME);
+    const el = wrapEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME) ? wrapEl : wrapEl.querySelector(`.${BEST_PRICE_WRAP_CLASS_NAME}`);
     if (!el) {
       console.warn("!", el);
       continue;
@@ -291,7 +291,7 @@ function initReorderCatalog(catalogRoot, buttonRoot) {
       continue;
     }
     i += 1;
-    let initial_order = parseInt(ds.initial_order || "0");
+    let initial_order = parseInt(ds.initial_order || "0", 10);
     if (!initial_order) {
       initial_order = i;
       ds.initial_order = i.toString();
@@ -348,7 +348,7 @@ function initReorderCatalog(catalogRoot, buttonRoot) {
     }
     button.classList.add("active");
   }
-  buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)?.remove();
+  buttonWrap.querySelector(`.${BEST_ORDER_BUTTON_CLASS_NAME}`)?.remove();
   buttonWrap.appendChild(E("div", { class: BEST_ORDER_BUTTON_CLASS_NAME }, ...values(buttons)));
 }
 
@@ -435,7 +435,7 @@ function parseGroups(groups, allowSum = true) {
   if (groups.quantity) {
     const valueStr = groups?.quantity;
     if (valueStr) {
-      result.quantity = parseInt(valueStr);
+      result.quantity = parseInt(valueStr, 10);
     }
   }
   if (allowSum && result.quantity > 1) {
@@ -461,7 +461,7 @@ function parseTitle(title) {
   for (const r of COMBINE_QUANTITY_LIST) {
     const rMatch = r.exec(title)?.groups;
     if (rMatch?.quantity && rMatch?.quantity_2) {
-      quantity = parseInt(rMatch.quantity) * parseInt(rMatch.quantity_2);
+      quantity = parseInt(rMatch.quantity, 10) * parseInt(rMatch.quantity_2, 10);
       break;
     }
   }
@@ -487,7 +487,7 @@ function parseTitleWithPrice(title, price) {
     quantity_price: null,
     quantity_price_display: null
   };
-  if ((!res.quantity || res.quantity == 1) && !units.length) {
+  if ((!res.quantity || res.quantity === 1) && !units.length) {
     return null;
   }
   for (const u of units) {
@@ -553,7 +553,7 @@ function renderBestPrice(titleInfo, extraStyle = {}) {
     wrapEl.style.margin = "5px";
     wrapEl.style.width = "fit-content";
     for (const [k, v] of entries(extraStyle || {})) {
-      if (typeof v == "string") {
+      if (typeof v === "string") {
         wrapEl.style[k] = v;
       }
     }
@@ -586,7 +586,7 @@ function processProductCard(cardEl, options) {
   }
   const to_render_els = cardEl.querySelectorAll(to_render_sel);
   for (const to_render_el of to_render_els) {
-    for (const e of to_render_el?.parentElement?.querySelectorAll("." + BEST_PRICE_CLASS_NAME) || []) {
+    for (const e of to_render_el?.parentElement?.querySelectorAll(`.${BEST_PRICE_CLASS_NAME}`) || []) {
       e.remove();
     }
   }
@@ -664,7 +664,7 @@ function initCatalog() {
       items.push(...catEl.querySelectorAll(":scope > div"));
       catEl.innerHTML = "";
     }
-    if (!readDataFromElement(catalogEl)?.["cloned"]) {
+    if (!readDataFromElement(catalogEl)?.cloned) {
       const newCatEl = catalogEl.cloneNode(true);
       catalogEl.replaceWith(newCatEl);
       catalogEl = newCatEl;
@@ -974,7 +974,7 @@ function initCatalog5() {
     return;
   console.log("Perekrestok.ru");
   waitCompletePage(() => {
-    if (matchLocation(prefix + "/cat/\\d+/p/")) {
+    if (matchLocation(`${prefix}/cat/\\d+/p/`)) {
       initProductPage5();
     }
     initCatalog5();

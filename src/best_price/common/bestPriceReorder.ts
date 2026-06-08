@@ -1,4 +1,4 @@
-import { E, GM_addStyle, entries, values } from "../../utils";
+import { E, entries, GM_addStyle, values } from "../../utils";
 import { sort } from "../../utils/sort";
 import { BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE } from "./constants";
 import { loadParsedTitleFromElement, storeDataToElement } from "./store";
@@ -35,7 +35,7 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
   for (const wrapEl of catalogRoot.querySelectorAll<HTMLElement>(":scope > *")) {
     const el = wrapEl.classList.contains(BEST_PRICE_WRAP_CLASS_NAME)
       ? wrapEl
-      : wrapEl.querySelector<HTMLElement>("." + BEST_PRICE_WRAP_CLASS_NAME);
+      : wrapEl.querySelector<HTMLElement>(`.${BEST_PRICE_WRAP_CLASS_NAME}`);
     if (!el) {
       console.warn("!", el);
       continue;
@@ -48,7 +48,7 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
       continue;
     }
     i += 1;
-    let initial_order = parseInt(ds.initial_order || "0");
+    let initial_order = parseInt(ds.initial_order || "0", 10);
     if (!initial_order) {
       initial_order = i;
       ds.initial_order = i.toString();
@@ -112,6 +112,6 @@ export function initReorderCatalog(catalogRoot: HTMLElement, buttonRoot: HTMLEle
     button.classList.add("active");
   }
 
-  buttonWrap.querySelector("." + BEST_ORDER_BUTTON_CLASS_NAME)?.remove();
+  buttonWrap.querySelector(`.${BEST_ORDER_BUTTON_CLASS_NAME}`)?.remove();
   buttonWrap.appendChild(E("div", { class: BEST_ORDER_BUTTON_CLASS_NAME }, ...values(buttons)));
 }

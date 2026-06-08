@@ -1,6 +1,6 @@
 import { type ConfType, JSDOM_SNAPSHOT_CONF, getPageFilePath } from "../../jsdom/jsdom_snapshot";
 
-import fs from "fs";
+import fs from "node:fs";
 import type { ConstructorOptions } from "jsdom";
 import jsdomGlobal from "jsdom-global";
 

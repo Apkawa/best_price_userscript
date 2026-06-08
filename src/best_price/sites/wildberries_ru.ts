@@ -1,5 +1,5 @@
 import { matchLocation, waitCompletePage } from "../../utils";
-import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { copyElementToNewRoot, ElementGetOrCreate } from "../../utils/dom";
 import { initReorderCatalog } from "../common/bestPriceReorder";
 import { processProductCard } from "../common/common_parser";
 

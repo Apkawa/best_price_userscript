@@ -13,7 +13,7 @@ export async function displayHtmlInBrowser(
   await page.route("**/*", (route) => {
     route.request().resourceType() === "script" ? route.abort() : route.continue();
   });
-  let _html;
+  let _html: string;
   if (typeof html === "string") {
     _html = html;
     await page.setContent(html);
@@ -39,7 +39,8 @@ export function waitForNetworkIdle(page: Page, options: WaitForNetworkIdleOption
   const maxInflightRequests = Math.max(options?.maxInflightRequests || 0, 0);
 
   let inflight = 0;
-  let resolve: (value: void) => void;
+  let resolve: () => void;
+  // biome-ignore lint/suspicious/noExplicitAny: todo
   let reject: (reason?: any) => void;
   let lastRequestTimeoutId: NodeJS.Timeout;
   let timeoutId: NodeJS.Timeout | null;

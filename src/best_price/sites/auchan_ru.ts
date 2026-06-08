@@ -1,5 +1,5 @@
 import { getElementByXpath, matchLocation, waitCompletePage } from "../../utils";
-import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { copyElementToNewRoot, ElementGetOrCreate } from "../../utils/dom";
 import { initReorderCatalog } from "../common/bestPriceReorder";
 import { BEST_PRICE_WRAP_CLASS_NAME } from "../common/constants";
 import { parseTitleWithPrice } from "../common/parseTitle";

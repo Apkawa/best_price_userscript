@@ -45,7 +45,7 @@ export function processProductCard(cardEl: HTMLElement, options: ProcessProductC
   const to_render_els = cardEl.querySelectorAll(to_render_sel);
   // Cleanup
   for (const to_render_el of to_render_els) {
-    for (const e of to_render_el?.parentElement?.querySelectorAll("." + BEST_PRICE_CLASS_NAME) ||
+    for (const e of to_render_el?.parentElement?.querySelectorAll(`.${BEST_PRICE_CLASS_NAME}`) ||
       []) {
       e.remove();
     }

@@ -1,15 +1,13 @@
 export {
+  E,
   getElementByXpath,
   getElementsByXpath,
-  E,
   markElementHandled,
-  waitElement,
   waitCompletePage,
+  waitElement,
 } from "./dom";
-
-export { parseSearch, mapLocation, matchLocation } from "./location";
-
 export { GM_addStyle } from "./GM";
+export { mapLocation, matchLocation, parseSearch } from "./location";
 
 export default function isRegexp(value: unknown): value is RegExp {
   return toString.call(value) === "[object RegExp]";

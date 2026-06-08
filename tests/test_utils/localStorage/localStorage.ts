@@ -4,6 +4,7 @@ export const intoString = (value: unknown): string => {
   /* eslint-disable-next-line @typescript-eslint/no-unsafe-return,
   @typescript-eslint/no-unsafe-member-access,
   @typescript-eslint/no-unsafe-call
+  biome-ignore lint/suspicious/noExplicitAny: any to string
   */
   return (value as any)?.toString?.() ?? "";
 };
@@ -55,12 +56,12 @@ class LocalStorageMock {
       );
     }
 
-    if (!key) return undefined;
+    if (!key) return;
 
     this.store[key] = intoString(value);
     this.length = Object.keys(this.store).length;
 
-    return undefined;
+    return;
   }
 
   removeItem(key: string): undefined {

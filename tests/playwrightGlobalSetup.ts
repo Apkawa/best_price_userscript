@@ -1,3 +1,3 @@
-import { type FullConfig, chromium } from "playwright/test";
+import type { FullConfig } from "playwright/test";
 
-async function globalSetup(config: FullConfig) {}
+async function _globalSetup(_config: FullConfig) {}

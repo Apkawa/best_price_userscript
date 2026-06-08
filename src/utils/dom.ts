@@ -174,7 +174,7 @@ export function ElementGetOrCreate(
 ): HTMLElement | null {
   const { className = "GM-wrap", pos = "appendChild" } = options;
   if (!root) return null;
-  let wrapEl = root.parentElement?.querySelector<HTMLElement>("." + className);
+  let wrapEl = root.parentElement?.querySelector<HTMLElement>(`.${className}`);
   if (!wrapEl) {
     wrapEl = E("div", { class: className });
     root[pos](wrapEl);
@@ -204,7 +204,7 @@ export function copyElementToNewRoot(
   } else {
     elList = el;
   }
-  for (const e of toRoot.parentElement?.querySelectorAll("." + className) || []) {
+  for (const e of toRoot.parentElement?.querySelectorAll(`.${className}`) || []) {
     e.remove();
   }
 

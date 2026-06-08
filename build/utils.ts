@@ -1,17 +1,17 @@
-import path from "path";
-import fs from "fs";
-import { PackageJson } from "type-fest";
+import path from "node:path";
+import fs from "node:fs";
+import type { PackageJson } from "type-fest";
 
 const packageJson: PackageJson = require("../package.json");
 
 export function getExtraInfo(srcPath: string) {
   const name = path.basename(srcPath, ".ts");
-  let homepage = packageJson.homepage;
+  const homepage = packageJson.homepage;
   let supportUrl = packageJson.bugs;
   if (typeof supportUrl !== "string") {
     supportUrl = supportUrl?.url;
   }
-  let downloadUrl = `${packageJson.repository}/raw/master/dist/${name}.js`;
+  const downloadUrl = `${packageJson.repository}/raw/master/dist/${name}.js`;
   let author = packageJson.author;
   if (typeof author !== "string") {
     author = author?.name;
@@ -34,16 +34,16 @@ export function buildUserScriptMeta(src_path: string) {
     .readFileSync(src_path, "utf-8")
     .replace(/(==\/UserScript==)[\s\S]+$/, "$1")
     .replace(/^.*==\/UserScript==.*$/gm, "");
-  let extraInfo = getExtraInfo(src_path);
+  const extraInfo = getExtraInfo(src_path);
   // console.log(extraInfo);
-  let columnWidth = 13;
-  for (let [k, v] of Object.entries(extraInfo)) {
-    let re = RegExp(`^//.*@${k}\\b.*$`, "gm");
+  const columnWidth = 13;
+  for (const [k, v] of Object.entries(extraInfo)) {
+    const re = RegExp(`^//.*@${k}\\b.*$`, "gm");
     let f_k = `@${k}`;
     f_k += Array(columnWidth - f_k.length)
       .fill(" ")
       .join("");
-    let s = `// ${f_k} ${v}`;
+    const s = `// ${f_k} ${v}`;
     if (re.test(text)) {
       text = text.replace(re, s);
     } else {

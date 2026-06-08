@@ -1,5 +1,5 @@
-import { matchLocation, waitCompletePage } from "../../utils";
-import { ElementGetOrCreate, copyElementToNewRoot } from "../../utils/dom";
+import { waitCompletePage } from "../../utils";
+import { copyElementToNewRoot, ElementGetOrCreate } from "../../utils/dom";
 import { initReorderCatalog } from "../common/bestPriceReorder";
 import { processProductCard } from "../common/common_parser";
 import { BEST_PRICE_WRAP_CLASS_NAME } from "../common/constants";
@@ -84,10 +84,10 @@ export function initCatalog(): void {
 (() => {
   console.error("No implemented");
   throw "No implemented";
-  const prefix = "https://(www\\.|)example\\.com";
-  if (!matchLocation(prefix)) return;
-  if (matchLocation(prefix + "/product/")) {
-    initProductPage();
-  }
-  initCatalog();
+  // const prefix = "https://(www\\.|)example\\.com";
+  // if (!matchLocation(prefix)) return;
+  // if (matchLocation(prefix + "/product/")) {
+  //   initProductPage();
+  // }
+  // initCatalog();
 })();

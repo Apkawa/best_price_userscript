@@ -1,18 +1,18 @@
 import { test as baseTest } from "@playwright/test";
-import { Browser } from "playwright";
+import type { Browser } from "playwright";
 import { RTFoxManager } from "../helpers/rtfox";
 import { projectRoot } from "../helpers/path_dirs";
-import path from "path";
+import path from "node:path";
 
 interface RTFoxContext {
   rtfox: RTFoxManager;
   browser: Browser;
 }
 
-export const test = baseTest.extend<{}, RTFoxContext>({
+export const test = baseTest.extend<_, RTFoxContext>({
   // Запуск менеджера и браузера
   rtfox: [
-    async ({}, use) => {
+    async (_, use) => {
       const manager = new RTFoxManager({
         port: 9222,
         profileDir: path.resolve(projectRoot(), "test-tools/profiles/__rtfox_profile"),

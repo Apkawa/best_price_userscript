@@ -62,7 +62,7 @@ export function initCatalog(): void {
   console.log("Perekrestok.ru");
   waitCompletePage(
     () => {
-      if (matchLocation(prefix + "/cat/\\d+/p/")) {
+      if (matchLocation(`${prefix}/cat/\\d+/p/`)) {
         initProductPage();
       }
       initCatalog();

@@ -1,7 +1,7 @@
-import fs from "fs";
+import fs from "node:fs";
 import path from "node:path";
 
-import { type Page } from "playwright";
+import type { Page } from "playwright";
 
 import { entries } from "../../src/utils";
 import { autoScroll } from "../e2e/helpers";
@@ -28,7 +28,7 @@ async function replaceAssetsUrlToAbsolute(page: Page) {
   await page.evaluate(() => {
     document.querySelectorAll("img,script,link,style").forEach((e) => {
       let attrName = "href";
-      if (e.tagName == "link") {
+      if (e.tagName === "link") {
         attrName = "src";
       }
       const href = e.getAttribute(attrName);

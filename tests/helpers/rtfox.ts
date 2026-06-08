@@ -1,5 +1,5 @@
-import { ChildProcess, spawn } from "node:child_process";
-import { chromium, Browser } from "playwright";
+import { type ChildProcess, spawn } from "node:child_process";
+import { chromium, type Browser } from "playwright";
 import { waitProcessReady } from "./process"; // ваш хелпер
 import { waitForCDPReady, waitForPort } from "./network"; // ваш хелпер
 import { projectRoot } from "./path_dirs";

@@ -17,10 +17,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use Node.js 22.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v1
         with:
-          node-version: 22.x
+          node-version: 24.x
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+        bun-version: latest
 
       - name: cache dependencies
         uses: actions/cache@v4
@@ -31,19 +35,19 @@ jobs:
       - name: Install dependencies
         run: |
           npm pkg set scripts.prepare="true"
-          npm ci
+          bun ci
 
       - name: Build
-        run: npm run build
+        run: bun run build
 
       - name: Run unit tests
-        run: npm run test:unit
+        run: bun run test:unit
         # TODO надо подумать над обходом cloudflare
 #      - name: Run e2e tests
 #        run: npm run test:e2e
 
-      - name: Run lint
-        run: npm run lint
+      - name: Run all checks
+        run: bun run check
 
   publish:
     needs:
@@ -57,10 +61,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Use Node.js 22.x
+      - name: Use Node.js 24.x
         uses: actions/setup-node@v1
         with:
-          node-version: 22.x
+          node-version: 24.x
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+        bun-version: latest
 
       - name: cache dependencies
         uses: actions/cache@v4
@@ -81,7 +89,7 @@ jobs:
 
       - name: Check env
         run: |
-          echo $RELEASE_VERSION 
+          echo $RELEASE_VERSION
           echo ${{ steps.extract_tag.outputs.tag }}
           echo ${{ steps.extract_branch.outputs.branch }}
 
@@ -98,13 +106,13 @@ jobs:
       - name: Install dependencies
         run: |
           npm pkg set scripts.prepare="true"
-          npm ci
+          bun ci
 
       - name: Build
         run: |
           echo $DOWNLOAD_SUFFIX
           export DOWNLOAD_SUFFIX=$DOWNLOAD_SUFFIX
-          npm run build
+          bun run build
         env:
           DOWNLOAD_SUFFIX: '/raw/release/${{ steps.target_folder.outputs.value }}/'
 

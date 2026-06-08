@@ -3,10 +3,10 @@ import { getLocalStorageMock } from "@tests/test_utils/localStorage/localStorage
 
 function globalHook(): void {
   before(() => {
-    global["localStorage"] = getLocalStorageMock();
+    global.localStorage = getLocalStorageMock();
   });
   after(() => {
-    global["localStorage"].clear();
+    global.localStorage.clear();
   });
 }
 

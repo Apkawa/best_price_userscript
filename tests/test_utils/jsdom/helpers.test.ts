@@ -9,9 +9,9 @@ describe("Test jsdom", () => {
     const doc = dom.window.document;
     const win = doc.defaultView;
     if (win) {
-      global["document"] = doc;
-      global["window"] = win;
-      global["HTMLElement"] = global["window"].HTMLElement;
+      global.document = doc;
+      global.window = win;
+      global.HTMLElement = global.window.HTMLElement;
     }
 
     const el = document.querySelector("body");

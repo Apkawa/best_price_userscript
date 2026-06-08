@@ -1,5 +1,5 @@
-import { ChildProcessByStdio, StdioNull, StdioPipe } from "node:child_process";
-import { Readable } from "node:stream";
+import type { ChildProcessByStdio } from "node:child_process";
+import type { Readable } from "node:stream";
 import { isFunction } from "rxjs/internal-compatibility";
 
 type ProcessType = ChildProcessByStdio<null, Readable, Readable>;
@@ -49,15 +49,15 @@ export function waitProcessReady(spawn: SpawnFunc, opts: WaitReadyOpts): Promise
     };
     rtfoxProcess.stdout?.on("data", onData);
 
-    let stderrOutput = "";
+    let _stderrOutput = "";
     rtfoxProcess.stderr?.on("data", (data: Buffer) => {
-      stderrOutput += data.toString();
+      _stderrOutput += data.toString();
       process.stderr.write(data);
     });
 
-    let stdoutOutput = "";
+    let _stdoutOutput = "";
     rtfoxProcess.stdout?.on("data", (data: Buffer) => {
-      stdoutOutput += data.toString();
+      _stdoutOutput += data.toString();
       process.stdout.write(data);
     });
   });

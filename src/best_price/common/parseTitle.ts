@@ -123,7 +123,7 @@ function parseGroups(groups: MatchGroupsResult, allowSum = true): ParseTitleResu
   if (groups.quantity) {
     const valueStr: string | undefined = groups?.quantity;
     if (valueStr) {
-      result.quantity = parseInt(valueStr);
+      result.quantity = parseInt(valueStr, 10);
     }
   }
   if (allowSum && result.quantity > 1) {
@@ -154,7 +154,7 @@ export function parseTitle(title: string): ParseTitleResult {
   for (const r of COMBINE_QUANTITY_LIST) {
     const rMatch = r.exec(title)?.groups;
     if (rMatch?.quantity && rMatch?.quantity_2) {
-      quantity = parseInt(rMatch.quantity) * parseInt(rMatch.quantity_2);
+      quantity = parseInt(rMatch.quantity, 10) * parseInt(rMatch.quantity_2, 10);
       break;
     }
   }
@@ -197,7 +197,7 @@ export function parseTitleWithPrice(title: string, price: number): ParseTitlePri
     quantity_price_display: null,
   };
 
-  if ((!res.quantity || res.quantity == 1) && !units.length) {
+  if ((!res.quantity || res.quantity === 1) && !units.length) {
     return null;
   }
   for (const u of units) {

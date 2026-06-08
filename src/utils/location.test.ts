@@ -1,7 +1,6 @@
 import { describe, it } from "node:test";
-import { expect } from "playwright/test";
-
 import { jsdomHook } from "@tests/test_utils/jsdom/hooks";
+import { expect } from "playwright/test";
 import { matchLocation } from "./location";
 
 describe("matchLocation", () => {

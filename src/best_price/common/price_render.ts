@@ -39,7 +39,7 @@ export function renderBestPrice(
     wrapEl.style.margin = "5px";
     wrapEl.style.width = "fit-content";
     for (const [k, v] of entries(extraStyle || {})) {
-      if (typeof v == "string") {
+      if (typeof v === "string") {
         wrapEl.style[k] = v;
       }
     }

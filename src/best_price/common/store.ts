@@ -31,7 +31,7 @@ export function readDataFromElement(el: HTMLElement): DataInfoType {
     .map(([k, v]) => {
       if (k.startsWith(PREFIX)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
+        return [k.replace(RegExp(`^${PREFIX}`), ""), JSON.parse(v || "")];
       }
       return [null, null];
     })
@@ -47,7 +47,7 @@ export function loadParsedTitleFromElement(cardEl: HTMLElement): ParseTitlePrice
     .map(([k, v]) => {
       if (k.startsWith(PREFIX)) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return [k.replace(RegExp("^" + PREFIX), ""), JSON.parse(v || "")];
+        return [k.replace(RegExp(`^${PREFIX}`), ""), JSON.parse(v || "")];
       }
       return [null, null];
     })

@@ -1,6 +1,5 @@
 import { waitForNetworkIdle } from "@tests/jsdom/helpers";
 import { expect, test } from "../rtfox_test";
-import { asyncSleep } from "../helpers";
 
 test.describe("detection", async () => {
   test.skip("browserscan bot-detection", async ({ page }) => {

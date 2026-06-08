@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import path from "node:path";
 import type { Page } from "playwright";
 import type { AutoScrollOptions } from "../e2e/helpers";
