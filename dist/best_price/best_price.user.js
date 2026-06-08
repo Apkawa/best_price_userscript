@@ -19,6 +19,7 @@
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
 // @downloadURL  https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price.user.js
 // @updateURL    https://github.com/Apkawa/best_price_userscript/raw/master/dist/best_price.user.js
+// @version      0.5.19
 // ==/UserScript==
 // src/utils/dom.ts
 function getElementByXpath(xpath, root = document) {

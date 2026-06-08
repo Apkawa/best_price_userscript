@@ -30,6 +30,7 @@ export function getExtraInfo(srcPath: string, opts: GetExtraInfoOpts = {}) {
     downloadURL: downloadUrl,
     updateURL: downloadUrl,
     license: packageJson.license,
+    version: packageJson.version,
   };
   return bannerMeta;
 }
