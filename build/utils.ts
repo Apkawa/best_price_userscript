@@ -4,14 +4,19 @@ import type { PackageJson } from "type-fest";
 
 const packageJson: PackageJson = require("../package.json");
 
-export function getExtraInfo(srcPath: string) {
+export interface GetExtraInfoOpts {
+  downloadSuffix?: string;
+}
+
+export function getExtraInfo(srcPath: string, opts: GetExtraInfoOpts = {}) {
+  const { downloadSuffix = "/raw/master/dist/" } = opts;
   const name = path.basename(srcPath, ".ts");
   const homepage = packageJson.homepage;
   let supportUrl = packageJson.bugs;
   if (typeof supportUrl !== "string") {
     supportUrl = supportUrl?.url;
   }
-  const downloadUrl = `${packageJson.repository}/raw/master/dist/${name}.js`;
+  const downloadUrl = `${packageJson.repository}${downloadSuffix}${name}.js`;
   let author = packageJson.author;
   if (typeof author !== "string") {
     author = author?.name;
@@ -29,15 +34,27 @@ export function getExtraInfo(srcPath: string) {
   return bannerMeta;
 }
 
-export function buildUserScriptMeta(src_path: string) {
+export interface BannerMeta {
+  [key: string]: string;
+}
+
+export interface BuildUserScriptMetaOpts {
+  bannerMetaOverride?: BannerMeta;
+  downloadSuffix?: string;
+}
+
+export function buildUserScriptMeta(src_path: string, opts: BuildUserScriptMetaOpts = {}) {
+  const { bannerMetaOverride, downloadSuffix } = opts;
+
   let text = fs
     .readFileSync(src_path, "utf-8")
     .replace(/(==\/UserScript==)[\s\S]+$/, "$1")
     .replace(/^.*==\/UserScript==.*$/gm, "");
-  const extraInfo = getExtraInfo(src_path);
+  const extraInfo = getExtraInfo(src_path, { downloadSuffix });
+
   // console.log(extraInfo);
   const columnWidth = 13;
-  for (const [k, v] of Object.entries(extraInfo)) {
+  for (const [k, v] of Object.entries({ ...extraInfo, ...bannerMetaOverride })) {
     const re = RegExp(`^//.*@${k}\\b.*$`, "gm");
     let f_k = `@${k}`;
     f_k += Array(columnWidth - f_k.length)
