@@ -17,9 +17,9 @@
 // @homepage     https://github.com/Apkawa/best_price_userscript
 // @homepageURL  https://github.com/Apkawa/best_price_userscript
 // @supportURL   https://github.com/Apkawa/best_price_userscript/issues
-// @downloadURL  https://gitverse.ru/api/repos/apkawa/best_price_userscript/raw/branch/release/release/best_price.user.js
-// @updateURL    https://gitverse.ru/api/repos/apkawa/best_price_userscript/raw/branch/release/release/best_price.user.js
-// @version      0.5.20
+// @downloadURL  https://gitverse.ru/api/repos/apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js
+// @updateURL    https://gitverse.ru/api/repos/apkawa/best_price_userscript/raw/branch/release/release/best_price/best_price.user.js
+// @version      0.5.21
 // ==/UserScript==
 // src/utils/dom.ts
 function getElementByXpath(xpath, root = document) {
