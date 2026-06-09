@@ -17,11 +17,14 @@ export async function asyncSleep(delay: number): Promise<true> {
 }
 
 export async function prepareAndGoTo(page: Page, url: string, options?: WaitForOptions) {
-  const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
-  page.setDefaultTimeout(defaultTimeout);
-  page.setDefaultNavigationTimeout(defaultTimeout);
-  await page.goto(url, { ...options });
-  await page.addScriptTag({ path: USERSCRIPT_PATH });
+  await page.addInitScript({ path: USERSCRIPT_PATH });
+  // const defaultTimeout = Number(process.env.PUPPETEER_TIMEOUT || 10000);
+  // page.setDefaultTimeout(defaultTimeout);
+  // page.setDefaultNavigationTimeout(defaultTimeout);
+  await page.goto(url, {
+    waitUntil: "domcontentloaded",
+    ...options,
+  });
 }
 
 interface ElementInfo extends Pick<Element, "textContent" | "outerHTML"> {

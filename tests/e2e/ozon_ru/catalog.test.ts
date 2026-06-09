@@ -1,10 +1,12 @@
-import { expect, test } from "playwright/test";
+// import { expect, test } from "playwright/test";
+import { expect, test } from "../rtfox_test";
 
 import {
   prepareAndGoTo,
   waitForSelectorAndGetElementInfo,
   waitForSelectorAndGetTextContent,
 } from "../helpers";
+import { Page } from "playwright";
 
 test.describe("ozon.ru", () => {
   test.describe("Check catalog", () => {
@@ -13,6 +15,7 @@ test.describe("ozon.ru", () => {
     });
     test("Page content", async ({ page }) => {
       const html = await page.content();
+      // await page.pause()
       expect(await page.title()).toMatch("OZON");
       expect(html).toMatch("OZON");
     });
@@ -25,7 +28,7 @@ test.describe("ozon.ru", () => {
     test("Checks price", async ({ page }) => {
       const el = await waitForSelectorAndGetElementInfo(
         page,
-        ".widget-search-result-container .GM-best-price",
+        "div[data-widget='tileGridDesktop'] .GM-best-price",
       );
       expect(el?.textContent).toBeTruthy();
     });

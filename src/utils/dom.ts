@@ -49,11 +49,11 @@ export function markElementHandled(
 
 export type StopCallback = () => void;
 
-export function waitElement(
+export async function waitElement(
   match: (el: HTMLElement) => boolean,
   callback: () => void,
-  root: Optional<HTMLElement> = document.body,
-): StopCallback {
+  root?: HTMLElement,
+): Promise<StopCallback> {
   // FIXME Fix for jsdom
   const observer = new MutationObserver((mutations) => {
     let matchFlag = false;
@@ -91,32 +91,39 @@ export function waitElement(
     isStarted = false;
   }
 
-  _start();
-  return () => {
+  return new Promise((resolve) => {
     // stop watching using:
-    _stop();
-  };
+    if (document.body) {
+      _start();
+      resolve(() => _stop());
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        _start();
+        resolve(() => _stop());
+      });
+    }
+  });
 }
 
 export interface WaitCompletePageOptions {
-  root?: Optional<HTMLElement>;
+  root?: HTMLElement;
   runOnce?: boolean;
   sync?: boolean;
   delay?: number;
 }
 
-export function waitCompletePage(
+export async function waitCompletePage(
   callback: () => void,
   options: WaitCompletePageOptions = {},
-): StopCallback {
-  const { root = document.body, runOnce = true, sync = true, delay = 150 } = options;
+): Promise<StopCallback> {
   // На случай того что страница уже давно загружена
   // let t: NodeJS.Timeout = setTimeout(callback, delay);
   let t: NodeJS.Timeout;
 
   let lock = false;
-  const run = (): StopCallback => {
-    const stop = waitElement(
+  const run = async (): Promise<StopCallback> => {
+    const { root, runOnce = true, sync = true, delay = 150 } = options;
+    const stop = await waitElement(
       () => true,
       () => {
         if (t) clearTimeout(t);
@@ -128,7 +135,9 @@ export function waitCompletePage(
           }
           callback();
           if (sync && !runOnce) {
-            setTimeout(run, delay);
+            setTimeout(async () => {
+              await run();
+            }, delay);
           }
           lock = false;
         }, delay);
@@ -138,7 +147,15 @@ export function waitCompletePage(
     return stop;
   };
 
-  return run();
+  return new Promise((resolve) => {
+    if (document.body) {
+      resolve(run());
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        resolve(run());
+      });
+    }
+  });
 }
 
 export function E(

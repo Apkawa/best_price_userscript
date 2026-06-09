@@ -22,7 +22,7 @@ test.describe("detection", async () => {
       waitUntil: "domcontentloaded",
     });
     await waitForNetworkIdle(page, { maxInflightRequests: 0 });
-    // await page.pause();
+    await page.pause();
     await expect(page).toHaveTitle("OZON маркетплейс – миллионы товаров по выгодным ценам");
   });
 });

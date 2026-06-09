@@ -52,7 +52,7 @@ export function initCatalog(): void {
     if (catalogWrapEl && buttonWrapEl) {
       initReorderCatalog(catalogWrapEl, buttonWrapEl);
     }
-    // Pagination
+    // Pagination copy to top. Optional.
     const catalogEl = document.querySelector<HTMLElement>(".catalog-view__main");
     const paginationRootWrap = ElementGetOrCreate(catalogEl, {
       pos: "before",

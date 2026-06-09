@@ -1,4 +1,4 @@
-import { E, entries, GM_addStyle, values } from "../../utils";
+import { E, entries, GM_addStyle, values, waitCompletePage } from "../../utils";
 import { sort } from "../../utils/sort";
 import { BEST_PRICE_WRAP_CLASS_NAME, MAX_NUMBER, ORDER_NAME_LOCAL_STORAGE } from "./constants";
 import { loadParsedTitleFromElement, storeDataToElement } from "./store";
@@ -14,7 +14,10 @@ border: 1px solid gray !important; padding: 5px !important; margin: 3px !importa
   );
 }
 
-addStyles();
+(async () =>
+  waitCompletePage(() => {
+    addStyles();
+  }))();
 
 interface CatalogRecord extends Record<string, unknown> {
   initial_order: number;

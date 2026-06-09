@@ -26,7 +26,7 @@ function getElementByXpath(xpath, root = document) {
   const e = document.evaluate(xpath, root, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
   return e && e;
 }
-function waitElement(match, callback, root = document.body) {
+async function waitElement(match, callback, root) {
   const observer = new MutationObserver((mutations) => {
     let matchFlag = false;
     mutations.forEach((mutation) => {
@@ -60,17 +60,24 @@ function waitElement(match, callback, root = document.body) {
     observer.disconnect();
     isStarted = false;
   }
-  _start();
-  return () => {
-    _stop();
-  };
+  return new Promise((resolve) => {
+    if (document.body) {
+      _start();
+      resolve(() => _stop());
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        _start();
+        resolve(() => _stop());
+      });
+    }
+  });
 }
-function waitCompletePage(callback, options = {}) {
-  const { root = document.body, runOnce = true, sync = true, delay = 150 } = options;
+async function waitCompletePage(callback, options = {}) {
   let t;
   let lock = false;
-  const run = () => {
-    const stop = waitElement(() => true, () => {
+  const run = async () => {
+    const { root, runOnce = true, sync = true, delay = 150 } = options;
+    const stop = await waitElement(() => true, () => {
       if (t)
         clearTimeout(t);
       t = setTimeout(() => {
@@ -82,14 +89,24 @@ function waitCompletePage(callback, options = {}) {
         }
         callback();
         if (sync && !runOnce) {
-          setTimeout(run, delay);
+          setTimeout(async () => {
+            await run();
+          }, delay);
         }
         lock = false;
       }, delay);
     }, root);
     return stop;
   };
-  return run();
+  return new Promise((resolve) => {
+    if (document.body) {
+      resolve(run());
+    } else {
+      document.addEventListener("DOMContentLoaded", () => {
+        resolve(run());
+      });
+    }
+  });
 }
 function E(tag, attributes = {}, ...children) {
   const element = document.createElement(tag);
@@ -271,7 +288,9 @@ border: 1px solid gray !important; padding: 5px !important; margin: 3px !importa
 `);
   GM_addStyle(`button.${BEST_ORDER_BUTTON_CLASS_NAME}.active { border: 2px solid red !important; }`);
 }
-addStyles();
+(async () => waitCompletePage(() => {
+  addStyles();
+}))();
 function initReorderCatalog(catalogRoot, buttonRoot) {
   const buttonWrap = buttonRoot;
   if (!buttonWrap)
@@ -680,12 +699,12 @@ function initCatalog() {
     paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, { pos: "before" });
   }
 }
-(() => {
+(async () => {
   if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) {
     return;
   }
   console.log("OZON.ru");
-  waitCompletePage(() => {
+  await waitCompletePage(() => {
     if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) {
       initProductPage();
     }

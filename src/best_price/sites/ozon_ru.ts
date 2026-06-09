@@ -120,13 +120,13 @@ export function initCatalog(): void {
     paginatorWrap && copyElementToNewRoot(paginator, paginatorWrap, { pos: "before" });
   }
 }
-(() => {
+(async () => {
   if (!matchLocation("^https://(www\\.|)ozon\\.ru/.*")) {
     return;
   }
   console.log("OZON.ru");
 
-  waitCompletePage(
+  await waitCompletePage(
     () => {
       if (matchLocation("^https://(www\\.|)ozon\\.ru/product/.*")) {
         initProductPage();
