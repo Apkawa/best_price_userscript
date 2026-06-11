@@ -24,7 +24,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-        bun-version: latest
+          bun-version: latest
 
       - name: cache dependencies
         uses: actions/cache@v4
@@ -70,7 +70,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
-        bun-version: latest
+          bun-version: latest
 
       - name: Install deps
         run: |
