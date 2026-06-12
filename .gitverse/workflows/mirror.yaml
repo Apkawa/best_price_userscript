@@ -1,0 +1,23 @@
+name: Sync from gitverse to github
+
+on:
+  schedule:
+    # Каждый час
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          # Fetches all history for branches and tags
+          fetch-depth: 0
+
+      - name: Mirror push
+        run: |
+          git fetch -p origin
+          git remote add mirror https://${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+          git push mirror --mirror

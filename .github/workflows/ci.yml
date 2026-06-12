@@ -16,13 +16,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
+
       - name: Use Node.js 24.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
           node-version: 24.x
+
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -60,15 +62,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: Use Node.js 24.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
           node-version: 24.x
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
 
@@ -99,7 +101,6 @@ jobs:
           echo $RELEASE_VERSION
           echo ${{ steps.extract_tag.outputs.tag }}
           echo ${{ steps.extract_branch.outputs.branch }}
-
 
       # Если мастер - деплоим в корень
       - name: Set target folder
