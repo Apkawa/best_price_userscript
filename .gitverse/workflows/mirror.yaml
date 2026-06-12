@@ -19,5 +19,5 @@ jobs:
       - name: Mirror push
         run: |
           git fetch -p origin
-          git remote add mirror https://${{ secrets.ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
+          git remote add mirror https://${{ secrets.GH_ACCESS_TOKEN }}@github.com/${{ github.repository }}.git
           git push mirror --mirror
