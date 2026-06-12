@@ -137,7 +137,7 @@ jobs:
         if: success()
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           branch: release # The branch the action should deploy to.
           folder: dist # The folder the action should deploy.
           clean: true # Automatically remove deleted files from the deploy branch
